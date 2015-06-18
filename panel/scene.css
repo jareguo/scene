@@ -1,5 +1,6 @@
 :host {
     @apply(--layout-vertical);
+
     overflow: auto;
 }
 
