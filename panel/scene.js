@@ -15,6 +15,7 @@ Editor.registerPanel( 'scene.panel', {
     },
 
     _onResize: function ( event ) {
+        // this.$.view.send('resize')
         // var bcr = this.$.webviewWrapper.getBoundingClientRect();
         // this.$.view.setAttribute('minwidth', bcr.width);
         // this.$.view.setAttribute('minheight', bcr.height);

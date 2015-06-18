@@ -12,7 +12,9 @@
 
         // init engine
         var canvasEL = document.getElementById('canvas');
-        var bcr = canvasEL.getBoundingClientRect();
+        var bcr = document.body.getBoundingClientRect();
+
+        //
         Fire.Engine.init({
             width: bcr.width,
             height: bcr.height,
@@ -21,6 +23,10 @@
             // TODO:
         });
 
+        window.onresize = function () {
+            bcr = document.body.getBoundingClientRect();
+            Fire.Engine.resize( bcr.width, bcr.height );
+        };
     }, function ( err ) {
         Editor.error( 'Failed to load %s. message: %s', runtimeUrl, err.message );
     });
