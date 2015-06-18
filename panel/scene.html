@@ -1,8 +1,19 @@
+<link rel="import" href="packages://ui-kit/widget/index.html">
+
 <dom-module id="editor-scene">
     <link rel="import" type="css" href="scene.css">
 
     <template>
-        <h1>Scene</h1>
+        <editor-toolbar></editor-toolbar>
+        <div class="wrapper flex-1">
+            <div class="border fit">
+                <webview id="view" src="webview/index.html"
+                    nodeintegration
+                    disablewebsecurity
+                    autosize="on"
+                ></webview>
+            </div>
+        </div>
     </template>
 </dom-module>
 
