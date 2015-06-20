@@ -1,6 +1,6 @@
 (function () {
     Editor.projectInfo = Editor.remote.projectInfo;
-    var libraryPath = Editor.remote.assetdb.library;
+    Editor.libraryPath = Editor.remote.libraryPath;
 
     // init engine-framework
     Editor.require('app://engine-framework');
@@ -9,7 +9,7 @@
     var runtimeUrl = 'app://runtime/runtime-' + Editor.projectInfo.runtime + '/index.html';
     Polymer.Base.importHref( runtimeUrl, function ( event ) {
         // init asset library
-        Fire.AssetLibrary.init(libraryPath);
+        Fire.AssetLibrary.init(Editor.libraryPath);
 
         // init engine
         var canvasEL = document.getElementById('canvas');
