@@ -4,7 +4,11 @@
     <link rel="import" type="css" href="scene.css">
 
     <template>
-        <editor-toolbar></editor-toolbar>
+        <editor-toolbar>
+            <editor-button on-click="reload">
+                <i class="fa fa-rotate-right"></i>
+            </editor-button>
+        </editor-toolbar>
         <div class="wrapper flex-1">
             <div class="border fit">
                 <webview id="view" src="webview/index.html"

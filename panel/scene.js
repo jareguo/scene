@@ -9,6 +9,18 @@ Editor.registerPanel( 'scene.panel', {
 
     ready: function () {
     },
+
+    reload: function () {
+        this.$.view.reloadIgnoringCache();
+    },
+
+    'scene:play': function () {
+        this.$.view.send('play');
+    },
+
+    'scene:stop': function () {
+        this.$.view.send('stop');
+    },
 });
 
 })();

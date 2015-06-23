@@ -22,6 +22,8 @@
       "width": "auto",
       "height": "auto",
       "messages": [
+        "scene:play",
+        "scene:stop"
       ],
       "profiles": {
         "local": {

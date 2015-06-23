@@ -2,8 +2,22 @@
     Editor.projectInfo = Editor.remote.projectInfo;
     Editor.libraryPath = Editor.remote.libraryPath;
 
+    if ( !Editor.assets ) Editor.assets = {};
+    if ( !Editor.metas ) Editor.metas = {};
+    if ( !Editor.inspectors ) Editor.inspectors = {};
+
+    // init ipc messages
+    require('./ipc');
+
     // init engine-framework
     Editor.require('app://engine-framework');
+
+    // init canvas-assets
+    // TODO: do we really need meta in scene-webview ???
+    var Meta = Editor.require('app://asset-db/lib/meta');
+    Editor.metas.asset = Meta.AssetMeta;
+    Editor.metas.folder = Meta.FolderMeta;
+    Editor.require('packages://canvas-assets/init');
 
     // init runtime
     var runtimeUrl = 'app://runtime/runtime-' + Editor.projectInfo.runtime + '/index.html';
