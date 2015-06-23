@@ -15,6 +15,10 @@ Editor.registerPanel( 'scene.panel', {
         this.$.view.reloadIgnoringCache();
     },
 
+    openDevTools: function () {
+        this.$.view.openDevTools();
+    },
+
     'scene:play': function () {
         this.$.view.send('play');
     },
