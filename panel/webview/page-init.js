@@ -40,9 +40,18 @@
             // TODO:
         });
 
+        // debounce resize
+        var _resizeDebounceID = null;
         window.onresize = function () {
-            bcr = document.body.getBoundingClientRect();
-            Fire.Engine.resize( bcr.width, bcr.height );
+            // debounce write for 10ms
+            if ( _resizeDebounceID ) {
+                return;
+            }
+            _resizeDebounceID = setTimeout(function () {
+                _resizeDebounceID = null;
+                bcr = document.body.getBoundingClientRect();
+                Fire.Engine.resize( bcr.width, bcr.height );
+            }, 10);
         };
     }, function ( err ) {
         Editor.error( 'Failed to load %s. message: %s', runtimeUrl, err.message );
