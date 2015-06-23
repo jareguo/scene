@@ -28,6 +28,8 @@
         // init engine
         var canvasEL = document.getElementById('canvas');
         var bcr = document.body.getBoundingClientRect();
+        canvasEL.width  = bcr.width;
+        canvasEL.height = bcr.height;
 
         //
         Fire.Engine.init({
