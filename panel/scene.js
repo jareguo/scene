@@ -20,11 +20,13 @@ Editor.registerPanel( 'scene.panel', {
     },
 
     'scene:play': function () {
-        this.$.view.send('play');
+        this.$.loader.hidden = false;
+        this.$.view.send('scene:play');
     },
 
     'scene:stop': function () {
-        this.$.view.send('stop');
+        this.$.loader.hidden = false;
+        this.$.view.reloadIgnoringCache();
     },
 
     _onViewConsole: function ( event ) {
@@ -45,6 +47,15 @@ Editor.registerPanel( 'scene.panel', {
 
     _onViewIpc: function ( event ) {
         switch ( event.channel ) {
+            case 'scene:played':
+                this.$.loader.hidden = true;
+                break;
+            case 'scene:ready':
+                this.$.loader.hidden = true;
+                break;
+            case 'scene:error':
+                this.$.loader.hidden = true;
+                break;
         }
     },
 

@@ -1,9 +1,12 @@
 var Ipc = require('ipc');
 
-Ipc.on( 'play', function () {
-    Editor.log('start playing');
-});
-
-Ipc.on( 'stop', function () {
-    Editor.log('stop playing');
+Ipc.on('scene:play', function () {
+    Editor.playScene(function (err) {
+        if (err) {
+            Editor.error(err);
+        }
+        else {
+            Ipc.sendToHost('scene:played');
+        }
+    });
 });
