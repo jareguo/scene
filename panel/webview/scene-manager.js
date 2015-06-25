@@ -6,8 +6,17 @@ function enterEditMode (next) {
     next();
 }
 
+function testForNow () {
+    for (var i = 0; i < 10; i++) {
+        var sprite = new cc.Sprite('app://runtime/runtime-cocos2d-js/res/logo.png');
+        sprite.x = 57 * (i + 1);
+        sprite.y = cc._canvas.height / 2;
+        Fire.Engine.scene.addChild( sprite );
+    }
+}
+
 Editor.initScene = function (callback) {
-    var sceneJson = Editor.remote.currentStash; // a remote sync method
+    var sceneJson = Editor.remote.stashedScene; // a remote sync method
     if (sceneJson) {
         Async.waterfall(
             [
@@ -31,6 +40,7 @@ Editor.initScene = function (callback) {
         );
     }
     else {
+        testForNow();
         enterEditMode(callback);
     }
 };
