@@ -20,11 +20,21 @@ Editor.registerPanel( 'scene.panel', {
     },
 
     'scene:play': function () {
-        this.$.view.send('play');
+        this.$.loader.hidden = false;
+        this.$.view.send('scene:play');
+    },
+
+    'scene:played': function () {
+        this.$.loader.hidden = true;
     },
 
     'scene:stop': function () {
-        this.$.view.send('stop');
+        this.$.loader.hidden = false;
+        this.$.view.reloadIgnoringCache();
+    },
+
+    'scene:ready': function () {
+        this.$.loader.hidden = true;
     },
 
     _onViewConsole: function ( event ) {
@@ -44,7 +54,14 @@ Editor.registerPanel( 'scene.panel', {
     },
 
     _onViewIpc: function ( event ) {
-        switch ( event.channel ) {
+        var args = Array.prototype.slice.call(arguments, 1);
+        var method = this[event.channel];
+        if (typeof method === 'function') {
+            method.apply(this, args);
+        }
+        else {
+            switch ( event.channel ) {
+            }
         }
     },
 
