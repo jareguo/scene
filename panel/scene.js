@@ -8,15 +8,6 @@ Editor.registerPanel( 'scene.panel', {
     },
 
     ready: function () {
-        this.viewIpc = new (require('events').EventEmitter)();
-
-        this.viewIpc.on('scene:played', function () {
-            this.$.loader.hidden = true;
-        }.bind(this));
-
-        this.viewIpc.on('scene:ready', function () {
-            this.$.loader.hidden = true;
-        }.bind(this));
     },
 
     reload: function () {
@@ -55,10 +46,13 @@ Editor.registerPanel( 'scene.panel', {
     },
 
     _onViewIpc: function ( event ) {
-        var args = Array.prototype.slice.call(arguments);
-        args[0] = event.channel;
-        if (this.viewIpc) {
-            this.viewIpc.emit.apply(this.viewIpc, args);
+        switch ( event.channel ) {
+            case 'scene:played':
+                this.$.loader.hidden = true;
+                break;
+            case 'scene:ready':
+                this.$.loader.hidden = true;
+                break;
         }
     },
 
