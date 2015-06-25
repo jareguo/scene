@@ -22,11 +22,10 @@
                     on-ipc-message="_onViewIpc"
                     on-did-finish-load="_onViewDidFinishLoad"
                 ></webview>
-                <editor-loader id="loader"
-                    mask
-                    text="Loading"
-                >
-                </editor-loader>
+                <editor-loader id="loader" mask text="Loading"></editor-loader>
+                <div id="dropArea" class="fit" hidden
+                    on-dragover="_onDragOver"
+                ></div>
             </div>
         </div>
     </template>

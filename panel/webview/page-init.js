@@ -1,6 +1,7 @@
 (function () {
     Editor.projectInfo = Editor.remote.projectInfo;
     Editor.libraryPath = Editor.remote.libraryPath;
+    Editor.importPath = Editor.remote.importPath;
 
     if ( !Editor.assets ) Editor.assets = {};
     if ( !Editor.metas ) Editor.metas = {};
@@ -24,59 +25,7 @@
 
     // init runtime
     var runtimeUrl = 'app://runtime/runtime-' + Editor.projectInfo.runtime + '/index.html';
-    Polymer.Base.importHref( runtimeUrl, function ( event ) {
-
-        // init asset library
-        Fire.AssetLibrary.init(Editor.libraryPath);
-
-        // init canvas
-        var canvasEL = document.getElementById('canvas');
-        var bcr = document.body.getBoundingClientRect();
-        canvasEL.width  = bcr.width;
-        canvasEL.height = bcr.height;
-
-        var initOptions = {
-            width: bcr.width,
-            height: bcr.height,
-            canvas: canvasEL,
-        };
-
-        // init engine
-        Fire.Engine.init(initOptions, function () {
-            Editor.initScene(function (err) {
-                if (err) {
-                    Editor.error(err);
-                    Ipc.sendToHost('scene:error', err);
-                }
-                else {
-                    var Ipc = require('ipc');
-                    Ipc.sendToHost('scene:ready');
-                }
-            });
-        });
-
-        // debounce resize
-        var _resizeDebounceID = null;
-        window.onresize = function () {
-            // debounce write for 10ms
-            if ( _resizeDebounceID ) {
-                return;
-            }
-            _resizeDebounceID = setTimeout(function () {
-                _resizeDebounceID = null;
-                bcr = document.body.getBoundingClientRect();
-                Fire.Engine.resize( bcr.width, bcr.height );
-            }, 10);
-        };
-
-        //
-        window.addEventListener('beforeunload', function () {
-            if (Fire.Engine.isPlaying) {
-                Fire.Engine.stop();
-            }
-        });
-
-    }, function ( err ) {
+    Polymer.Base.importHref( runtimeUrl, null, function ( err ) {
         Editor.error( 'Failed to load %s. message: %s', runtimeUrl, err.message );
     });
 })();

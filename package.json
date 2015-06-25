@@ -23,7 +23,9 @@
       "height": "auto",
       "messages": [
         "scene:play",
-        "scene:stop"
+        "scene:stop",
+        "editor:dragstart",
+        "editor:dragend"
       ],
       "profiles": {
         "local": {

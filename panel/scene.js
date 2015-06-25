@@ -1,13 +1,24 @@
 (function () {
-var Util = require('util');
-
 Editor.registerPanel( 'scene.panel', {
     is: 'editor-scene',
+
+    behaviors: [ EditorUI.droppable ],
+
+    hostAttributes: {
+        'droppable': 'asset',
+    },
+
+    listeners: {
+        'drop-area-enter': '_onDropAreaEnter',
+        'drop-area-leave': '_onDropAreaLeave',
+        'drop-area-accept': '_onDropAreaAccept',
+    },
 
     properties: {
     },
 
     ready: function () {
+        this._initDroppable(this.$.dropArea);
     },
 
     reload: function () {
@@ -27,6 +38,14 @@ Editor.registerPanel( 'scene.panel', {
     'scene:stop': function () {
         this.$.loader.hidden = false;
         this.$.view.reloadIgnoringCache();
+    },
+
+    'editor:dragstart': function () {
+        this.$.dropArea.hidden = false;
+    },
+
+    'editor:dragend': function () {
+        this.$.dropArea.hidden = true;
     },
 
     _onViewConsole: function ( event ) {
@@ -61,6 +80,35 @@ Editor.registerPanel( 'scene.panel', {
 
     _onViewDidFinishLoad: function ( event ) {
         this.$.loader.hidden = true;
+    },
+
+    _onDropAreaEnter: function ( event ) {
+        event.stopPropagation();
+    },
+
+    _onDropAreaLeave: function ( event ) {
+        event.stopPropagation();
+    },
+
+    _onDropAreaAccept: function ( event ) {
+        event.stopPropagation();
+
+        Editor.Selection.cancel();
+        this.$.view.send( 'scene:drop',
+                          event.detail.dragItems,
+                          event.detail.dragType,
+                          event.detail.offsetX,
+                          event.detail.offsetY
+                        );
+    },
+
+    _onDragOver: function ( event ) {
+        event.preventDefault();
+
+        if ( EditorUI.DragDrop.type( event.dataTransfer ) === 'asset' ) {
+            EditorUI.DragDrop.allowDrop( event.dataTransfer, true );
+            EditorUI.DragDrop.updateDropEffect( event.dataTransfer, 'copy' );
+        }
     },
 });
 
