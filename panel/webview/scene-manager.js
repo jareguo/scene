@@ -21,7 +21,7 @@ Editor.initScene = function (callback) {
         Async.waterfall(
             [
                 function (next) {
-                    // 依赖资源由 SceneWrapper.prototype.create 加载，这里只需要反序列化出来就行
+                    // Assets will be loaded by SceneWrapper.prototype.create, here we just deserialize the scene graph
                     var scene = Fire.deserialize(sceneJson);
                     next(null, scene);
                 },
