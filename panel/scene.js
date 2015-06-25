@@ -8,6 +8,15 @@ Editor.registerPanel( 'scene.panel', {
     },
 
     ready: function () {
+        this.viewIpc = new (require('events').EventEmitter)();
+
+        this.viewIpc.on('scene:played', function () {
+            this.$.loader.hidden = true;
+        }.bind(this));
+
+        this.viewIpc.on('scene:ready', function () {
+            this.$.loader.hidden = true;
+        }.bind(this));
     },
 
     reload: function () {
@@ -24,17 +33,9 @@ Editor.registerPanel( 'scene.panel', {
         this.$.view.send('scene:play');
     },
 
-    'scene:played': function () {
-        this.$.loader.hidden = true;
-    },
-
     'scene:stop': function () {
         this.$.loader.hidden = false;
         this.$.view.reloadIgnoringCache();
-    },
-
-    'scene:ready': function () {
-        this.$.loader.hidden = true;
     },
 
     _onViewConsole: function ( event ) {
@@ -54,14 +55,10 @@ Editor.registerPanel( 'scene.panel', {
     },
 
     _onViewIpc: function ( event ) {
-        var args = Array.prototype.slice.call(arguments, 1);
-        var method = this[event.channel];
-        if (typeof method === 'function') {
-            method.apply(this, args);
-        }
-        else {
-            switch ( event.channel ) {
-            }
+        var args = Array.prototype.slice.call(arguments);
+        args[0] = event.channel;
+        if (this.viewIpc) {
+            this.viewIpc.emit.apply(this.viewIpc, args);
         }
     },
 
