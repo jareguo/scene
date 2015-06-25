@@ -53,6 +53,9 @@ Editor.registerPanel( 'scene.panel', {
             case 'scene:ready':
                 this.$.loader.hidden = true;
                 break;
+            case 'scene:error':
+                this.$.loader.hidden = true;
+                break;
         }
     },
 

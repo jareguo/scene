@@ -46,6 +46,7 @@
             Editor.initScene(function (err) {
                 if (err) {
                     Editor.error(err);
+                    Ipc.sendToHost('scene:error', err);
                 }
                 else {
                     var Ipc = require('ipc');
