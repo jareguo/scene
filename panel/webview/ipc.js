@@ -25,19 +25,22 @@ Ipc.on('scene:drop', function ( uuids, type, x, y ) {
                     return;
                 }
 
-                next ();
+                next ( null, null );
             },
 
             function ( node, next ) {
-                // var mousePos = new Fire.Vec2(x, y);
-                // // var worldMousePos = this.renderContext.camera.screenToWorld(mousePos);
-                // var worldMousePos = mousePos;
-                // node.worldPosition = worldMousePos;
-                node.x = x;
-                node.y = cc._canvas.height-y;
-                Fire.Engine.scene.addChild( node );
+                if ( node ) {
+                    // var mousePos = new Fire.Vec2(x, y);
+                    // // var worldMousePos = this.renderContext.camera.screenToWorld(mousePos);
+                    // var worldMousePos = mousePos;
+                    // node.worldPosition = worldMousePos;
+                    node.x = x;
+                    node.y = cc._canvas.height-y;
+                    Fire.node(node).parent = Fire.Engine.getCurrentScene();
 
-                // TODO: Editor.Selection.select( 'node', ent.id, true, true );
+                    // TODO: Editor.Selection.select( 'node', ent.id, true, true );
+                }
+
                 next ();
             },
 
