@@ -43,7 +43,7 @@ Ipc.on('scene:drop', function ( uuids, type, x, y ) {
 
         ], function ( err ) {
             if ( err ) {
-                Editor.failed( 'Failed to drop asset %s, message: %s', uuid, err );
+                Editor.failed( 'Failed to drop asset %s, message: %s', uuid, err.stack );
                 return;
             }
         });
