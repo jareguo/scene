@@ -34,9 +34,10 @@ Ipc.on('scene:drop', function ( uuids, type, x, y ) {
                     // // var worldMousePos = this.renderContext.camera.screenToWorld(mousePos);
                     // var worldMousePos = mousePos;
                     // node.worldPosition = worldMousePos;
-                    node.x = x;
-                    node.y = cc._canvas.height-y;
-                    Fire.node(node).parent = Fire.Engine.getCurrentScene();
+
+                    var fireNode = Fire.node(node);
+                    fireNode.position = Fire.v2( x, cc._canvas.height-y );
+                    fireNode.parent = Fire.engine.getCurrentScene();
 
                     // TODO: Editor.Selection.select( 'node', ent.id, true, true );
                 }

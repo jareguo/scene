@@ -30,7 +30,7 @@ Polymer( {
             canvas: canvasEL,
         };
 
-        Fire.Engine.init(initOptions, function () {
+        Fire.engine.init(initOptions, function () {
             Editor.initScene(function (err) {
                 if (err) {
                     Editor.error(err);
@@ -44,8 +44,8 @@ Polymer( {
 
         // beforeunload event
         window.addEventListener('beforeunload', function ( event ) {
-            if ( Fire.Engine.isPlaying ) {
-                Fire.Engine.stop();
+            if ( Fire.engine.isPlaying ) {
+                Fire.engine.stop();
             }
         });
 
@@ -60,7 +60,7 @@ Polymer( {
             _resizeDebounceID = setTimeout(function () {
                 _resizeDebounceID = null;
                 var bcr = self.getBoundingClientRect();
-                Fire.Engine.resize( bcr.width, bcr.height );
+                Fire.engine.resize( bcr.width, bcr.height );
             }, 10);
         });
     },

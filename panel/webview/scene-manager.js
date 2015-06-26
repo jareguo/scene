@@ -11,7 +11,7 @@ function testForNow () {
         var sprite = new cc.Sprite('app://runtime/runtime-cocos2d-js/res/logo.png');
         sprite.x = 57 * (i + 1);
         sprite.y = cc._canvas.height / 2;
-        Fire.Engine.scene.addChild( sprite );
+        Fire.engine.scene.addChild( sprite );
     }
 }
 
@@ -26,12 +26,12 @@ Editor.initScene = function (callback) {
                     next(null, scene);
                 },
                 function (scene, next) {
-                    Fire.Engine._initScene(scene, function () {
+                    Fire.engine._initScene(scene, function () {
                         next(null, scene);
                     });
                 },
                 function (scene, next) {
-                    Fire.Engine._launchScene(scene);
+                    Fire.engine._launchScene(scene);
                     next();
                 },
                 enterEditMode,
@@ -47,7 +47,7 @@ Editor.initScene = function (callback) {
 
 
 function dumpScene (next) {
-    var scene = Fire.Engine.getCurrentScene();
+    var scene = Fire.engine.getCurrentScene();
     var sceneJson = Editor.serialize(scene, {stringify: false});
     next(null, sceneJson);
 }
@@ -60,7 +60,7 @@ function stashScene (jsonObj, next) {
 
 function enterGameMode (next) {
     // reset scene camera
-    var scene = Fire.Engine.getCurrentScene();
+    var scene = Fire.engine.getCurrentScene();
     scene.position = Fire.Vec2.zero;
     scene.scale = Fire.Vec2.one;
     // TODO - clear selection (gizmo)
@@ -74,7 +74,7 @@ Editor.playScene = function (callback) {
             stashScene,
             enterGameMode,
             function (next) {
-                Fire.Engine.play();
+                Fire.engine.play();
                 next();
             },
         ],
