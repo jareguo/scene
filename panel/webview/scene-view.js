@@ -60,7 +60,7 @@ Polymer( {
             _resizeDebounceID = setTimeout(function () {
                 _resizeDebounceID = null;
                 var bcr = self.getBoundingClientRect();
-                Fire.engine.resize( bcr.width, bcr.height );
+                Fire.engine.canvasSize = new Fire.v2( bcr.width, bcr.height );
             }, 10);
         });
     },

@@ -1,11 +1,6 @@
 (function () {
-    Editor.projectInfo = Editor.remote.projectInfo;
-    Editor.libraryPath = Editor.remote.libraryPath;
-    Editor.importPath = Editor.remote.importPath;
-
-    if ( !Editor.assets ) Editor.assets = {};
-    if ( !Editor.metas ) Editor.metas = {};
-    if ( !Editor.inspectors ) Editor.inspectors = {};
+    // mixin Editor for canvas-studio
+    Editor.require('app://canvas-studio/page/editor-init');
 
     // init scene manager
     require('./scene-manager');

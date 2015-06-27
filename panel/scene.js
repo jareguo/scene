@@ -48,6 +48,10 @@ Editor.registerPanel( 'scene.panel', {
         this.$.dropArea.hidden = true;
     },
 
+    'editor:state-changed': function ( name, value ) {
+        this.$.view.send('editor:state-changed', name, value);
+    },
+
     _onViewConsole: function ( event ) {
         switch ( event.level ) {
         case 0:

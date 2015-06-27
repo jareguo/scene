@@ -25,7 +25,8 @@
         "scene:play",
         "scene:stop",
         "editor:dragstart",
-        "editor:dragend"
+        "editor:dragend",
+        "editor:state-changed"
       ],
       "profiles": {
         "local": {
