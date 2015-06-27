@@ -4,11 +4,11 @@ var Async = require('async');
 Ipc.on('scene:play', function () {
     Editor.playScene(function (err) {
         if (err) {
-            Editor.error(err);
+            Ipc.sendToHost('scene:play-error', err);
+            return;
         }
-        else {
-            Ipc.sendToHost('scene:played');
-        }
+
+        Ipc.sendToHost('scene:playing');
     });
 });
 

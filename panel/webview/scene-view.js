@@ -33,12 +33,11 @@ Polymer( {
         Fire.engine.init(initOptions, function () {
             Editor.initScene(function (err) {
                 if (err) {
-                    Editor.error(err);
-                    Ipc.sendToHost('scene:error', err);
+                    Ipc.sendToHost('scene:init-error', err);
+                    return;
                 }
-                else {
-                    Ipc.sendToHost('scene:ready');
-                }
+
+                Ipc.sendToHost('scene:ready');
             });
         });
 

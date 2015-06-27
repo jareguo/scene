@@ -18,11 +18,16 @@ Editor.registerPanel( 'scene.panel', {
     },
 
     ready: function () {
+        this._viewReady = false;
+        Editor.states['scene-initializing'] = true;
+
         this._initDroppable(this.$.dropArea);
     },
 
     reload: function () {
         this.$.loader.hidden = false;
+        Editor.states['scene-initializing'] = true;
+
         this.$.view.reloadIgnoringCache();
     },
 
@@ -32,11 +37,15 @@ Editor.registerPanel( 'scene.panel', {
 
     'scene:play': function () {
         this.$.loader.hidden = false;
-        this.$.view.send('scene:play');
+        Editor.states['scene-initializing'] = true;
+
+        this._sendToView('scene:play');
     },
 
     'scene:stop': function () {
         this.$.loader.hidden = false;
+        Editor.states['scene-initializing'] = true;
+
         this.$.view.reloadIgnoringCache();
     },
 
@@ -49,7 +58,42 @@ Editor.registerPanel( 'scene.panel', {
     },
 
     'editor:state-changed': function ( name, value ) {
-        this.$.view.send('editor:state-changed', name, value);
+        this._sendToView('editor:state-changed', name, value);
+    },
+
+    _sendToView () {
+        if ( this._viewReady ) {
+            this.$.view.send.apply( this.$.view, arguments );
+        }
+    },
+
+    // view events
+
+    _onViewDomReady: function ( event ) {
+        this._viewReady = true;
+    },
+
+    _onViewDidFinishLoad: function ( event ) {
+    },
+
+    _onViewDidFailLoad: function ( event ) {
+        Editor.error('Failed loading scene view, Error Code: %s, Message: %s',
+                     event.errorCode,
+                     event.errorDescription );
+    },
+
+    _onViewCrashed: function ( event ) {
+        Editor.error( 'Scene view crashed!' );
+    },
+
+    _onViewGpuCrashed: function ( event ) {
+        Editor.error( 'Scene view gpu-crashed!' );
+    },
+
+    _onViewPluginCrashed: function ( event ) {
+        Editor.error('Scene view plugin-crashed! Plugin Name: %s, Version: %s',
+                     event.name,
+                     event.version );
     },
 
     _onViewConsole: function ( event ) {
@@ -69,22 +113,41 @@ Editor.registerPanel( 'scene.panel', {
     },
 
     _onViewIpc: function ( event ) {
+        var err;
+
         switch ( event.channel ) {
-            case 'scene:played':
-                this.$.loader.hidden = true;
-                break;
             case 'scene:ready':
                 this.$.loader.hidden = true;
+                Editor.states['scene-initializing'] = false;
+                Editor.states['scene-playing'] = false;
                 break;
-            case 'scene:error':
+
+            case 'scene:playing':
                 this.$.loader.hidden = true;
+                Editor.states['scene-initializing'] = false;
+                Editor.states['scene-playing'] = true;
+
+                break;
+
+            case 'scene:init-error':
+                err = event.args[0];
+                Editor.failed('Failed to init scene: %s', err.stack);
+
+                this.$.loader.hidden = true;
+                Editor.states['scene-initializing'] = false;
+                break;
+
+            case 'scene:play-error':
+                err = event.args[0];
+                Editor.failed('Failed to play scene: %s', err.stack);
+
+                this.$.loader.hidden = true;
+                Editor.states['scene-initializing'] = false;
                 break;
         }
     },
 
-    _onViewDidFinishLoad: function ( event ) {
-        this.$.loader.hidden = true;
-    },
+    // drag & drop
 
     _onDropAreaEnter: function ( event ) {
         event.stopPropagation();
@@ -98,7 +161,7 @@ Editor.registerPanel( 'scene.panel', {
         event.stopPropagation();
 
         Editor.Selection.cancel();
-        this.$.view.send( 'scene:drop',
+        this._sendToView( 'scene:drop',
                           event.detail.dragItems,
                           event.detail.dragType,
                           event.detail.offsetX,

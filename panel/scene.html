@@ -18,9 +18,14 @@
                     nodeintegration
                     disablewebsecurity
                     autosize="on"
+                    on-dom-ready="_onViewDomReady"
+                    on-did-finish-load="_onViewDidFinishLoad"
+                    on-did-fail-load="_onViewDidFailLoad"
+                    on-crashed="_onViewCrashed"
+                    on-gpu-crashed="_onViewGpuCrashed"
+                    on-plugin-crashed="_onViewPluginCrashed"
                     on-console-message="_onViewConsole"
                     on-ipc-message="_onViewIpc"
-                    on-did-finish-load="_onViewDidFinishLoad"
                 ></webview>
                 <editor-loader id="loader" mask text="Loading"></editor-loader>
                 <div id="dropArea" class="fit" hidden
