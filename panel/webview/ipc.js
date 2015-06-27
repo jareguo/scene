@@ -58,9 +58,17 @@ var _snapshotID = null;
 Ipc.on('scene:subscript-hierarchy-snapshot', function ( interval ) {
     if ( _snapshotID ) {
         clearTimeout(_snapshotID);
+        _snapshotID = null;
     }
     _snapshotID = setInterval( function () {
         var nodes = Fire.takeHierarchySnapshot();
         Editor.sendToWindows( 'scene:hierarchy-snapshot', nodes );
     }, interval);
+});
+
+Ipc.on('scene:unsubscript-hierarchy-snapshot', function () {
+    if ( _snapshotID ) {
+        clearTimeout(_snapshotID);
+        _snapshotID = null;
+    }
 });

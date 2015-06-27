@@ -69,6 +69,10 @@ Editor.registerPanel( 'scene.panel', {
         this._sendToView( 'scene:subscript-hierarchy-snapshot', interval );
     },
 
+    'scene:unsubscript-hierarchy-snapshot': function () {
+        this._sendToView( 'scene:unsubscript-hierarchy-snapshot' );
+    },
+
     _sendToView () {
         if ( this._viewReady ) {
             this.$.view.send.apply( this.$.view, arguments );
