@@ -23,11 +23,12 @@
       "width": "auto",
       "height": "auto",
       "messages": [
-        "scene:play",
-        "scene:stop",
         "editor:dragstart",
         "editor:dragend",
-        "editor:state-changed"
+        "editor:state-changed",
+        "scene:play",
+        "scene:stop",
+        "scene:subscript-hierarchy-snapshot"
       ],
       "profiles": {
         "local": {

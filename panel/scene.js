@@ -19,20 +19,36 @@ Editor.registerPanel( 'scene.panel', {
 
     ready: function () {
         this._viewReady = false;
+
         Editor.states['scene-initializing'] = true;
 
         this._initDroppable(this.$.dropArea);
     },
 
     reload: function () {
+        // change scene states
         this.$.loader.hidden = false;
         Editor.states['scene-initializing'] = true;
 
+        // reload the scene
         this.$.view.reloadIgnoringCache();
+        Editor.sendToAll('scene:reloading');
     },
 
     openDevTools: function () {
         this.$.view.openDevTools();
+    },
+
+    'editor:dragstart': function () {
+        this.$.dropArea.hidden = false;
+    },
+
+    'editor:dragend': function () {
+        this.$.dropArea.hidden = true;
+    },
+
+    'editor:state-changed': function ( name, value ) {
+        this._sendToView('editor:state-changed', name, value);
     },
 
     'scene:play': function () {
@@ -49,16 +65,8 @@ Editor.registerPanel( 'scene.panel', {
         this.$.view.reloadIgnoringCache();
     },
 
-    'editor:dragstart': function () {
-        this.$.dropArea.hidden = false;
-    },
-
-    'editor:dragend': function () {
-        this.$.dropArea.hidden = true;
-    },
-
-    'editor:state-changed': function ( name, value ) {
-        this._sendToView('editor:state-changed', name, value);
+    'scene:subscript-hierarchy-snapshot': function ( interval ) {
+        this._sendToView( 'scene:subscript-hierarchy-snapshot', interval );
     },
 
     _sendToView () {
@@ -115,11 +123,14 @@ Editor.registerPanel( 'scene.panel', {
     _onViewIpc: function ( event ) {
         var err;
 
+        // NOTE: webview ipc only send to editor-scene.panel
         switch ( event.channel ) {
             case 'scene:ready':
                 this.$.loader.hidden = true;
                 Editor.states['scene-initializing'] = false;
                 Editor.states['scene-playing'] = false;
+
+                Editor.sendToAll('scene:ready');
                 break;
 
             case 'scene:playing':
