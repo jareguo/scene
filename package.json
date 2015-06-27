@@ -10,6 +10,7 @@
   "menus": {
     "Panel/Scene": {
       "icon": "panel/icon.png",
+      "accelerator": "CmdOrCtrl+1",
       "message": "scene:open"
     }
   },
