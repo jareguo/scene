@@ -65,6 +65,7 @@ Editor.registerPanel( 'scene.panel', {
         Editor.states['scene-initializing'] = true;
 
         this.$.view.reloadIgnoringCache();
+        Editor.sendToAll('scene:reloading');
     },
 
     'scene:query-hierarchy': function () {
