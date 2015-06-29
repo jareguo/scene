@@ -28,8 +28,7 @@
         "editor:state-changed",
         "scene:play",
         "scene:stop",
-        "scene:subscript-hierarchy-snapshot",
-        "scene:unsubscript-hierarchy-snapshot"
+        "scene:query-hierarchy"
       ],
       "profiles": {
         "local": {

@@ -26,6 +26,8 @@ Editor.registerPanel( 'scene.panel', {
     },
 
     reload: function () {
+        this._viewReady = false;
+
         // change scene states
         this.$.loader.hidden = false;
         Editor.states['scene-initializing'] = true;
@@ -65,12 +67,8 @@ Editor.registerPanel( 'scene.panel', {
         this.$.view.reloadIgnoringCache();
     },
 
-    'scene:subscript-hierarchy-snapshot': function ( interval ) {
-        this._sendToView( 'scene:subscript-hierarchy-snapshot', interval );
-    },
-
-    'scene:unsubscript-hierarchy-snapshot': function () {
-        this._sendToView( 'scene:unsubscript-hierarchy-snapshot' );
+    'scene:query-hierarchy': function () {
+        this._sendToView( 'scene:query-hierarchy' );
     },
 
     _sendToView () {
