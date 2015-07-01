@@ -72,6 +72,10 @@ Editor.registerPanel( 'scene.panel', {
         this._sendToView( 'scene:query-hierarchy' );
     },
 
+    'scene:query-node': function ( id ) {
+        this._sendToView( 'scene:query-node', id );
+    },
+
     _sendToView () {
         if ( this._viewReady ) {
             this.$.view.send.apply( this.$.view, arguments );

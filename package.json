@@ -28,7 +28,8 @@
         "editor:state-changed",
         "scene:play",
         "scene:stop",
-        "scene:query-hierarchy"
+        "scene:query-hierarchy",
+        "scene:query-node"
       ],
       "profiles": {
         "local": {

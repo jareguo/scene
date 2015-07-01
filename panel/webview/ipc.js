@@ -54,8 +54,13 @@ Ipc.on('scene:drop', function ( uuids, type, x, y ) {
     });
 });
 
-Ipc.on('scene:query-hierarchy', function ( interval ) {
+Ipc.on('scene:query-hierarchy', function () {
     var nodes = Fire.takeHierarchySnapshot();
     Editor.sendToWindows( 'scene:reply-query-hierarchy', nodes );
 });
 
+
+Ipc.on('scene:query-node', function ( id ) {
+    // TODO
+    Editor.sendToWindows( 'scene:reply-query-node', { /*@jare TODO*/ } );
+});
