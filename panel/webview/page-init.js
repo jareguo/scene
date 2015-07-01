@@ -1,4 +1,6 @@
 (function () {
+    Editor.isRuntime = true;
+
     // mixin Editor for canvas-studio
     Editor.require('app://canvas-studio/page/editor-init');
 
