@@ -61,6 +61,7 @@ Ipc.on('scene:query-hierarchy', function () {
 
 
 Ipc.on('scene:query-node', function ( id ) {
-    // TODO
-    Editor.sendToWindows( 'scene:reply-query-node', { /*@jare TODO*/ } );
+    var node = Fire.engine.getInstanceById(id);
+    var dump = Editor.getNodeDump(node);
+    Editor.sendToWindows( 'scene:reply-query-node', dump );
 });
