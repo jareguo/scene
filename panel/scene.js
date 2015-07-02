@@ -27,6 +27,7 @@ Editor.registerPanel( 'scene.panel', {
 
     reload: function () {
         this._viewReady = false;
+        console.time('scene:reloading');
 
         // change scene states
         this.$.loader.hidden = false;
@@ -76,7 +77,7 @@ Editor.registerPanel( 'scene.panel', {
         this._sendToView( 'scene:query-node', id );
     },
 
-    _sendToView () {
+    _sendToView: function () {
         if ( this._viewReady ) {
             this.$.view.send.apply( this.$.view, arguments );
         }
@@ -138,6 +139,7 @@ Editor.registerPanel( 'scene.panel', {
                 Editor.states['scene-playing'] = false;
 
                 Editor.sendToAll('scene:ready');
+                console.timeEnd('scene:reloading');
                 break;
 
             case 'scene:playing':
