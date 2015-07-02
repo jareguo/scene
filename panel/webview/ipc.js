@@ -36,7 +36,7 @@ Ipc.on('scene:drop', function ( uuids, type, x, y ) {
                     // node.worldPosition = worldMousePos;
 
                     var fireNode = Fire.node(node);
-                    fireNode.position = Fire.v2( x, cc._canvas.height-y );
+                    fireNode.position = Fire.v2( x, Fire.engine.canvasSize.y-y );
                     fireNode.parent = Fire.engine.getCurrentScene();
 
                     // TODO: Editor.Selection.select( 'node', ent.id, true, true );
