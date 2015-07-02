@@ -28,18 +28,13 @@
 
     <template>
         <!-- pixi grid -->
-        <div class="border fit">
-            <div id='instruction'>
-                <p>Use mouse scroll to zoom in/out, hold shift key to pan around.</p>
-            </div>
-            <pixi-grid id="grid" class="fit"
-                       show-label-h
-                       show-label-v
-                       show-debug-info
-                       on-mousedown="_onMouseDown"
-                       on-mousewheel="_onMouseWheel"
-                    ></pixi-grid>
-        </div>
+        <pixi-grid id="grid" class="fit"
+            show-label-h
+            show-label-v
+            show-debug-info
+        >
+        </pixi-grid>
+
         <!-- runtime canvas -->
         <canvas id="runtime-canvas"></canvas>
     </template>
