@@ -13,7 +13,7 @@ Polymer( {
         this.$.grid.setMappingH( 0, 100, 100 );
 
         this.$.grid.setScaleV( [5,2], 0.01, 1000 );
-        this.$.grid.setMappingV( 0, -100, 100 );
+        this.$.grid.setMappingV( 0, 100, 100 );
 
         this.$.grid.setAnchor( 0.0, 0.0 );
 
