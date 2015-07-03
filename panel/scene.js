@@ -79,7 +79,12 @@ Editor.registerPanel( 'scene.panel', {
 
     _sendToView: function () {
         if ( this._viewReady ) {
-            this.$.view.send.apply( this.$.view, arguments );
+            var args = arguments;
+            // NOTE: this will prevent us send back ipc message
+            //       in ipc callstack which will make ipc event in reverse order
+            setImmediate( function () {
+                this.$.view.send.apply( this.$.view, args );
+            }.bind(this));
         }
     },
 
