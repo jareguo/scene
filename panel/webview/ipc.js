@@ -2,14 +2,7 @@ var Ipc = require('ipc');
 var Async = require('async');
 
 Ipc.on('scene:play', function () {
-    Editor.playScene(function (err) {
-        if (err) {
-            Ipc.sendToHost('scene:play-error', err);
-            return;
-        }
-
-        Ipc.sendToHost('scene:playing');
-    });
+    window.sceneView.play();
 });
 
 Ipc.on('scene:drop', function ( uuids, type, x, y ) {

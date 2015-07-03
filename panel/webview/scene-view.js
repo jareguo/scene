@@ -8,6 +8,8 @@ Polymer( {
     },
 
     ready: function () {
+        window.sceneView = this;
+
         // grid
         this.$.grid.setScaleH( [5,2], 0.01, 1000 );
         this.$.grid.setMappingH( 0, 100, 100 );
@@ -80,6 +82,21 @@ Polymer( {
                 Fire.engine.canvasSize = new Fire.v2( bcr.width, bcr.height );
                 self._resize();
             }, 10);
+        });
+    },
+
+    play: function () {
+        var self = this;
+        Editor.playScene(function (err) {
+            if (err) {
+                Ipc.sendToHost('scene:play-error', err);
+                return;
+            }
+
+            self.$.grid.showLabelH = false;
+            self.$.grid.showLabelV = false;
+            self.$.grid.showDebugInfo = false;
+            Ipc.sendToHost('scene:playing');
         });
     },
 });
