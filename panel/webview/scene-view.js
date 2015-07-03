@@ -93,9 +93,7 @@ Polymer( {
                 return;
             }
 
-            self.$.grid.showLabelH = false;
-            self.$.grid.showLabelV = false;
-            self.$.grid.showDebugInfo = false;
+            self.$.grid.hidden = true;
             Ipc.sendToHost('scene:playing');
         });
     },
