@@ -19,6 +19,7 @@ Editor.registerPanel( 'scene.panel', {
 
     ready: function () {
         this._viewReady = false;
+        this._ipcList = [];
 
         Editor.states['scene-initializing'] = true;
 
@@ -82,14 +83,22 @@ Editor.registerPanel( 'scene.panel', {
     },
 
     _sendToView: function () {
-        if ( this._viewReady ) {
-            var args = arguments;
-            // NOTE: this will prevent us send back ipc message
-            //       in ipc callstack which will make ipc event in reverse order
-            setImmediate( function () {
-                this.$.view.send.apply( this.$.view, args );
-            }.bind(this));
+        if ( !this._viewReady ) {
+            return;
         }
+
+        // NOTE: this will prevent us send back ipc message
+        //       in ipc callstack which will make ipc event in reverse order
+        if ( !this._timeoutID ) {
+            this._timeoutID = setTimeout( function () {
+                for ( var i = 0; i < this._ipcList.length; ++i ) {
+                    this.$.view.send.apply( this.$.view, this._ipcList[i] );
+                }
+                this._ipcList = [];
+                this._timeoutID = null;
+            }.bind(this),1);
+        }
+        this._ipcList.push(arguments);
     },
 
     // view events
