@@ -29,7 +29,8 @@
         "scene:play",
         "scene:stop",
         "scene:query-hierarchy",
-        "scene:query-node"
+        "scene:query-node",
+        "scene:node-set-property"
       ],
       "profiles": {
         "local": {

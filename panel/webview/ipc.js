@@ -58,3 +58,9 @@ Ipc.on('scene:query-node', function ( id ) {
     var dump = Editor.getNodeDump(node);
     Editor.sendToWindows( 'scene:reply-query-node', dump );
 });
+
+Ipc.on('scene:node-set-property', function ( id, path, value ) {
+    var node = Fire.engine.getInstanceById(id);
+    // TODO:
+    Editor.info( 'TODO: @jare please implement node.setPath(\'%s\',%s)', path, value );
+});

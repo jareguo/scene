@@ -77,6 +77,10 @@ Editor.registerPanel( 'scene.panel', {
         this._sendToView( 'scene:query-node', id );
     },
 
+    'scene:node-set-property': function ( id, path, value ) {
+        this._sendToView( 'scene:node-set-property', id, path, value );
+    },
+
     _sendToView: function () {
         if ( this._viewReady ) {
             var args = arguments;
