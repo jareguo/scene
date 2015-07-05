@@ -30,7 +30,9 @@
         "scene:stop",
         "scene:query-hierarchy",
         "scene:query-node",
-        "scene:node-set-property"
+        "scene:node-set-property",
+        "scene:create-assets",
+        "scene:move-nodes"
       ],
       "profiles": {
         "local": {

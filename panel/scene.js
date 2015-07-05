@@ -82,6 +82,14 @@ Editor.registerPanel( 'scene.panel', {
         this._sendToView( 'scene:node-set-property', id, path, value );
     },
 
+    'scene:create-assets': function ( uuids, nodeID ) {
+        this._sendToView( 'scene:create-assets', uuids, nodeID );
+    },
+
+    'scene:move-nodes': function ( ids, parentID, nextSiblingId ) {
+        this._sendToView( 'scene:move-nodes', ids, parentID, nextSiblingId );
+    },
+
     _sendToView: function () {
         if ( !this._viewReady ) {
             return;
@@ -211,6 +219,8 @@ Editor.registerPanel( 'scene.panel', {
         event.preventDefault();
 
         if ( EditorUI.DragDrop.type( event.dataTransfer ) === 'asset' ) {
+            event.stopPropagation();
+
             EditorUI.DragDrop.allowDrop( event.dataTransfer, true );
             EditorUI.DragDrop.updateDropEffect( event.dataTransfer, 'copy' );
         }
