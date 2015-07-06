@@ -17,7 +17,7 @@ Polymer( {
         this.$.grid.setScaleV( [5,2], 0.01, 1000 );
         this.$.grid.setMappingV( 100, 0, 100 );
 
-        this.$.grid.setAnchor( 0.0, 0.0 );
+        this.$.grid.setAnchor( 0.0, 1.0 );
 
         // make sure css reflow
         requestAnimationFrame( function () {
