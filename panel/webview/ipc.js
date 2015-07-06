@@ -104,10 +104,21 @@ Ipc.on('scene:query-node', function ( id ) {
     Editor.sendToWindows( 'scene:reply-query-node', dump );
 });
 
-Ipc.on('scene:node-set-property', function ( id, path, value ) {
+Ipc.on('scene:node-set-property', function ( id, path, value, isMixin ) {
     var node = Fire.engine.getRuntimeInstanceById(id);
-    // TODO:
-    Editor.info( 'TODO: @jare please implement node.setPath(\'%s\',%s)', path, value );
+    if (node) {
+        if (! isMixin) {
+            node = Fire.node(node);
+        }
+
+        try {
+            Editor.setDeepPropertyByPath(node, path, value);
+        }
+        catch (e) {
+            Fire.warn('Failed to set property %s of %s to %s, ' + e.message,
+                path, Fire.node(node).name, value);
+        }
+    }
 });
 
 Ipc.on('scene:node-mixin', function ( id, uuid ) {
