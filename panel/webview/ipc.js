@@ -6,6 +6,8 @@ Ipc.on('scene:play', function () {
 });
 
 Ipc.on('scene:drop', function ( uuids, type, x, y ) {
+    var nodeIDs = [];
+
     Async.each( uuids, function ( uuid, done ) {
         Async.waterfall([
             function ( next ) {
@@ -29,6 +31,8 @@ Ipc.on('scene:drop', function ( uuids, type, x, y ) {
                     // node.worldPosition = worldMousePos;
 
                     var fireNode = Fire.node(node);
+                    nodeIDs.push( fireNode.id );
+
                     fireNode.position = Fire.v2( x, Fire.engine.canvasSize.y-y );
                     fireNode.parent = Fire.engine.getCurrentScene();
 
@@ -43,6 +47,8 @@ Ipc.on('scene:drop', function ( uuids, type, x, y ) {
                 Editor.failed( 'Failed to drop asset %s, message: %s', uuid, err.stack );
                 return;
             }
+
+            Editor.Selection.select('node', nodeIDs, true, true );
         });
     });
 });
@@ -55,6 +61,8 @@ Ipc.on('scene:create-assets', function ( uuids, nodeID ) {
     if ( !parentNode ) {
         parentNode = Fire.engine.getCurrentScene();
     }
+
+    var nodeIDs = [];
 
     //
     Async.each( uuids, function ( uuid, done ) {
@@ -75,6 +83,8 @@ Ipc.on('scene:create-assets', function ( uuids, nodeID ) {
             function ( node, next ) {
                 if ( node ) {
                     var fireNode = Fire.node(node);
+                    nodeIDs.push( fireNode.id );
+
                     if ( parentNode ) {
                         fireNode.parent = parentNode;
                     }
@@ -88,6 +98,8 @@ Ipc.on('scene:create-assets', function ( uuids, nodeID ) {
                 Editor.failed( 'Failed to drop asset %s, message: %s', uuid, err.stack );
                 return;
             }
+
+            Editor.Selection.select('node', nodeIDs, true, true );
         });
     });
 });
