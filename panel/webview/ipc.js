@@ -110,6 +110,10 @@ Ipc.on('scene:node-set-property', function ( id, path, value ) {
     Editor.info( 'TODO: @jare please implement node.setPath(\'%s\',%s)', path, value );
 });
 
+Ipc.on('scene:node-mixin', function ( id, uuid ) {
+    Editor.info( 'TODO: @jare please implement Fire.mixin( nodeID, UUID ), %s, %s', id, uuid );
+});
+
 Ipc.on('scene:move-nodes', function ( ids, parentID, nextSiblingId ) {
     var parent = parentID && Fire.node(Fire.engine.getRuntimeInstanceById(parentID));
     var next = nextSiblingId ? Fire.node(Fire.engine.getRuntimeInstanceById(nextSiblingId)) : null;

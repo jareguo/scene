@@ -82,6 +82,10 @@ Editor.registerPanel( 'scene.panel', {
         this._sendToView( 'scene:node-set-property', id, path, value );
     },
 
+    'scene:node-mixin': function ( id, uuid ) {
+        this._sendToView( 'scene:node-mixin', id, uuid );
+    },
+
     'scene:create-assets': function ( uuids, nodeID ) {
         this._sendToView( 'scene:create-assets', uuids, nodeID );
     },

@@ -31,6 +31,7 @@
         "scene:query-hierarchy",
         "scene:query-node",
         "scene:node-set-property",
+        "scene:node-mixin",
         "scene:create-assets",
         "scene:move-nodes"
       ],
