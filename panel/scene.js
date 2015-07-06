@@ -70,8 +70,8 @@ Editor.registerPanel( 'scene.panel', {
         Editor.sendToAll('scene:reloading');
     },
 
-    'scene:query-hierarchy': function () {
-        this._sendToView( 'scene:query-hierarchy' );
+    'scene:query-hierarchy': function ( queryID ) {
+        this._sendToView( 'scene:query-hierarchy', queryID );
     },
 
     'scene:query-node': function ( id ) {
