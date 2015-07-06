@@ -54,10 +54,10 @@ Polymer( {
             Editor.initScene(function (err) {
                 if (err) {
                     Ipc.sendToHost('scene:init-error', err);
-                    return;
                 }
-
-                Ipc.sendToHost('scene:ready');
+                else {
+                    Ipc.sendToHost('scene:ready');
+                }
             });
         });
 

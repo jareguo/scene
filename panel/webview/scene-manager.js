@@ -12,6 +12,7 @@ Editor.initScene = function (callback) {
         // load last editing scene
         Async.waterfall(
             [
+                loadCompiledScript,
                 function (next) {
                     // Assets will be loaded by SceneWrapper.prototype.create, here we just deserialize the scene graph
                     var scene = Fire.deserialize(sceneJson);
@@ -33,7 +34,9 @@ Editor.initScene = function (callback) {
     }
     else {
         // empty scene
+        loadCompiledScript(function () {
         enterEditMode(callback);
+        });
     }
 };
 
@@ -74,3 +77,37 @@ Editor.playScene = function (callback) {
     );
 };
 
+function loadCompiledScript (next) {
+    function doLoad (src, cb) {
+        var script = document.createElement('script');
+        script.onload = function () {
+            console.timeEnd('load ' + src);
+            cb();
+        };
+        script.onerror = function () {
+            console.timeEnd('load ' + src);
+            //if (loadedScriptNodes.length > 0) {
+            //    loader.unloadAll();
+            //}
+            console.error('Failed to load %s', src);
+            cb(new Error('Failed to load ' + src));
+        };
+        script.setAttribute('type','text/javascript');
+        script.setAttribute('charset', 'utf-8');
+        script.setAttribute('src', src);    // FireUrl.addRandomQuery(src)
+        console.time('load ' + src);
+        document.head.appendChild(script);
+        //loadedScriptNodes.push(script);
+    }
+    var Path = require('path');
+    var scriptPath = Path.join(Editor.libraryPath, 'bundle.project.js');
+    var Fs = require('fire-fs');
+    Fs.exists(scriptPath, function (exists) {
+        if (exists) {
+            doLoad(scriptPath, next);
+        }
+        else {
+            next();
+        }
+    });
+}
