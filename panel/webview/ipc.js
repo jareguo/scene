@@ -107,12 +107,9 @@ Ipc.on('scene:query-node', function ( queryID, nodeID ) {
 Ipc.on('scene:node-set-property', function ( id, path, value, isMixin ) {
     var node = Fire.engine.getRuntimeInstanceById(id);
     if (node) {
-        if (! isMixin) {
-            node = Fire.node(node);
-        }
-
+        var objToSet = isMixin ? node : Fire.node(node);
         try {
-            Editor.setDeepPropertyByPath(node, path, value);
+            Editor.setDeepPropertyByPath(objToSet, path, value);
         }
         catch (e) {
             Fire.warn('Failed to set property %s of %s to %s, ' + e.message,
@@ -122,7 +119,17 @@ Ipc.on('scene:node-set-property', function ( id, path, value, isMixin ) {
 });
 
 Ipc.on('scene:node-mixin', function ( id, uuid ) {
-    Editor.info( 'TODO: @jare please implement Fire.mixin( nodeID, UUID ), %s, %s', id, uuid );
+    var node = Fire.engine.getRuntimeInstanceById(id);
+    if (node) {
+        var className = Editor.compressUuid(uuid);
+        var classToMix = Fire.JS._getClassById(className);
+        if (classToMix) {
+            Fire.mixin(node, classToMix);
+        }
+        else {
+            Fire.error('Can not find %s to mixin', uuid);
+        }
+    }
 });
 
 Ipc.on('scene:move-nodes', function ( ids, parentID, nextSiblingId ) {
