@@ -98,10 +98,10 @@ Ipc.on('scene:query-hierarchy', function ( queryID ) {
 });
 
 
-Ipc.on('scene:query-node', function ( id ) {
-    var node = Fire.engine.getRuntimeInstanceById(id);
+Ipc.on('scene:query-node', function ( queryID, nodeID ) {
+    var node = Fire.engine.getRuntimeInstanceById(nodeID);
     var dump = Editor.getNodeDump(node);
-    Editor.sendToWindows( 'scene:reply-query-node', dump );
+    Editor.sendToWindows( 'scene:reply-query-node', queryID, dump );
 });
 
 Ipc.on('scene:node-set-property', function ( id, path, value, isMixin ) {

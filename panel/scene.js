@@ -74,8 +74,8 @@ Editor.registerPanel( 'scene.panel', {
         this._sendToView( 'scene:query-hierarchy', queryID );
     },
 
-    'scene:query-node': function ( id ) {
-        this._sendToView( 'scene:query-node', id );
+    'scene:query-node': function ( queryID, nodeID ) {
+        this._sendToView( 'scene:query-node', queryID, nodeID );
     },
 
     'scene:node-set-property': function ( id, path, value ) {
@@ -99,18 +99,38 @@ Editor.registerPanel( 'scene.panel', {
             return;
         }
 
-        // NOTE: this will prevent us send back ipc message
+        // NOTE: This will prevent us send back ipc message
         //       in ipc callstack which will make ipc event in reverse order
+        // NOTE: In Electron, webview.send have some remote.sync method in it
+        //       popIpc one by one will prevent too much sync method in one frame
         if ( !this._timeoutID ) {
             this._timeoutID = setTimeout( function () {
-                for ( var i = 0; i < this._ipcList.length; ++i ) {
-                    this.$.view.send.apply( this.$.view, this._ipcList[i] );
-                }
-                this._ipcList = [];
-                this._timeoutID = null;
+                // DISABLE
+                // for ( var i = 0; i < this._ipcList.length; ++i ) {
+                //     this.$.view.send.apply( this.$.view, this._ipcList[i] );
+                // }
+                // this._ipcList = [];
+                // this._timeoutID = null;
+
+                this._popIpc();
             }.bind(this),1);
         }
         this._ipcList.push(arguments);
+    },
+
+    _popIpc: function () {
+        if ( this._ipcList.length > 0 ) {
+            var args = this._ipcList.shift();
+            this.$.view.send.apply( this.$.view, args );
+        }
+
+        this._timeoutID = null;
+
+        if ( this._ipcList.length > 0 ) {
+            this._timeoutID = setTimeout( function () {
+                this._popIpc();
+            }.bind(this),1);
+        }
     },
 
     // view events
