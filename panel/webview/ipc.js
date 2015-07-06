@@ -92,9 +92,9 @@ Ipc.on('scene:create-assets', function ( uuids, nodeID ) {
     });
 });
 
-Ipc.on('scene:query-hierarchy', function () {
+Ipc.on('scene:query-hierarchy', function ( queryID ) {
     var nodes = Fire.takeHierarchySnapshot();
-    Editor.sendToWindows( 'scene:reply-query-hierarchy', nodes );
+    Editor.sendToWindows( 'scene:reply-query-hierarchy', queryID, nodes );
 });
 
 
