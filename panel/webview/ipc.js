@@ -50,7 +50,7 @@ Ipc.on('scene:drop', function ( uuids, type, x, y ) {
 Ipc.on('scene:create-assets', function ( uuids, nodeID ) {
     var parentNode;
     if ( nodeID ) {
-        parentNode = Fire.node(Fire.engine.getInstanceById(nodeID));
+        parentNode = Fire.node(Fire.engine.getRuntimeInstanceById(nodeID));
     }
     if ( !parentNode ) {
         parentNode = Fire.engine.getCurrentScene();
@@ -99,25 +99,25 @@ Ipc.on('scene:query-hierarchy', function () {
 
 
 Ipc.on('scene:query-node', function ( id ) {
-    var node = Fire.engine.getInstanceById(id);
+    var node = Fire.engine.getRuntimeInstanceById(id);
     var dump = Editor.getNodeDump(node);
     Editor.sendToWindows( 'scene:reply-query-node', dump );
 });
 
 Ipc.on('scene:node-set-property', function ( id, path, value ) {
-    var node = Fire.engine.getInstanceById(id);
+    var node = Fire.engine.getRuntimeInstanceById(id);
     // TODO:
     Editor.info( 'TODO: @jare please implement node.setPath(\'%s\',%s)', path, value );
 });
 
 Ipc.on('scene:move-nodes', function ( ids, parentID, nextSiblingId ) {
-    var parent = parentID && Fire.node(Fire.engine.getInstanceById(parentID));
-    var next = nextSiblingId ? Fire.node(Fire.engine.getInstanceById(nextSiblingId)) : null;
+    var parent = parentID && Fire.node(Fire.engine.getRuntimeInstanceById(parentID));
+    var next = nextSiblingId ? Fire.node(Fire.engine.getRuntimeInstanceById(nextSiblingId)) : null;
     var nextIndex = next ? next.getSiblingIndex() : -1;
 
     for (var i = 0; i < ids.length; i++) {
         var id = ids[i];
-        var node = Fire.node(Fire.engine.getInstanceById(id));
+        var node = Fire.node(Fire.engine.getRuntimeInstanceById(id));
         if (node && (!parent || !parent.isChildOf(node))) {
             if (node.parent !== parent) {
                 // TODO: ask @jare
