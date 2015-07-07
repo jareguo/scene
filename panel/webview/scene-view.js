@@ -145,16 +145,14 @@ Polymer( {
                                    }.bind(this));
             }
             else {
-                // TODO
-                // var toggleMode = false;
-                // var lastSelection = Editor.Selection.entities;
-                // if ( event.metaKey || event.ctrlKey ) {
-                //     toggleMode = true;
-                // }
+                var toggleMode = false;
+                var lastSelection = Editor.Selection.entities;
+                if ( event.metaKey || event.ctrlKey ) {
+                    toggleMode = true;
+                }
 
-                var rect = this.$.gizmos.getBoundingClientRect();
-                var startx = event.clientX - rect.left;
-                var starty = event.clientY - rect.top;
+                var startx = event.offsetX;
+                var starty = event.offsetY;
 
                 EditorUI.startDrag('default', event,
 
@@ -188,7 +186,9 @@ Polymer( {
         event.stopPropagation();
 
         var newScale = Editor.Utils.smoothScale(this.scale, event.wheelDelta);
-        newScale = Math.clamp( newScale, 0.01, 1000 );
+        newScale = Math.clamp(newScale,
+                              this.$.grid.hticks.minValueScale,
+                              this.$.grid.hticks.maxValueScale);
 
         //
         this.scale = newScale;
