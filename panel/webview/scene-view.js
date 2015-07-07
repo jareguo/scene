@@ -4,7 +4,18 @@ var Ipc = require('ipc');
 Polymer( {
     is: 'scene-view',
 
+    listeners: {
+        'mousedown': '_onMouseDown',
+        'mousewheel': '_onMouseWheel',
+        'keydown': '_onKeyDown',
+        'keyup': '_onKeyUp',
+    },
+
     properties: {
+        scale: {
+            type: Number,
+            value: 1.0,
+        },
     },
 
     ready: function () {
@@ -26,12 +37,19 @@ Polymer( {
             // init grid
             this.$.grid.resize();
             this.$.grid.repaint();
+
+            // init gizmos
+            this.$.gizmos.resize();
+            this.$.gizmos.repaint();
         }.bind(this));
     },
 
     _resize: function () {
         this.$.grid.resize();
         this.$.grid.repaint();
+
+        this.$.gizmos.resize();
+        this.$.gizmos.repaint();
     },
 
     _initEngine: function () {
@@ -94,8 +112,112 @@ Polymer( {
             }
 
             self.$.grid.hidden = true;
+            self.$.gizmos.hidden = true;
+
             Ipc.sendToHost('scene:playing');
         });
+    },
+
+    _onMouseDown: function ( event ) {
+        event.stopPropagation();
+
+        // process rect-selection
+        if ( event.which === 1 ) {
+            if ( event.shiftKey ) {
+                this.style.cursor = '-webkit-grabbing';
+                EditorUI.startDrag('-webkit-grabbing', event,
+                                   // move
+                                   function ( event, dx, dy, offsetx, offsety ) {
+                                       this.$.grid.pan( dx, dy );
+                                       this.$.grid.repaint();
+
+                                       var scene = Fire.engine.getCurrentScene();
+                                       scene.position = Fire.v2(this.$.grid.xAxisOffset,
+                                                               -this.$.grid.yAxisOffset);
+                                   }.bind(this),
+
+                                   // end
+                                   function ( event, dx, dy, offsetx, offsety ) {
+                                       if ( event.shiftKey )
+                                           this.style.cursor = '-webkit-grab';
+                                       else
+                                           this.style.cursor = '';
+                                   }.bind(this));
+            }
+            else {
+                // TODO
+                // var toggleMode = false;
+                // var lastSelection = Editor.Selection.entities;
+                // if ( event.metaKey || event.ctrlKey ) {
+                //     toggleMode = true;
+                // }
+
+                var rect = this.$.gizmos.getBoundingClientRect();
+                var startx = event.clientX - rect.left;
+                var starty = event.clientY - rect.top;
+
+                EditorUI.startDrag('default', event,
+
+                                   // move
+                                   function ( event, dx, dy, offsetx, offsety ) {
+                                       var x = startx;
+                                       var y = starty;
+                                       if ( offsetx < 0.0 ) {
+                                           x += offsetx;
+                                           offsetx = -offsetx;
+                                       }
+                                       if ( offsety < 0.0 ) {
+                                           y += offsety;
+                                           offsety = -offsety;
+                                       }
+
+                                       this.$.gizmos.updateSelectRect( x, y, offsetx, offsety );
+                                   }.bind(this),
+
+                                   // end
+                                   function ( event, dx, dy, offsetx, offsety ) {
+                                       this.$.gizmos.fadeoutSelectRect();
+                                   }.bind(this));
+            }
+
+            return;
+        }
+    },
+
+    _onMouseWheel: function ( event ) {
+        event.stopPropagation();
+
+        var newScale = Editor.Utils.smoothScale(this.scale, event.wheelDelta);
+        newScale = Math.clamp( newScale, 0.01, 1000 );
+
+        //
+        this.scale = newScale;
+
+        //
+        this.$.grid.xAxisScaleAt ( event.offsetX, newScale );
+        this.$.grid.yAxisScaleAt ( event.offsetY, newScale );
+        this.$.grid.repaint();
+
+        //
+        var scene = Fire.engine.getCurrentScene();
+        scene.scale = Fire.v2( this.$.grid.xAxisScale, this.$.grid.yAxisScale );
+        scene.position = Fire.v2(this.$.grid.xAxisOffset, -this.$.grid.yAxisOffset);
+    },
+
+    _onKeyDown: function ( event ) {
+        event.stopPropagation();
+
+        if ( Editor.KeyCode(event.which) === 'shift' ) {
+            this.style.cursor = '-webkit-grab';
+        }
+    },
+
+    _onKeyUp: function ( event ) {
+        event.stopPropagation();
+
+        if ( Editor.KeyCode(event.which) === 'shift' ) {
+            this.style.cursor = '';
+        }
     },
 });
 

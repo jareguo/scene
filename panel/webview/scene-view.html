@@ -1,6 +1,8 @@
+<link rel="import" href="packages://pixi-grid/widget/pixi-grid.html">
+<link rel="import" href="packages://ui-gizmos/widget/svg-gizmos.html">
+
 <dom-module id="scene-view">
     <link rel="import" type="css" href="scene-view.css">
-    <link rel="import" href="packages://pixi-grid/widget/pixi-grid.html">
 
     <style>
         :host {
@@ -37,6 +39,9 @@
 
         <!-- runtime canvas -->
         <canvas id="runtime-canvas"></canvas>
+
+        <!-- svg gizmos -->
+        <svg-gizmos id="gizmos" class="fit"></svg-gizmos>
     </template>
 </dom-module>
 
