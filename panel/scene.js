@@ -99,6 +99,8 @@ Editor.registerPanel( 'scene.panel', {
             return;
         }
 
+        this._ipcList.push(arguments);
+
         // NOTE: This will prevent us send back ipc message
         //       in ipc callstack which will make ipc event in reverse order
         // NOTE: In Electron, webview.send have some remote.sync method in it
@@ -115,10 +117,20 @@ Editor.registerPanel( 'scene.panel', {
                 this._popIpc();
             }.bind(this),1);
         }
-        this._ipcList.push(arguments);
     },
 
     _popIpc: function () {
+        // TEMP HACK: please ref inspector._loadInspector
+        if ( Editor._importing ) {
+            if ( this._ipcList.length > 0 ) {
+                this._timeoutID = setTimeout( function () {
+                    this._popIpc();
+                }.bind(this),10);
+            }
+
+            return;
+        }
+
         if ( this._ipcList.length > 0 ) {
             var args = this._ipcList.shift();
             this.$.view.send.apply( this.$.view, args );
