@@ -145,7 +145,13 @@ Ipc.on('scene:node-mixin', function ( id, uuid ) {
 });
 
 Ipc.on('scene:move-nodes', function ( ids, parentID, nextSiblingId ) {
-    var parent = parentID && Fire.node(Fire.engine.getRuntimeInstanceById(parentID));
+    var parent;
+
+    if (parentID)
+        parent = Fire.node(Fire.engine.getRuntimeInstanceById(parentID));
+    else
+        parent = Fire.engine.getCurrentScene();
+
     var next = nextSiblingId ? Fire.node(Fire.engine.getRuntimeInstanceById(nextSiblingId)) : null;
     var nextIndex = next ? next.getSiblingIndex() : -1;
 
