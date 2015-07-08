@@ -8,6 +8,8 @@ Polymer( {
     listeners: {
         'mousedown': '_onMouseDown',
         'mousewheel': '_onMouseWheel',
+        'mousemove': '_onMouseMove',
+        'mouseleave': '_onMouseLeave',
         'keydown': '_onKeyDown',
         'keyup': '_onKeyUp',
     },
@@ -63,32 +65,6 @@ Polymer( {
             this.$.gizmos.resize();
             this.$.gizmos.repaint();
         }.bind(this));
-    },
-
-    select: function ( ids ) {
-        this._selection = _.uniq(this._selection.concat(ids));
-
-        // TODO
-    },
-
-    unselect: function ( ids ) {
-        this._selection = _.difference( this._selection, ids );
-
-        // TODO
-    },
-
-    sceneToScreen: function ( x, y ) {
-        return Fire.v2(
-            this.$.grid.valueToPixelH(x),
-            this.$.grid.valueToPixelV(y)
-        );
-    },
-
-    screenToScene: function ( x, y ) {
-        return Fire.v2(
-            this.$.grid.pixelToValueH(x),
-            this.$.grid.pixelToValueV(y)
-        );
     },
 
     _resize: function () {
@@ -151,6 +127,81 @@ Polymer( {
         });
     },
 
+    sceneToScreen: function ( x, y ) {
+        return Fire.v2(
+            this.$.grid.valueToPixelH(x),
+            this.$.grid.valueToPixelV(y)
+        );
+    },
+
+    worldToScreen: function ( x, y ) {
+        var scene = Fire.engine.getCurrentScene();
+        var scenePos = scene.transformPointToLocal( Fire.v2(x,y) );
+        return this.sceneToScreen( scenePos.x, scenePos.y );
+    },
+
+    screenToScene: function ( x, y ) {
+        return Fire.v2(
+            this.$.grid.pixelToValueH(x),
+            this.$.grid.pixelToValueV(y)
+        );
+    },
+
+    screenToWorld: function ( x, y ) {
+        var scene = Fire.engine.getCurrentScene();
+        return scene.transformPointToWorld( this.screenToScene(x,y) );
+    },
+
+    select: function ( ids ) {
+        this._selection = _.uniq(this._selection.concat(ids));
+
+        // TODO
+    },
+
+    unselect: function ( ids ) {
+        this._selection = _.difference( this._selection, ids );
+
+        // TODO
+    },
+
+    hitTest: function ( x, y ) {
+        // TODO
+        // this.$.gizmos.rectHitTest( x, y, 1, 1 );
+
+        var worldHitPoint = this.screenToWorld(x,y);
+        var minDist = Number.MAX_VALUE;
+        var resultNode;
+
+        var nodes = Fire.engine.getIntersectionList( new Fire.Rect(worldHitPoint.x, worldHitPoint.y, 1, 1) );
+        nodes.forEach( function ( node ) {
+            var fireNode = Fire.node(node);
+            var aabb = fireNode.getWorldBounds();
+            // TODO: calculate the OBB center instead
+            var dist = worldHitPoint.sub(aabb.center).magSqr();
+            if ( dist < minDist ) {
+                minDist = dist;
+                resultNode = fireNode;
+            }
+        });
+
+        return resultNode;
+    },
+
+    rectHitTest: function ( x, y, w, h ) {
+        var v1 = this.screenToWorld(x,y);
+        var v2 = this.screenToWorld(x+w,y+h);
+        var worldRect = Fire.Rect.fromMinMax(v1,v2);
+
+        var results = [];
+        var nodes = Fire.engine.getIntersectionList(worldRect);
+        nodes.forEach( function ( node ) {
+            var fireNode = Fire.node(node);
+            results.push(fireNode);
+        });
+
+        return results;
+    },
+
     play: function () {
         var self = this;
         Editor.playScene(function (err) {
@@ -206,8 +257,14 @@ Polymer( {
 
                                    // move
                                    function ( event, dx, dy, offsetx, offsety ) {
+                                       var magSqr = offsetx*offsetx + offsety*offsety;
+                                       if ( magSqr < 2.0 * 2.0 ) {
+                                           return;
+                                       }
+
                                        var x = startx;
                                        var y = starty;
+
                                        if ( offsetx < 0.0 ) {
                                            x += offsetx;
                                            offsetx = -offsetx;
@@ -218,11 +275,58 @@ Polymer( {
                                        }
 
                                        this.$.gizmos.updateSelectRect( x, y, offsetx, offsety );
+
+                                       var nodes = this.rectHitTest( x, y, offsetx, offsety );
+                                       var i, ids;
+
+                                       // toggle mode will always act added behaviour when we in rect-select-state
+                                       if ( toggleMode ) {
+                                           ids = lastSelection.slice();
+
+                                           for ( i = 0; i < nodes.length; ++i ) {
+                                               if ( ids.indexOf(nodes[i].id) === -1 )
+                                                   ids.push( nodes[i].id );
+                                           }
+                                       }
+                                       else {
+                                           ids = [];
+
+                                           for ( i = 0; i < nodes.length; ++i ) {
+                                               ids.push( nodes[i].id );
+                                           }
+                                       }
+                                       Editor.Selection.select ( 'node', ids, true, false );
                                    }.bind(this),
 
                                    // end
                                    function ( event, dx, dy, offsetx, offsety ) {
-                                       this.$.gizmos.fadeoutSelectRect();
+                                       var magSqr = offsetx*offsetx + offsety*offsety;
+                                       if ( magSqr < 2.0 * 2.0 ) {
+                                           var node = this.hitTest( startx, starty );
+
+                                           if ( toggleMode ) {
+                                               if ( node ) {
+                                                   if ( lastSelection.indexOf(node.id) === -1 ) {
+                                                       Editor.Selection.select ( 'node', node.id, false, true );
+                                                   }
+                                                   else {
+                                                       Editor.Selection.unselect ( 'node', node.id, true );
+                                                   }
+                                               }
+                                           }
+                                           else {
+                                               if ( node ) {
+                                                   Editor.Selection.select ( 'node', node.id, true, true );
+                                               }
+                                               else {
+                                                   Editor.Selection.clear ( 'node' );
+                                               }
+                                           }
+                                       }
+                                       else {
+                                           Editor.Selection.confirm ();
+                                           this.$.gizmos.fadeoutSelectRect();
+                                       }
                                    }.bind(this));
             }
 
@@ -250,6 +354,18 @@ Polymer( {
         var scene = Fire.engine.getCurrentScene();
         scene.scale = Fire.v2( this.$.grid.xAxisScale, this.$.grid.yAxisScale );
         scene.position = Fire.v2(this.$.grid.xAxisOffset, -this.$.grid.yAxisOffset);
+    },
+
+    _onMouseMove: function ( event ) {
+        event.stopPropagation();
+
+        var node = this.hitTest( event.offsetX, event.offsetY );
+        var id = node ? node.id : null;
+        Editor.Selection.hover( 'node', id );
+    },
+
+    _onMouseLeave: function ( event ) {
+        Editor.Selection.hover( 'node', null );
     },
 
     _onKeyDown: function ( event ) {
