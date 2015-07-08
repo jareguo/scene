@@ -25,18 +25,11 @@ Ipc.on('scene:drop', function ( uuids, type, x, y ) {
 
             function ( node, next ) {
                 if ( node ) {
-                    // var mousePos = new Fire.Vec2(x, y);
-                    // // var worldMousePos = this.renderContext.camera.screenToWorld(mousePos);
-                    // var worldMousePos = mousePos;
-                    // node.worldPosition = worldMousePos;
-
                     var fireNode = Fire.node(node);
                     nodeIDs.push( fireNode.id );
 
-                    fireNode.position = Fire.v2( x, Fire.engine.canvasSize.y-y );
                     fireNode.parent = Fire.engine.getCurrentScene();
-
-                    // TODO: Editor.Selection.select( 'node', ent.id, true, true );
+                    fireNode.scenePosition = window.sceneView.screenToScene(x,y);
                 }
 
                 next ();
@@ -88,6 +81,9 @@ Ipc.on('scene:create-assets', function ( uuids, nodeID ) {
                     if ( parentNode ) {
                         fireNode.parent = parentNode;
                     }
+                    var center_x = Fire.engine.canvasSize.x/2;
+                    var center_y = Fire.engine.canvasSize.y/2;
+                    fireNode.scenePosition = window.sceneView.screenToScene( center_x, center_y );
                 }
 
                 next ();
@@ -124,7 +120,7 @@ Ipc.on('scene:node-set-property', function ( id, path, value, isMixin ) {
             Editor.setDeepPropertyByPath(objToSet, path, value);
         }
         catch (e) {
-            Fire.warn('Failed to set property %s of %s to %s, ' + e.message,
+            Editor.warn('Failed to set property %s of %s to %s, ' + e.message,
                 path, Fire.node(node).name, value);
         }
     }
@@ -139,7 +135,7 @@ Ipc.on('scene:node-mixin', function ( id, uuid ) {
             Fire.mixin(node, classToMix);
         }
         else {
-            Fire.error('Can not find %s to mixin', uuid);
+            Editor.error('Can not find %s to mixin', uuid);
         }
     }
 });
@@ -205,4 +201,32 @@ Ipc.on('scene:move-nodes', function ( ids, parentID, nextSiblingId ) {
             }
         }
     }
+});
+
+Ipc.on('selection:selected', function ( type, ids ) {
+    if ( type !== 'node' ) {
+        return;
+    }
+
+    window.sceneView.select(ids);
+});
+
+Ipc.on('selection:unselected', function ( type, ids ) {
+    if ( type !== 'node' ) {
+        return;
+    }
+
+    window.sceneView.unselect(ids);
+});
+
+Ipc.on('scene:transform-tool-changed', function ( value ) {
+    window.sceneView.transformTool = value;
+});
+
+Ipc.on('scene:coordinate-changed', function ( value ) {
+    window.sceneView.coordinate = value;
+});
+
+Ipc.on('scene:pivot-changed', function ( value ) {
+    window.sceneView.pivot = value;
 });

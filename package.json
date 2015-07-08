@@ -22,6 +22,8 @@
       "icon": "panel/icon.png",
       "width": "auto",
       "height": "auto",
+      "shortcuts": {
+      },
       "messages": [
         "editor:dragstart",
         "editor:dragend",
@@ -33,7 +35,14 @@
         "scene:node-set-property",
         "scene:node-mixin",
         "scene:create-assets",
-        "scene:move-nodes"
+        "scene:move-nodes",
+        "selection:selected",
+        "selection:unselected",
+        "selection:activated",
+        "selection:deactivated",
+        "selection:hoverin",
+        "selection:hoverout",
+        "selection:changed"
       ],
       "profiles": {
         "local": {

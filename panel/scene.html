@@ -5,6 +5,47 @@
 
     <template>
         <editor-toolbar>
+            <editor-buttons class="small" attr-for-selected="name"
+                selected="{{transformTool}}"
+            >
+                <editor-buttons-item name="move">
+                    <i class="fa fa-arrows"></i>
+                </editor-buttons-item>
+                <editor-buttons-item name="rotate">
+                    <i class="fa fa-rotate-left"></i>
+                </editor-buttons-item>
+                <editor-buttons-item name="scale">
+                    <i class="fa fa-expand"></i>
+                </editor-buttons-item>
+            </editor-buttons>
+            <span class="space"></span>
+
+            <editor-buttons class="small" attr-for-selected="name"
+                selected="{{coordinate}}"
+            >
+                <editor-buttons-item name="local">
+                    <img src="../static/tools-local.png">
+                </editor-buttons-item>
+                <editor-buttons-item name="global">
+                    <img src="../static/tools-global.png">
+                </editor-buttons-item>
+            </editor-buttons>
+            <span class="label">{{coordinate}}</span>
+
+            <editor-buttons class="small" attr-for-selected="name"
+                selected="{{pivot}}"
+            >
+                <editor-buttons-item name="pivot">
+                    <img src="../static/tools-pivot.png">
+                </editor-buttons-item>
+                <editor-buttons-item name="center">
+                    <img src="../static/tools-center.png">
+                </editor-buttons-item>
+            </editor-buttons>
+            <span class="label">{{pivot}}</span>
+
+            <div class="flex-1"></div>
+
             <editor-button on-click="reload">
                 <i class="fa fa-rotate-right"></i>
             </editor-button>

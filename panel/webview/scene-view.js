@@ -1,5 +1,6 @@
 (function () {
 var Ipc = require('ipc');
+var _ = require('lodash');
 
 Polymer( {
     is: 'scene-view',
@@ -16,17 +17,37 @@ Polymer( {
             type: Number,
             value: 1.0,
         },
+
+        transformTool: {
+            type: String,
+            value: 'move',
+        },
+
+        coordinate: {
+            type: String,
+            value: 'local',
+        },
+
+        pivot: {
+            type: String,
+            value: 'pivot',
+        },
     },
 
     ready: function () {
         window.sceneView = this;
 
+        this._selection = [];
+
+        var mappingH = Fire.Runtime.Settings['mapping-h'];
+        var mappingV = Fire.Runtime.Settings['mapping-v'];
+
         // grid
         this.$.grid.setScaleH( [5,2], 0.01, 1000 );
-        this.$.grid.setMappingH( 0, 100, 100 );
+        this.$.grid.setMappingH( mappingH[0], mappingH[1], mappingH[2] );
 
         this.$.grid.setScaleV( [5,2], 0.01, 1000 );
-        this.$.grid.setMappingV( 100, 0, 100 );
+        this.$.grid.setMappingV( mappingV[0], mappingV[1], mappingV[2] );
 
         this.$.grid.setAnchor( 0.0, 1.0 );
 
@@ -42,6 +63,32 @@ Polymer( {
             this.$.gizmos.resize();
             this.$.gizmos.repaint();
         }.bind(this));
+    },
+
+    select: function ( ids ) {
+        this._selection = _.uniq(this._selection.concat(ids));
+
+        // TODO
+    },
+
+    unselect: function ( ids ) {
+        this._selection = _.difference( this._selection, ids );
+
+        // TODO
+    },
+
+    sceneToScreen: function ( x, y ) {
+        return Fire.v2(
+            this.$.grid.valueToPixelH(x),
+            this.$.grid.valueToPixelV(y)
+        );
+    },
+
+    screenToScene: function ( x, y ) {
+        return Fire.v2(
+            this.$.grid.pixelToValueH(x),
+            this.$.grid.pixelToValueV(y)
+        );
     },
 
     _resize: function () {
@@ -81,6 +128,7 @@ Polymer( {
 
         // beforeunload event
         window.addEventListener('beforeunload', function ( event ) {
+            Editor.Selection.clear('node');
             if ( Fire.engine.isPlaying ) {
                 Fire.engine.stop();
             }
@@ -209,6 +257,19 @@ Polymer( {
 
         if ( Editor.KeyCode(event.which) === 'shift' ) {
             this.style.cursor = '-webkit-grab';
+            return;
+        }
+
+        if ( !event.metaKey && !event.shiftKey && !event.ctrlKey && !event.altKey ) {
+            if ( Editor.KeyCode(event.which) === 'w' ) {
+                Ipc.sendToHost('scene:change-transform-tool', 'move');
+            }
+            else if ( Editor.KeyCode(event.which) === 'e' ) {
+                Ipc.sendToHost('scene:change-transform-tool', 'rotate');
+            }
+            else if ( Editor.KeyCode(event.which) === 'r' ) {
+                Ipc.sendToHost('scene:change-transform-tool', 'scale');
+            }
         }
     },
 

@@ -12,3 +12,21 @@
     border: 1px solid #171717;
     background: #333;
 }
+
+editor-buttons-item img {
+    height: 10px;
+}
+
+editor-buttons-item i {
+    font-size: 10px;
+    padding: 0px;
+}
+
+span.space {
+    margin-right: 5px;
+}
+
+span.label {
+    width: 35px;
+    margin-right: 5px;
+}

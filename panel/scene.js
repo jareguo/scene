@@ -15,6 +15,23 @@ Editor.registerPanel( 'scene.panel', {
     },
 
     properties: {
+        transformTool: {
+            type: String,
+            value: 'move',
+            observer: '_transformToolChanged',
+        },
+
+        coordinate: {
+            type: String,
+            value: 'local',
+            observer: '_coordinateChanged',
+        },
+
+        pivot: {
+            type: String,
+            value: 'pivot',
+            observer: '_pivotChanged',
+        },
     },
 
     ready: function () {
@@ -94,6 +111,62 @@ Editor.registerPanel( 'scene.panel', {
         this._sendToView( 'scene:move-nodes', ids, parentID, nextSiblingId );
     },
 
+    'selection:selected': function ( type, ids ) {
+        if ( type !== 'node' ) {
+            return;
+        }
+
+        this._sendToView( 'selection:selected', type, ids );
+    },
+
+    'selection:unselected': function ( type, ids ) {
+        if ( type !== 'node' ) {
+            return;
+        }
+
+        this._sendToView( 'selection:unselected', type, ids );
+    },
+
+    'selection:activated': function ( type, id ) {
+        if ( type !== 'node' ) {
+            return;
+        }
+
+        this._sendToView( 'selection:activated', type, id );
+    },
+
+    'selection:deactivated': function ( type, id ) {
+        if ( type !== 'node' ) {
+            return;
+        }
+
+        this._sendToView( 'selection:deactivated', type, id );
+    },
+
+    'selection:hoverin': function ( type, id ) {
+        if ( type !== 'node' ) {
+            return;
+        }
+
+        this._sendToView( 'selection:hoverin', type, id );
+    },
+
+    'selection:hoverout': function ( type, id ) {
+        if ( type !== 'node' ) {
+            return;
+        }
+
+        this._sendToView( 'selection:hoverout', type, id );
+    },
+
+    'selection:changed': function ( type ) {
+        if ( type !== 'node' ) {
+            return;
+        }
+
+        this._sendToView( 'selection:changed', type );
+    },
+
     _sendToView: function () {
         if ( !this._viewReady ) {
             return;
@@ -107,21 +180,14 @@ Editor.registerPanel( 'scene.panel', {
         //       popIpc one by one will prevent too much sync method in one frame
         if ( !this._timeoutID ) {
             this._timeoutID = setTimeout( function () {
-                // DISABLE
-                // for ( var i = 0; i < this._ipcList.length; ++i ) {
-                //     this.$.view.send.apply( this.$.view, this._ipcList[i] );
-                // }
-                // this._ipcList = [];
-                // this._timeoutID = null;
-
                 this._popIpc();
             }.bind(this),1);
         }
     },
 
     _popIpc: function () {
-        // TEMP HACK: please ref inspector._loadInspector
-        if ( Editor._importing ) {
+        // NOTE: without EditorUI.importing, the webview.send sometimes blocking the HTMLImports
+        if ( EditorUI.importing ) {
             if ( this._ipcList.length > 0 ) {
                 this._timeoutID = setTimeout( function () {
                     this._popIpc();
@@ -143,6 +209,13 @@ Editor.registerPanel( 'scene.panel', {
                 this._popIpc();
             }.bind(this),1);
         }
+
+        // DISABLE
+        // for ( var i = 0; i < this._ipcList.length; ++i ) {
+        //     this.$.view.send.apply( this.$.view, this._ipcList[i] );
+        // }
+        // this._ipcList = [];
+        // this._timeoutID = null;
     },
 
     // view events
@@ -152,6 +225,7 @@ Editor.registerPanel( 'scene.panel', {
     },
 
     _onViewDidFinishLoad: function ( event ) {
+        this._sendToView( 'scene:transform-tool-changed', this.transformTool );
     },
 
     _onViewDidFailLoad: function ( event ) {
@@ -226,6 +300,10 @@ Editor.registerPanel( 'scene.panel', {
                 this.$.loader.hidden = true;
                 Editor.states['scene-initializing'] = false;
                 break;
+
+            case 'scene:change-transform-tool':
+                this.transformTool = event.args[0];
+                break;
         }
     },
 
@@ -260,6 +338,20 @@ Editor.registerPanel( 'scene.panel', {
             EditorUI.DragDrop.allowDrop( event.dataTransfer, true );
             EditorUI.DragDrop.updateDropEffect( event.dataTransfer, 'copy' );
         }
+    },
+
+    // value changes
+
+    _transformToolChanged: function () {
+        this._sendToView( 'scene:transform-tool-changed', this.transformTool );
+    },
+
+    _coordinateChanged: function () {
+        this._sendToView( 'scene:coordinate-changed', this.coordinate );
+    },
+
+    _pivotChanged: function () {
+        this._sendToView( 'scene:pivot-changed', this.pivot );
     },
 });
 

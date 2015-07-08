@@ -12,13 +12,16 @@
 
     // init engine-framework
     Editor.require('app://engine-framework');
+    require('./debug-helper');
 
     // init canvas-assets
     Editor.require('packages://canvas-assets/init');
 
     // init runtime
     var runtimeUrl = 'app://runtime/runtime-' + Editor.projectInfo.runtime + '/index.html';
-    Polymer.Base.importHref( runtimeUrl, null, function ( err ) {
-        Editor.error( 'Failed to load %s. message: %s', runtimeUrl, err.message );
+    EditorUI.import( runtimeUrl, function ( err ) {
+        if ( err ) {
+            Editor.error( 'Failed to load %s. message: %s', runtimeUrl, err.message );
+        }
     });
 })();
