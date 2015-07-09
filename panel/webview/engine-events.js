@@ -10,5 +10,5 @@ Fire.engine.on('node-detach-from-scene', function ( event ) {
 });
 
 Fire.engine.on('post-update', function ( event ) {
-    sceneView.$.gizmos.update();
+    sceneView.$.gizmos.repaint();
 });

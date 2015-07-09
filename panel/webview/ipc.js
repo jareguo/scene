@@ -229,6 +229,12 @@ Ipc.on('selection:unselected', function ( type, ids ) {
     window.sceneView.unselect(ids);
 });
 
+Ipc.on('scene:init-scene-view', function ( settings ) {
+    window.sceneView.$.gizmos.transformTool = settings.transformTool;
+    window.sceneView.$.gizmos.coordinate = settings.coordinate;
+    window.sceneView.$.gizmos.pivot = settings.pivot;
+});
+
 Ipc.on('scene:transform-tool-changed', function ( value ) {
     window.sceneView.$.gizmos.transformTool = value;
 });

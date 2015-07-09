@@ -44,16 +44,7 @@ Editor.registerPanel( 'scene.panel', {
     },
 
     reload: function () {
-        this._viewReady = false;
-        console.time('scene:reloading');
-
-        // change scene states
-        this.$.loader.hidden = false;
-        Editor.states['scene-initializing'] = true;
-
-        // reload the scene
         this.$.view.reloadIgnoringCache();
-        Editor.sendToAll('scene:reloading');
     },
 
     openDevTools: function () {
@@ -224,12 +215,27 @@ Editor.registerPanel( 'scene.panel', {
 
     // view events
 
+    _onViewDidStartLoading: function ( event ) {
+        console.time('scene:reloading');
+
+        this.$.loader.hidden = false;
+        this._viewReady = false;
+
+        // change scene states
+        Editor.states['scene-initializing'] = true;
+        Editor.sendToAll('scene:reloading');
+    },
+
     _onViewDomReady: function ( event ) {
         this._viewReady = true;
     },
 
     _onViewDidFinishLoad: function ( event ) {
-        this._sendToView( 'scene:transform-tool-changed', this.transformTool );
+        this._sendToView( 'scene:init-scene-view', {
+            transformTool: this.transformTool,
+            coordinate: this.coordinate,
+            pivot: this.pivot,
+        });
     },
 
     _onViewDidFailLoad: function ( event ) {
