@@ -22,6 +22,9 @@
     EditorUI.import( runtimeUrl, function ( err ) {
         if ( err ) {
             Editor.error( 'Failed to load %s. message: %s', runtimeUrl, err.message );
+            return;
         }
+
+        require('./engine-events');
     });
 })();
