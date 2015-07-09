@@ -17,6 +17,9 @@
     // init canvas-assets
     Editor.require('packages://canvas-assets/init');
 
+    // init gizmos
+    Editor.require('packages://ui-gizmos/init');
+
     // init runtime
     var runtimeUrl = 'app://runtime/runtime-' + Editor.projectInfo.runtime + '/index.html';
     EditorUI.import( runtimeUrl, function ( err ) {

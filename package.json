@@ -36,6 +36,7 @@
         "scene:node-mixin",
         "scene:create-assets",
         "scene:move-nodes",
+        "scene:delete-nodes",
         "selection:selected",
         "selection:unselected",
         "selection:activated",

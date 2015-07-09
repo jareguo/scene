@@ -111,6 +111,10 @@ Editor.registerPanel( 'scene.panel', {
         this._sendToView( 'scene:move-nodes', ids, parentID, nextSiblingId );
     },
 
+    'scene:delete-nodes': function ( ids ) {
+        this._sendToView( 'scene:delete-nodes', ids );
+    },
+
     'selection:selected': function ( type, ids ) {
         if ( type !== 'node' ) {
             return;

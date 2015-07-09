@@ -19,27 +19,10 @@ Polymer( {
             type: Number,
             value: 1.0,
         },
-
-        transformTool: {
-            type: String,
-            value: 'move',
-        },
-
-        coordinate: {
-            type: String,
-            value: 'local',
-        },
-
-        pivot: {
-            type: String,
-            value: 'pivot',
-        },
     },
 
     ready: function () {
         window.sceneView = this;
-
-        this._selection = [];
 
         var mappingH = Fire.Runtime.Settings['mapping-h'];
         var mappingV = Fire.Runtime.Settings['mapping-v'];
@@ -63,7 +46,8 @@ Polymer( {
 
             // init gizmos
             this.$.gizmos.resize();
-            this.$.gizmos.repaint();
+            this.$.gizmos.sceneToPixel = this.sceneToPixel.bind(this);
+            this.$.gizmos.pixelToScene = this.pixelToScene.bind(this);
         }.bind(this));
     },
 
@@ -72,7 +56,6 @@ Polymer( {
         this.$.grid.repaint();
 
         this.$.gizmos.resize();
-        this.$.gizmos.repaint();
     },
 
     _initEngine: function () {
@@ -127,48 +110,56 @@ Polymer( {
         });
     },
 
-    sceneToScreen: function ( x, y ) {
+    sceneToPixel: function ( x, y ) {
         return Fire.v2(
             this.$.grid.valueToPixelH(x),
             this.$.grid.valueToPixelV(y)
         );
     },
 
-    worldToScreen: function ( x, y ) {
+    worldToPixel: function ( x, y ) {
         var scene = Fire.engine.getCurrentScene();
         var scenePos = scene.transformPointToLocal( Fire.v2(x,y) );
-        return this.sceneToScreen( scenePos.x, scenePos.y );
+        return this.sceneToPixel( scenePos.x, scenePos.y );
     },
 
-    screenToScene: function ( x, y ) {
+    pixelToScene: function ( x, y ) {
         return Fire.v2(
             this.$.grid.pixelToValueH(x),
             this.$.grid.pixelToValueV(y)
         );
     },
 
-    screenToWorld: function ( x, y ) {
+    pixelToWorld: function ( x, y ) {
         var scene = Fire.engine.getCurrentScene();
-        return scene.transformPointToWorld( this.screenToScene(x,y) );
+        return scene.transformPointToWorld( this.pixelToScene(x,y) );
     },
 
     select: function ( ids ) {
-        this._selection = _.uniq(this._selection.concat(ids));
+        var selection = Editor.Selection.curSelection('node');
+        var nodeWrappers = selection.map(function ( id ) {
+            var node = Fire.engine.getRuntimeInstanceById(id);
+            return Fire.node(node);
+        });
 
-        // TODO
+        this.$.gizmos.edit(nodeWrappers);
     },
 
     unselect: function ( ids ) {
-        this._selection = _.difference( this._selection, ids );
+        var selection = Editor.Selection.curSelection('node');
+        var nodeWrappers = selection.map(function ( id ) {
+            var node = Fire.engine.getRuntimeInstanceById(id);
+            return Fire.node(node);
+        });
 
-        // TODO
+        this.$.gizmos.edit(nodeWrappers);
     },
 
     hitTest: function ( x, y ) {
         // TODO
         // this.$.gizmos.rectHitTest( x, y, 1, 1 );
 
-        var worldHitPoint = this.screenToWorld(x,y);
+        var worldHitPoint = this.pixelToWorld(x,y);
         var minDist = Number.MAX_VALUE;
         var resultNode;
 
@@ -188,8 +179,8 @@ Polymer( {
     },
 
     rectHitTest: function ( x, y, w, h ) {
-        var v1 = this.screenToWorld(x,y);
-        var v2 = this.screenToWorld(x+w,y+h);
+        var v1 = this.pixelToWorld(x,y);
+        var v2 = this.pixelToWorld(x+w,y+h);
         var worldRect = Fire.Rect.fromMinMax(v1,v2);
 
         var results = [];
@@ -349,6 +340,9 @@ Polymer( {
         this.$.grid.xAxisScaleAt ( event.offsetX, newScale );
         this.$.grid.yAxisScaleAt ( event.offsetY, newScale );
         this.$.grid.repaint();
+
+        //
+        this.$.gizmos.scale = newScale;
 
         //
         var scene = Fire.engine.getCurrentScene();

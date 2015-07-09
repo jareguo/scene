@@ -29,7 +29,7 @@ Ipc.on('scene:drop', function ( uuids, type, x, y ) {
                     nodeIDs.push( fireNode.id );
 
                     fireNode.parent = Fire.engine.getCurrentScene();
-                    fireNode.scenePosition = window.sceneView.screenToScene(x,y);
+                    fireNode.scenePosition = window.sceneView.pixelToScene(x,y);
                 }
 
                 next ();
@@ -83,7 +83,7 @@ Ipc.on('scene:create-assets', function ( uuids, nodeID ) {
                     }
                     var center_x = Fire.engine.canvasSize.x/2;
                     var center_y = Fire.engine.canvasSize.y/2;
-                    fireNode.scenePosition = window.sceneView.screenToScene( center_x, center_y );
+                    fireNode.scenePosition = window.sceneView.pixelToScene( center_x, center_y );
                 }
 
                 next ();
@@ -203,6 +203,16 @@ Ipc.on('scene:move-nodes', function ( ids, parentID, nextSiblingId ) {
     }
 });
 
+Ipc.on('scene:delete-nodes', function ( ids ) {
+    for (var i = 0; i < ids.length; i++) {
+        var id = ids[i];
+        var nodeWrapper = Fire.node(Fire.engine.getRuntimeInstanceById(id));
+        if (nodeWrapper) {
+            nodeWrapper.parent = null;
+        }
+    }
+});
+
 Ipc.on('selection:selected', function ( type, ids ) {
     if ( type !== 'node' ) {
         return;
@@ -220,13 +230,13 @@ Ipc.on('selection:unselected', function ( type, ids ) {
 });
 
 Ipc.on('scene:transform-tool-changed', function ( value ) {
-    window.sceneView.transformTool = value;
+    window.sceneView.$.gizmos.transformTool = value;
 });
 
 Ipc.on('scene:coordinate-changed', function ( value ) {
-    window.sceneView.coordinate = value;
+    window.sceneView.$.gizmos.coordinate = value;
 });
 
 Ipc.on('scene:pivot-changed', function ( value ) {
-    window.sceneView.pivot = value;
+    window.sceneView.$.gizmos.pivot = value;
 });
