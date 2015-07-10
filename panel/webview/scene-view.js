@@ -44,11 +44,11 @@ Polymer( {
             this.$.grid.repaint();
 
             // init gizmos
-            this.$.gizmos.resize();
-            this.$.gizmos.sceneToPixel = this.sceneToPixel.bind(this);
-            this.$.gizmos.worldToPixel = this.worldToPixel.bind(this);
-            this.$.gizmos.pixelToScene = this.pixelToScene.bind(this);
-            this.$.gizmos.pixelToWorld = this.pixelToWorld.bind(this);
+            this.$.gizmosView.resize();
+            this.$.gizmosView.sceneToPixel = this.sceneToPixel.bind(this);
+            this.$.gizmosView.worldToPixel = this.worldToPixel.bind(this);
+            this.$.gizmosView.pixelToScene = this.pixelToScene.bind(this);
+            this.$.gizmosView.pixelToWorld = this.pixelToWorld.bind(this);
         }.bind(this));
     },
 
@@ -56,7 +56,7 @@ Polymer( {
         this.$.grid.resize();
         this.$.grid.repaint();
 
-        this.$.gizmos.resize();
+        this.$.gizmosView.resize();
     },
 
     _initEngine: function () {
@@ -141,7 +141,7 @@ Polymer( {
             var node = Fire.engine.getRuntimeInstanceById(id);
             return Fire.node(node);
         });
-        this.$.gizmos.select(nodeWrappers);
+        this.$.gizmosView.select(nodeWrappers);
     },
 
     unselect: function ( ids ) {
@@ -150,14 +150,14 @@ Polymer( {
             return Fire.node(node);
         });
 
-        this.$.gizmos.unselect(nodeWrappers);
+        this.$.gizmosView.unselect(nodeWrappers);
     },
 
     hoverin: function ( id ) {
         var node = Fire.engine.getRuntimeInstanceById(id);
         if ( node ) {
             var nodeWrapper = Fire.node(node);
-            this.$.gizmos.hoverin(nodeWrapper);
+            this.$.gizmosView.hoverin(nodeWrapper);
         }
     },
 
@@ -165,7 +165,7 @@ Polymer( {
         var node = Fire.engine.getRuntimeInstanceById(id);
         if ( node ) {
             var nodeWrapper = Fire.node(node);
-            this.$.gizmos.hoverout(nodeWrapper);
+            this.$.gizmosView.hoverout(nodeWrapper);
         }
     },
 
@@ -181,7 +181,7 @@ Polymer( {
 
     hitTest: function ( x, y ) {
         // TODO
-        // this.$.gizmos.rectHitTest( x, y, 1, 1 );
+        // this.$.gizmosView.rectHitTest( x, y, 1, 1 );
 
         var worldHitPoint = this.pixelToWorld( Fire.v2(x,y) );
         var minDist = Number.MAX_VALUE;
@@ -226,7 +226,7 @@ Polymer( {
             }
 
             self.$.grid.hidden = true;
-            self.$.gizmos.hidden = true;
+            self.$.gizmosView.hidden = true;
 
             Ipc.sendToHost('scene:playing');
         });
@@ -289,7 +289,7 @@ Polymer( {
                                            offsety = -offsety;
                                        }
 
-                                       this.$.gizmos.updateSelectRect( x, y, offsetx, offsety );
+                                       this.$.gizmosView.updateSelectRect( x, y, offsetx, offsety );
 
                                        var nodes = this.rectHitTest( x, y, offsetx, offsety );
                                        var i, ids;
@@ -340,7 +340,7 @@ Polymer( {
                                        }
                                        else {
                                            Editor.Selection.confirm ();
-                                           this.$.gizmos.fadeoutSelectRect();
+                                           this.$.gizmosView.fadeoutSelectRect();
                                        }
                                    }.bind(this));
             }
@@ -366,7 +366,7 @@ Polymer( {
         this.$.grid.repaint();
 
         //
-        this.$.gizmos.scale = newScale;
+        this.$.gizmosView.scale = newScale;
 
         //
         var scene = Fire.engine.getCurrentScene();

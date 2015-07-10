@@ -4,7 +4,7 @@ Fire.engine.on('node-attach-to-scene', function ( event ) {
 
     var gizmoDef = Editor.gizmos[className];
     if ( gizmoDef ) {
-        wrapper.gizmo = new gizmoDef( sceneView.$.gizmos, wrapper );
+        wrapper.gizmo = new gizmoDef( sceneView.$.gizmosView, wrapper );
     }
 
     // TODO:
@@ -36,7 +36,7 @@ var _repaintGizmos = function (node) {
 };
 
 Fire.engine.on('post-update', function ( event ) {
-    sceneView.$.gizmos.repaint();
+    sceneView.$.gizmosView.repaint();
 
     var wrapper = Fire.engine.getCurrentScene();
     wrapper.runtimeChildren.map(_repaintGizmos);

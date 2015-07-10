@@ -242,19 +242,19 @@ Ipc.on('selection:hoverout', function ( type, id ) {
 });
 
 Ipc.on('scene:init-scene-view', function ( settings ) {
-    window.sceneView.$.gizmos.transformTool = settings.transformTool;
-    window.sceneView.$.gizmos.coordinate = settings.coordinate;
-    window.sceneView.$.gizmos.pivot = settings.pivot;
+    window.sceneView.$.gizmosView.transformTool = settings.transformTool;
+    window.sceneView.$.gizmosView.coordinate = settings.coordinate;
+    window.sceneView.$.gizmosView.pivot = settings.pivot;
 });
 
 Ipc.on('scene:transform-tool-changed', function ( value ) {
-    window.sceneView.$.gizmos.transformTool = value;
+    window.sceneView.$.gizmosView.transformTool = value;
 });
 
 Ipc.on('scene:coordinate-changed', function ( value ) {
-    window.sceneView.$.gizmos.coordinate = value;
+    window.sceneView.$.gizmosView.coordinate = value;
 });
 
 Ipc.on('scene:pivot-changed', function ( value ) {
-    window.sceneView.$.gizmos.pivot = value;
+    window.sceneView.$.gizmosView.pivot = value;
 });
