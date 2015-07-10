@@ -29,7 +29,7 @@ Ipc.on('scene:drop', function ( uuids, type, x, y ) {
                     nodeIDs.push( fireNode.id );
 
                     fireNode.parent = Fire.engine.getCurrentScene();
-                    fireNode.scenePosition = window.sceneView.pixelToScene(x,y);
+                    fireNode.scenePosition = window.sceneView.pixelToScene( Fire.v2(x,y) );
                 }
 
                 next ();
@@ -83,7 +83,7 @@ Ipc.on('scene:create-assets', function ( uuids, nodeID ) {
                     }
                     var center_x = Fire.engine.canvasSize.x/2;
                     var center_y = Fire.engine.canvasSize.y/2;
-                    fireNode.scenePosition = window.sceneView.pixelToScene( center_x, center_y );
+                    fireNode.scenePosition = window.sceneView.pixelToScene( Fire.v2(center_x, center_y) );
                 }
 
                 next ();

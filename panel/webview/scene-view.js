@@ -111,29 +111,29 @@ Polymer( {
         });
     },
 
-    sceneToPixel: function ( x, y ) {
+    sceneToPixel: function ( pos ) {
         return Fire.v2(
-            this.$.grid.valueToPixelH(x),
-            this.$.grid.valueToPixelV(y)
+            this.$.grid.valueToPixelH(pos.x),
+            this.$.grid.valueToPixelV(pos.y)
         );
     },
 
-    worldToPixel: function ( x, y ) {
+    worldToPixel: function (pos) {
         var scene = Fire.engine.getCurrentScene();
-        var scenePos = scene.transformPointToLocal( Fire.v2(x,y) );
-        return this.sceneToPixel( scenePos.x, scenePos.y );
+        var scenePos = scene.transformPointToLocal(pos);
+        return this.sceneToPixel( scenePos );
     },
 
-    pixelToScene: function ( x, y ) {
+    pixelToScene: function (pos) {
         return Fire.v2(
-            this.$.grid.pixelToValueH(x),
-            this.$.grid.pixelToValueV(y)
+            this.$.grid.pixelToValueH(pos.x),
+            this.$.grid.pixelToValueV(pos.y)
         );
     },
 
-    pixelToWorld: function ( x, y ) {
+    pixelToWorld: function (pos) {
         var scene = Fire.engine.getCurrentScene();
-        return scene.transformPointToWorld( this.pixelToScene(x,y) );
+        return scene.transformPointToWorld( this.pixelToScene(pos) );
     },
 
     select: function ( ids ) {
@@ -175,7 +175,7 @@ Polymer( {
         // TODO
         // this.$.gizmos.rectHitTest( x, y, 1, 1 );
 
-        var worldHitPoint = this.pixelToWorld(x,y);
+        var worldHitPoint = this.pixelToWorld( Fire.v2(x,y) );
         var minDist = Number.MAX_VALUE;
         var resultNode;
 
@@ -195,8 +195,8 @@ Polymer( {
     },
 
     rectHitTest: function ( x, y, w, h ) {
-        var v1 = this.pixelToWorld(x,y);
-        var v2 = this.pixelToWorld(x+w,y+h);
+        var v1 = this.pixelToWorld( Fire.v2(x,y) );
+        var v2 = this.pixelToWorld( Fire.v2(x+w,y+h) );
         var worldRect = Fire.Rect.fromMinMax(v1,v2);
 
         var results = [];
