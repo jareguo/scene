@@ -141,64 +141,36 @@ Editor.registerPanel( 'scene.panel', {
     },
 
     'selection:selected': function ( type, ids ) {
-        if ( type !== 'node' ) {
-            return;
-        }
-
         this._sendToView( '_selection:selected', type, ids );
         this._sendToView( 'selection:selected', type, ids );
     },
 
     'selection:unselected': function ( type, ids ) {
-        if ( type !== 'node' ) {
-            return;
-        }
-
         this._sendToView( '_selection:unselected', type, ids );
         this._sendToView( 'selection:unselected', type, ids );
     },
 
     'selection:activated': function ( type, id ) {
-        if ( type !== 'node' ) {
-            return;
-        }
-
         this._sendToView( '_selection:activated', type, id );
         this._sendToView( 'selection:activated', type, id );
     },
 
     'selection:deactivated': function ( type, id ) {
-        if ( type !== 'node' ) {
-            return;
-        }
-
         this._sendToView( '_selection:deactivated', type, id );
         this._sendToView( 'selection:deactivated', type, id );
     },
 
     'selection:hoverin': function ( type, id ) {
-        if ( type !== 'node' ) {
-            return;
-        }
-
         this._sendToView( '_selection:hoverin', type, id );
         this._sendToView( 'selection:hoverin', type, id );
     },
 
     'selection:hoverout': function ( type, id ) {
-        if ( type !== 'node' ) {
-            return;
-        }
-
         this._sendToView( '_selection:hoverout', type, id );
         this._sendToView( 'selection:hoverout', type, id );
     },
 
     'selection:changed': function ( type ) {
-        if ( type !== 'node' ) {
-            return;
-        }
-
         this._sendToView( '_selection:changed', type );
         this._sendToView( 'selection:changed', type );
     },
@@ -218,7 +190,7 @@ Editor.registerPanel( 'scene.panel', {
         if ( !this._timeoutID ) {
             this._timeoutID = setTimeout( function () {
                 this._flushIpc();
-            }.bind(this),1);
+            }.bind(this),10);
         }
     },
 
