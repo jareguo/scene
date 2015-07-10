@@ -25,7 +25,9 @@
       "shortcuts": {
           "w": "selectMove",
           "e": "selectRotate",
-          "r": "selectScale"
+          "r": "selectScale",
+          "command+backspace": "deleteCurrentSelected",
+          "ctrl+backspace": "deleteCurrentSelected"
       },
       "messages": [
         "editor:dragstart",

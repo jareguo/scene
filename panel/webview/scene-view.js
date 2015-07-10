@@ -137,7 +137,6 @@ Polymer( {
     },
 
     select: function ( ids ) {
-        // var selection = Editor.Selection.curSelection('node');
         var nodeWrappers = ids.map(function ( id ) {
             var node = Fire.engine.getRuntimeInstanceById(id);
             return Fire.node(node);
@@ -146,7 +145,6 @@ Polymer( {
     },
 
     unselect: function ( ids ) {
-        // var selection = Editor.Selection.curSelection('node');
         var nodeWrappers = ids.map(function ( id ) {
             var node = Fire.engine.getRuntimeInstanceById(id);
             return Fire.node(node);
@@ -168,6 +166,16 @@ Polymer( {
         if ( node ) {
             var nodeWrapper = Fire.node(node);
             this.$.gizmos.hoverout(nodeWrapper);
+        }
+    },
+
+    delete: function ( ids ) {
+        for (var i = 0; i < ids.length; i++) {
+            var id = ids[i];
+            var nodeWrapper = Fire.node(Fire.engine.getRuntimeInstanceById(id));
+            if (nodeWrapper) {
+                nodeWrapper.parent = null;
+            }
         }
     },
 

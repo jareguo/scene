@@ -75,6 +75,16 @@ Editor.registerPanel( 'scene.panel', {
         this.transformTool = 'scale';
     },
 
+    deleteCurrentSelected: function ( event ) {
+        if ( event ) {
+            event.stopPropagation();
+        }
+
+        var ids = Editor.Selection.curSelection('node');
+        Editor.Selection.clear('node');
+        Editor.sendToPanel( 'scene.panel', 'scene:delete-nodes', ids);
+    },
+
     'editor:dragstart': function () {
         this.$.dropArea.hidden = false;
     },
@@ -198,7 +208,8 @@ Editor.registerPanel( 'scene.panel', {
             return;
         }
 
-        this._ipcList.push(arguments);
+        var args = [].slice.call( arguments, 0 );
+        this._ipcList.push(args);
 
         // NOTE: This will prevent us send back ipc message
         //       in ipc callstack which will make ipc event in reverse order
@@ -206,42 +217,42 @@ Editor.registerPanel( 'scene.panel', {
         //       popIpc one by one will prevent too much sync method in one frame
         if ( !this._timeoutID ) {
             this._timeoutID = setTimeout( function () {
-                this._popIpc();
+                this._flushIpc();
             }.bind(this),1);
         }
     },
 
-    _popIpc: function () {
+    _flushIpc: function () {
         // NOTE: without EditorUI.importing, the webview.send sometimes blocking the HTMLImports
         if ( EditorUI.importing ) {
             if ( this._ipcList.length > 0 ) {
                 this._timeoutID = setTimeout( function () {
-                    this._popIpc();
+                    this._flushIpc();
                 }.bind(this),10);
             }
 
             return;
         }
 
-        if ( this._ipcList.length > 0 ) {
-            var args = this._ipcList.shift();
-            this.$.view.send.apply( this.$.view, args );
-        }
-
+        var list = this._ipcList;
+        this._ipcList = [];
         this._timeoutID = null;
 
-        if ( this._ipcList.length > 0 ) {
-            this._timeoutID = setTimeout( function () {
-                this._popIpc();
-            }.bind(this),1);
-        }
+        this.$.view.send( 'scene:ipc-messages', list );
 
         // DISABLE
-        // for ( var i = 0; i < this._ipcList.length; ++i ) {
-        //     this.$.view.send.apply( this.$.view, this._ipcList[i] );
+        // if ( this._ipcList.length > 0 ) {
+        //     var args = this._ipcList.shift();
+        //     this.$.view.send.apply( this.$.view, args );
         // }
-        // this._ipcList = [];
+
         // this._timeoutID = null;
+
+        // if ( this._ipcList.length > 0 ) {
+        //     this._timeoutID = setTimeout( function () {
+        //         this._flushIpc();
+        //     }.bind(this),1);
+        // }
     },
 
     // view events

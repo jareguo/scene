@@ -1,6 +1,12 @@
 var Ipc = require('ipc');
 var Async = require('async');
 
+Ipc.on('scene:ipc-messages', function ( ipcList ) {
+    for ( var i = 0; i < ipcList.length; ++i ) {
+        Ipc.emit.apply( Ipc, ipcList[i] );
+    }
+});
+
 Ipc.on('scene:play', function () {
     window.sceneView.play();
 });
@@ -204,13 +210,7 @@ Ipc.on('scene:move-nodes', function ( ids, parentID, nextSiblingId ) {
 });
 
 Ipc.on('scene:delete-nodes', function ( ids ) {
-    for (var i = 0; i < ids.length; i++) {
-        var id = ids[i];
-        var nodeWrapper = Fire.node(Fire.engine.getRuntimeInstanceById(id));
-        if (nodeWrapper) {
-            nodeWrapper.parent = null;
-        }
-    }
+    window.sceneView.delete(ids);
 });
 
 Ipc.on('selection:selected', function ( type, ids ) {

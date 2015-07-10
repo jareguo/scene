@@ -8,5 +8,5 @@ Fire.JS.get(Fire, '$0', function () {
 });
 
 Fire.JS.get(Fire, '$s', function () {
-    return Fire.node(Fire.engine.getCurrentScene());
+    return Fire.engine.getCurrentScene();
 });
