@@ -217,7 +217,6 @@ Ipc.on('selection:selected', function ( type, ids ) {
     if ( type !== 'node' ) {
         return;
     }
-
     window.sceneView.select(ids);
 });
 
@@ -225,8 +224,21 @@ Ipc.on('selection:unselected', function ( type, ids ) {
     if ( type !== 'node' ) {
         return;
     }
-
     window.sceneView.unselect(ids);
+});
+
+Ipc.on('selection:hoverin', function ( type, id ) {
+    if ( type !== 'node' ) {
+        return;
+    }
+    window.sceneView.hoverin(id);
+});
+
+Ipc.on('selection:hoverout', function ( type, id ) {
+    if ( type !== 'node' ) {
+        return;
+    }
+    window.sceneView.hoverout(id);
 });
 
 Ipc.on('scene:init-scene-view', function ( settings ) {

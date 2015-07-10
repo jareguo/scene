@@ -1,6 +1,5 @@
 (function () {
 var Ipc = require('ipc');
-var _ = require('lodash');
 
 Polymer( {
     is: 'scene-view',
@@ -47,7 +46,9 @@ Polymer( {
             // init gizmos
             this.$.gizmos.resize();
             this.$.gizmos.sceneToPixel = this.sceneToPixel.bind(this);
+            this.$.gizmos.worldToPixel = this.worldToPixel.bind(this);
             this.$.gizmos.pixelToScene = this.pixelToScene.bind(this);
+            this.$.gizmos.pixelToWorld = this.pixelToWorld.bind(this);
         }.bind(this));
     },
 
@@ -136,23 +137,38 @@ Polymer( {
     },
 
     select: function ( ids ) {
-        var selection = Editor.Selection.curSelection('node');
-        var nodeWrappers = selection.map(function ( id ) {
+        // var selection = Editor.Selection.curSelection('node');
+        var nodeWrappers = ids.map(function ( id ) {
             var node = Fire.engine.getRuntimeInstanceById(id);
             return Fire.node(node);
         });
-
-        this.$.gizmos.edit(nodeWrappers);
+        this.$.gizmos.select(nodeWrappers);
     },
 
     unselect: function ( ids ) {
-        var selection = Editor.Selection.curSelection('node');
-        var nodeWrappers = selection.map(function ( id ) {
+        // var selection = Editor.Selection.curSelection('node');
+        var nodeWrappers = ids.map(function ( id ) {
             var node = Fire.engine.getRuntimeInstanceById(id);
             return Fire.node(node);
         });
 
-        this.$.gizmos.edit(nodeWrappers);
+        this.$.gizmos.unselect(nodeWrappers);
+    },
+
+    hoverin: function ( id ) {
+        var node = Fire.engine.getRuntimeInstanceById(id);
+        if ( node ) {
+            var nodeWrapper = Fire.node(node);
+            this.$.gizmos.hoverin(nodeWrapper);
+        }
+    },
+
+    hoverout: function ( id ) {
+        var node = Fire.engine.getRuntimeInstanceById(id);
+        if ( node ) {
+            var nodeWrapper = Fire.node(node);
+            this.$.gizmos.hoverout(nodeWrapper);
+        }
     },
 
     hitTest: function ( x, y ) {
@@ -236,7 +252,7 @@ Polymer( {
             }
             else {
                 var toggleMode = false;
-                var lastSelection = Editor.Selection.entities;
+                var lastSelection = Editor.Selection.curSelection('node');
                 if ( event.metaKey || event.ctrlKey ) {
                     toggleMode = true;
                 }
@@ -368,18 +384,6 @@ Polymer( {
         if ( Editor.KeyCode(event.which) === 'shift' ) {
             this.style.cursor = '-webkit-grab';
             return;
-        }
-
-        if ( !event.metaKey && !event.shiftKey && !event.ctrlKey && !event.altKey ) {
-            if ( Editor.KeyCode(event.which) === 'w' ) {
-                Ipc.sendToHost('scene:change-transform-tool', 'move');
-            }
-            else if ( Editor.KeyCode(event.which) === 'e' ) {
-                Ipc.sendToHost('scene:change-transform-tool', 'rotate');
-            }
-            else if ( Editor.KeyCode(event.which) === 'r' ) {
-                Ipc.sendToHost('scene:change-transform-tool', 'scale');
-            }
         }
     },
 

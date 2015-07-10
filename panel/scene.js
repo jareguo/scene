@@ -51,6 +51,30 @@ Editor.registerPanel( 'scene.panel', {
         this.$.view.openDevTools();
     },
 
+    selectMove: function ( event ) {
+        if ( event ) {
+            event.stopPropagation();
+        }
+
+        this.transformTool = 'move';
+    },
+
+    selectRotate: function ( event ) {
+        if ( event ) {
+            event.stopPropagation();
+        }
+
+        this.transformTool = 'rotate';
+    },
+
+    selectScale: function ( event ) {
+        if ( event ) {
+            event.stopPropagation();
+        }
+
+        this.transformTool = 'scale';
+    },
+
     'editor:dragstart': function () {
         this.$.dropArea.hidden = false;
     },
@@ -111,6 +135,7 @@ Editor.registerPanel( 'scene.panel', {
             return;
         }
 
+        this._sendToView( '_selection:selected', type, ids );
         this._sendToView( 'selection:selected', type, ids );
     },
 
@@ -119,6 +144,7 @@ Editor.registerPanel( 'scene.panel', {
             return;
         }
 
+        this._sendToView( '_selection:unselected', type, ids );
         this._sendToView( 'selection:unselected', type, ids );
     },
 
@@ -127,6 +153,7 @@ Editor.registerPanel( 'scene.panel', {
             return;
         }
 
+        this._sendToView( '_selection:activated', type, id );
         this._sendToView( 'selection:activated', type, id );
     },
 
@@ -135,6 +162,7 @@ Editor.registerPanel( 'scene.panel', {
             return;
         }
 
+        this._sendToView( '_selection:deactivated', type, id );
         this._sendToView( 'selection:deactivated', type, id );
     },
 
@@ -143,6 +171,7 @@ Editor.registerPanel( 'scene.panel', {
             return;
         }
 
+        this._sendToView( '_selection:hoverin', type, id );
         this._sendToView( 'selection:hoverin', type, id );
     },
 
@@ -151,6 +180,7 @@ Editor.registerPanel( 'scene.panel', {
             return;
         }
 
+        this._sendToView( '_selection:hoverout', type, id );
         this._sendToView( 'selection:hoverout', type, id );
     },
 
@@ -159,6 +189,7 @@ Editor.registerPanel( 'scene.panel', {
             return;
         }
 
+        this._sendToView( '_selection:changed', type );
         this._sendToView( 'selection:changed', type );
     },
 
@@ -309,10 +340,6 @@ Editor.registerPanel( 'scene.panel', {
 
                 this.$.loader.hidden = true;
                 Editor.states['scene-initializing'] = false;
-                break;
-
-            case 'scene:change-transform-tool':
-                this.transformTool = event.args[0];
                 break;
         }
     },

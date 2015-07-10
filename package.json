@@ -23,6 +23,9 @@
       "width": "auto",
       "height": "auto",
       "shortcuts": {
+          "w": "selectMove",
+          "e": "selectRotate",
+          "r": "selectScale"
       },
       "messages": [
         "editor:dragstart",
