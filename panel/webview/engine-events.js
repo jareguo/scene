@@ -5,6 +5,7 @@ Fire.engine.on('node-attach-to-scene', function ( event ) {
     var gizmoDef = Editor.gizmos[className];
     if ( gizmoDef ) {
         wrapper.gizmo = new gizmoDef( sceneView.$.gizmosView, wrapper );
+        wrapper.gizmo.repaint();
     }
 
     // TODO:
