@@ -350,14 +350,17 @@ Editor.registerPanel( 'scene.panel', {
     },
 
     _onDragOver: function ( event ) {
-        event.preventDefault();
-
-        if ( EditorUI.DragDrop.type( event.dataTransfer ) === 'asset' ) {
-            event.stopPropagation();
-
-            EditorUI.DragDrop.allowDrop( event.dataTransfer, true );
-            EditorUI.DragDrop.updateDropEffect( event.dataTransfer, 'copy' );
+        var dragType = EditorUI.DragDrop.type(event.dataTransfer);
+        if ( dragType !== 'asset' ) {
+            EditorUI.DragDrop.allowDrop( event.dataTransfer, false );
+            return;
         }
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        EditorUI.DragDrop.allowDrop( event.dataTransfer, true );
+        EditorUI.DragDrop.updateDropEffect( event.dataTransfer, 'copy' );
     },
 
     // value changes
