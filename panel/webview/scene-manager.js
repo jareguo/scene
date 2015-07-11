@@ -35,7 +35,7 @@ Editor.initScene = function (callback) {
     else {
         // empty scene
         loadCompiledScript(function () {
-        enterEditMode(callback);
+            enterEditMode(callback);
         });
     }
 };

@@ -132,6 +132,11 @@ Editor.registerPanel( 'scene.panel', {
         this._sendToView( 'scene:create-assets', uuids, nodeID );
     },
 
+    'scene:create-new-node': function ( menuPath ) {
+        var parentId = Editor.Selection.contexts('node')[0] || Editor.Selection.curActivate('node');
+        this._sendToView( 'scene:create-new-node', menuPath, parentId );
+    },
+
     'scene:move-nodes': function ( ids, parentID, nextSiblingId ) {
         this._sendToView( 'scene:move-nodes', ids, parentID, nextSiblingId );
     },
@@ -298,7 +303,7 @@ Editor.registerPanel( 'scene.panel', {
                 Editor.states['scene-initializing'] = false;
                 Editor.states['scene-playing'] = false;
 
-                Editor.sendToAll('scene:ready');
+                Editor.sendToAll('scene:ready', event.args[0]);
                 console.timeEnd('scene:reloading');
                 break;
 

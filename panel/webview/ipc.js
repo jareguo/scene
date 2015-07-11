@@ -106,6 +106,26 @@ Ipc.on('scene:create-assets', function ( uuids, nodeID ) {
     });
 });
 
+Ipc.on('scene:create-new-node', function ( menuPath, parentID ) {
+    var parentNode;
+    if ( parentID ) {
+        parentNode = Fire.engine.getRuntimeInstanceById(parentID);
+    }
+    if ( !parentNode ) {
+        parentNode = Fire.engine.getCurrentRuntimeScene();
+    }
+    var Wrapper = Fire.menuToWrapper[menuPath];
+    if (Wrapper) {
+        var wrapper = new Wrapper();
+        wrapper.onAfterDeserialize();
+        wrapper.runtimeParent = parentNode;
+        wrapper.name = 'New ' + menuPath.split('/').slice(-1)[0];
+    }
+    else {
+        Editor.error('Unknown node create:', menuPath);
+    }
+});
+
 Ipc.on('scene:query-hierarchy', function ( queryID ) {
     var nodes = Fire.takeHierarchySnapshot();
     Editor.sendToWindows( 'scene:reply-query-hierarchy', queryID, nodes );
