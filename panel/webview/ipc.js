@@ -106,7 +106,7 @@ Ipc.on('scene:create-assets', function ( uuids, nodeID ) {
     });
 });
 
-Ipc.on('scene:create-new-node', function ( menuPath, parentID ) {
+Ipc.on('scene:create-new-node', function ( menuItem, parentID ) {
     var parentNode;
     if ( parentID ) {
         parentNode = Fire.engine.getRuntimeInstanceById(parentID);
@@ -114,15 +114,17 @@ Ipc.on('scene:create-new-node', function ( menuPath, parentID ) {
     if ( !parentNode ) {
         parentNode = Fire.engine.getCurrentRuntimeScene();
     }
-    var Wrapper = Fire.menuToWrapper[menuPath];
+    var wrapperID = menuItem.id;
+    var Wrapper = Fire.JS._getClassById(wrapperID);
     if (Wrapper) {
         var wrapper = new Wrapper();
         wrapper.onAfterDeserialize();
         wrapper.runtimeParent = parentNode;
+        var menuPath = menuItem.menuPath;
         wrapper.name = 'New ' + menuPath.split('/').slice(-1)[0];
     }
     else {
-        Editor.error('Unknown node create:', menuPath);
+        Editor.error('Unknown node to create:', wrapperID);
     }
 });
 

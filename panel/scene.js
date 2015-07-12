@@ -132,9 +132,9 @@ Editor.registerPanel( 'scene.panel', {
         this._sendToView( 'scene:create-assets', uuids, nodeID );
     },
 
-    'scene:create-new-node': function ( menuPath ) {
+    'scene:create-new-node': function ( menuItem ) {
         var parentId = Editor.Selection.contexts('node')[0] || Editor.Selection.curActivate('node');
-        this._sendToView( 'scene:create-new-node', menuPath, parentId );
+        this._sendToView( 'scene:create-new-node', menuItem, parentId );
     },
 
     'scene:move-nodes': function ( ids, parentID, nextSiblingId ) {

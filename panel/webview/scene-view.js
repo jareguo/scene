@@ -81,8 +81,7 @@ Polymer( {
                     Ipc.sendToHost('scene:init-error', err);
                 }
                 else {
-                    var menuPaths = Object.keys(Fire.menuToWrapper);
-                    Ipc.sendToHost('scene:ready', menuPaths);
+                    Ipc.sendToHost('scene:ready');
                 }
             });
         });
