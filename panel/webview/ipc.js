@@ -14,7 +14,7 @@ Ipc.on('scene:save-current', function ( url ) {
 });
 
 Ipc.on('scene:open-by-uuid', function ( uuid ) {
-    Fire.engine._loadSceneByUuid(uuid);
+    window.sceneView.load(uuid);
 });
 
 Ipc.on('scene:play', function () {

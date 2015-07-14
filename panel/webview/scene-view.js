@@ -111,6 +111,18 @@ Polymer( {
         });
     },
 
+    load: function ( uuid ) {
+        Fire.engine._loadSceneByUuid(uuid, function (err) {
+            if (err) {
+                Ipc.sendToHost('scene:init-error', err);
+            }
+            else {
+                Editor.remote.currentSceneUuid = uuid;
+                Ipc.sendToHost('scene:ready');
+            }
+        });
+    },
+
     sceneToPixel: function ( pos ) {
         return Fire.v2(
             this.$.grid.valueToPixelH(pos.x),

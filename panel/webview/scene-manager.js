@@ -33,10 +33,23 @@ Editor.initScene = function (callback) {
         );
     }
     else {
-        // empty scene
-        loadCompiledScript(function () {
-            enterEditMode(callback);
-        });
+        Async.waterfall([
+            loadCompiledScript,
+
+            function ( next ) {
+                var currentSceneUuid = Editor.remote.currentSceneUuid;
+                if ( currentSceneUuid ) {
+                    Fire.engine._loadSceneByUuid(currentSceneUuid, function ( err ) {
+                        next (err);
+                    });
+                    return;
+                }
+
+                next();
+            },
+
+            enterEditMode,
+        ], callback );
     }
 };
 

@@ -154,6 +154,11 @@ Editor.registerPanel( 'scene.panel', {
     },
 
     'scene:open-by-uuid': function ( uuid ) {
+        this.$.loader.hidden = false;
+        Editor.states['scene-initializing'] = true;
+        Editor.sendToAll('scene:reloading');
+
+        Editor.Selection.clear('node');
         this._sendToView('scene:open-by-uuid', uuid );
     },
 
@@ -363,7 +368,7 @@ Editor.registerPanel( 'scene.panel', {
                 Editor.states['scene-initializing'] = false;
                 Editor.states['scene-playing'] = false;
 
-                Editor.sendToAll('scene:ready', event.args[0]);
+                Editor.sendToAll('scene:ready');
                 console.timeEnd('scene:reloading');
                 break;
 
