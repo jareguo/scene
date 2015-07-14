@@ -8,7 +8,7 @@ Ipc.on('scene:ipc-messages', function ( ipcList ) {
 });
 
 Ipc.on('scene:new-scene', function () {
-    window.sceneView.new();
+    window.sceneView.newScene();
 });
 
 Ipc.on('scene:save-scene-from-page', function ( url ) {
@@ -19,7 +19,7 @@ Ipc.on('scene:save-scene-from-page', function ( url ) {
 });
 
 Ipc.on('scene:open-scene-by-uuid', function ( uuid ) {
-    window.sceneView.load(uuid);
+    window.sceneView.loadScene(uuid);
 });
 
 Ipc.on('scene:play', function () {

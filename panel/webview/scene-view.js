@@ -111,7 +111,7 @@ Polymer( {
         });
     },
 
-    new: function () {
+    newScene: function () {
         var SceneWrapperImpl = Fire.engine.getCurrentScene().constructor;
         var sceneWrapper = new SceneWrapperImpl();
         sceneWrapper.onAfterDeserialize();
@@ -120,7 +120,7 @@ Polymer( {
         Ipc.sendToHost('scene:ready');
     },
 
-    load: function ( uuid ) {
+    loadScene: function ( uuid ) {
         Fire.engine._loadSceneByUuid(uuid, function (err) {
             if (err) {
                 Ipc.sendToHost('scene:init-error', err);
