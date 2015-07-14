@@ -245,6 +245,12 @@ Ipc.on('scene:delete-nodes', function ( ids ) {
     window.sceneView.delete(ids);
 });
 
+Ipc.on('scene:stash-and-reload', function () {
+    Editor.cacheScene(function () {
+        Ipc.sendToHost('scene:ask-for-reload');
+    });
+});
+
 Ipc.on('selection:selected', function ( type, ids ) {
     if ( type !== 'node' ) {
         return;

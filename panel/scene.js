@@ -210,6 +210,11 @@ Editor.registerPanel( 'scene.panel', {
         this._sendToView( 'scene:delete-nodes', ids );
     },
 
+    'scene:stash-and-reload': function () {
+        this._sendToView( 'scene:stash-and-reload' );
+        this._onViewDidStartLoading();
+    },
+
     'selection:selected': function ( type, ids ) {
         this._sendToView( '_selection:selected', type, ids );
         this._sendToView( 'selection:selected', type, ids );
@@ -393,6 +398,10 @@ Editor.registerPanel( 'scene.panel', {
 
                 this.$.loader.hidden = true;
                 Editor.states['scene-initializing'] = false;
+                break;
+
+            case 'scene:ask-for-reload':
+                this.reload();
                 break;
         }
     },

@@ -45,6 +45,7 @@
         "scene:create-new-node",
         "scene:move-nodes",
         "scene:delete-nodes",
+        "scene:stash-and-reload",
         "selection:selected",
         "selection:unselected",
         "selection:activated",
