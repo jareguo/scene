@@ -62,6 +62,13 @@ function enterGameMode (next) {
     next();
 }
 
+Editor.cacheScene = function (callback) {
+    Async.waterfall([
+        dumpScene,
+        stashScene,
+    ], callback);
+};
+
 Editor.playScene = function (callback) {
     Async.waterfall(
         [

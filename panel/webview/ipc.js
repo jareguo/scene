@@ -7,6 +7,16 @@ Ipc.on('scene:ipc-messages', function ( ipcList ) {
     }
 });
 
+Ipc.on('scene:save-current', function ( url ) {
+    var scene = Fire.engine.getCurrentScene();
+    var sceneJson = Editor.serialize(scene, {stringify: false});
+    Editor.sendToCore( 'app:save-scene', url, sceneJson );
+});
+
+Ipc.on('scene:open-by-uuid', function ( uuid ) {
+    Fire.engine._loadSceneByUuid(uuid);
+});
+
 Ipc.on('scene:play', function () {
     window.sceneView.play();
 });

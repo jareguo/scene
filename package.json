@@ -33,6 +33,8 @@
         "editor:dragstart",
         "editor:dragend",
         "editor:state-changed",
+        "scene:save-current",
+        "scene:open-by-uuid",
         "scene:play",
         "scene:stop",
         "scene:query-hierarchy",

@@ -41,6 +41,29 @@ Editor.registerPanel( 'scene.panel', {
         Editor.states['scene-initializing'] = true;
 
         this._initDroppable(this.$.dropArea);
+
+        // TODO
+        // beforeunload event
+        // window.addEventListener('beforeunload', function ( event ) {
+        //     var res = this.confirmCloseScene();
+        //     switch ( res ) {
+        //     // save
+        //     case 0:
+        //         this.saveCurrentScene();
+        //         event.returnValue = true;
+        //         return;
+
+        //     // cancel
+        //     case 1:
+        //         event.returnValue = false;
+        //         return;
+
+        //     // don't save
+        //     case 2:
+        //         event.returnValue = true;
+        //         return;
+        //     }
+        // }.bind(this));
     },
 
     reload: function () {
@@ -85,6 +108,35 @@ Editor.registerPanel( 'scene.panel', {
         Editor.sendToPanel( 'scene.panel', 'scene:delete-nodes', ids);
     },
 
+    confirmCloseScene: function () {
+        var dirty = true;
+        if ( dirty ) {
+            var Url = require('fire-url');
+
+            var name = 'New Scene';
+            var url = 'assets://New Scene.fire';
+            var currentSceneUuid = Editor.remote.currentSceneUuid;
+
+            if ( currentSceneUuid ) {
+                url = Editor.assetdb.remote.uuidToUrl(currentSceneUuid);
+                name = Url.basename(url);
+            }
+
+            var Remote = require('remote');
+            var Dialog = Remote.require('dialog');
+            return Dialog.showMessageBox( Remote.getCurrentWindow(), {
+                type: 'warning',
+                buttons: ['Save','Cancel','Don\'t Save'],
+                title: 'Save Scene Confirm',
+                message: name + ' has changed, do you want to save it?',
+                detail: 'Your changes will be lost if you close this item without saving.'
+            } );
+        }
+
+        //
+        return 2;
+    },
+
     'editor:dragstart': function () {
         this.$.dropArea.hidden = false;
     },
@@ -95,6 +147,14 @@ Editor.registerPanel( 'scene.panel', {
 
     'editor:state-changed': function ( name, value ) {
         this._sendToView('editor:state-changed', name, value);
+    },
+
+    'scene:save-current': function ( url ) {
+        this._sendToView('scene:save-current', url );
+    },
+
+    'scene:open-by-uuid': function ( uuid ) {
+        this._sendToView('scene:open-by-uuid', uuid );
     },
 
     'scene:play': function () {
