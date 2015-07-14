@@ -149,17 +149,25 @@ Editor.registerPanel( 'scene.panel', {
         this._sendToView('editor:state-changed', name, value);
     },
 
-    'scene:save-current': function ( url ) {
-        this._sendToView('scene:save-current', url );
+    'scene:new-scene': function () {
+        this.$.loader.hidden = false;
+        Editor.states['scene-initializing'] = true;
+        Editor.sendToAll('scene:reloading');
+
+        this._sendToView('scene:new-scene' );
     },
 
-    'scene:open-by-uuid': function ( uuid ) {
+    'scene:save-scene-from-page': function ( url ) {
+        this._sendToView('scene:save-scene-from-page', url );
+    },
+
+    'scene:open-scene-by-uuid': function ( uuid ) {
         this.$.loader.hidden = false;
         Editor.states['scene-initializing'] = true;
         Editor.sendToAll('scene:reloading');
 
         Editor.Selection.clear('node');
-        this._sendToView('scene:open-by-uuid', uuid );
+        this._sendToView('scene:open-scene-by-uuid', uuid );
     },
 
     'scene:play': function () {

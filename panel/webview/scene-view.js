@@ -111,6 +111,15 @@ Polymer( {
         });
     },
 
+    new: function () {
+        var SceneWrapperImpl = Fire.engine.getCurrentScene().constructor;
+        var sceneWrapper = new SceneWrapperImpl();
+        sceneWrapper.onAfterDeserialize();
+        Fire.engine._launchScene(sceneWrapper);
+        Editor.remote.currentSceneUuid = null;
+        Ipc.sendToHost('scene:ready');
+    },
+
     load: function ( uuid ) {
         Fire.engine._loadSceneByUuid(uuid, function (err) {
             if (err) {
