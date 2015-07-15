@@ -27,7 +27,7 @@
           "e": "selectRotate",
           "r": "selectScale",
           "command+backspace": "deleteCurrentSelected",
-          "ctrl+backspace": "deleteCurrentSelected"
+          "del": "deleteCurrentSelected"
       },
       "messages": [
         "editor:dragstart",
