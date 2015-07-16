@@ -267,25 +267,29 @@ Polymer( {
            )
         {
             this.style.cursor = '-webkit-grabbing';
-            EditorUI.startDrag('-webkit-grabbing', event,
-                               // move
-                               function ( event, dx, dy, offsetx, offsety ) {
-                                   this.$.grid.pan( dx, dy );
-                                   this.$.grid.repaint();
+            EditorUI.startDrag(
+                '-webkit-grabbing',
+                event,
 
-                                   var scene = Fire.engine.getCurrentScene();
-                                   scene.position = Fire.v2(this.$.grid.xAxisOffset,
-                                                           -this.$.grid.yAxisOffset);
-                                   Fire.engine.repaintInEditMode();
-                               }.bind(this),
+                // move
+                function ( event, dx, dy, offsetx, offsety ) {
+                    this.$.grid.pan( dx, dy );
+                    this.$.grid.repaint();
 
-                               // end
-                               function ( event, dx, dy, offsetx, offsety ) {
-                                   if ( event.shiftKey )
-                                       this.style.cursor = '-webkit-grab';
-                                   else
-                                       this.style.cursor = '';
-                               }.bind(this));
+                    var scene = Fire.engine.getCurrentScene();
+                    scene.position = Fire.v2(this.$.grid.xAxisOffset,
+                                             -this.$.grid.yAxisOffset);
+                    Fire.engine.repaintInEditMode();
+                }.bind(this),
+
+                // end
+                function ( event, dx, dy, offsetx, offsety ) {
+                    if ( event.shiftKey )
+                        this.style.cursor = '-webkit-grab';
+                    else
+                        this.style.cursor = '';
+                }.bind(this)
+            );
 
             return;
         }
@@ -301,81 +305,84 @@ Polymer( {
             var startx = event.offsetX;
             var starty = event.offsetY;
 
-            EditorUI.startDrag('default', event,
+            EditorUI.startDrag(
+                'default',
+                event,
 
-                               // move
-                               function ( event, dx, dy, offsetx, offsety ) {
-                                   var magSqr = offsetx*offsetx + offsety*offsety;
-                                   if ( magSqr < 2.0 * 2.0 ) {
-                                       return;
-                                   }
+                // move
+                function ( event, dx, dy, offsetx, offsety ) {
+                    var magSqr = offsetx*offsetx + offsety*offsety;
+                    if ( magSqr < 2.0 * 2.0 ) {
+                        return;
+                    }
 
-                                   var x = startx;
-                                   var y = starty;
+                    var x = startx;
+                    var y = starty;
 
-                                   if ( offsetx < 0.0 ) {
-                                       x += offsetx;
-                                       offsetx = -offsetx;
-                                   }
-                                   if ( offsety < 0.0 ) {
-                                       y += offsety;
-                                       offsety = -offsety;
-                                   }
+                    if ( offsetx < 0.0 ) {
+                        x += offsetx;
+                        offsetx = -offsetx;
+                    }
+                    if ( offsety < 0.0 ) {
+                        y += offsety;
+                        offsety = -offsety;
+                    }
 
-                                   this.$.gizmosView.updateSelectRect( x, y, offsetx, offsety );
+                    this.$.gizmosView.updateSelectRect( x, y, offsetx, offsety );
 
-                                   var nodes = this.rectHitTest( x, y, offsetx, offsety );
-                                   var i, ids;
+                    var nodes = this.rectHitTest( x, y, offsetx, offsety );
+                    var i, ids;
 
-                                   // toggle mode will always act added behaviour when we in rect-select-state
-                                   if ( toggleMode ) {
-                                       ids = lastSelection.slice();
+                    // toggle mode will always act added behaviour when we in rect-select-state
+                    if ( toggleMode ) {
+                        ids = lastSelection.slice();
 
-                                       for ( i = 0; i < nodes.length; ++i ) {
-                                           if ( ids.indexOf(nodes[i].id) === -1 )
-                                               ids.push( nodes[i].id );
-                                       }
-                                   }
-                                   else {
-                                       ids = [];
+                        for ( i = 0; i < nodes.length; ++i ) {
+                            if ( ids.indexOf(nodes[i].id) === -1 )
+                                ids.push( nodes[i].id );
+                        }
+                    }
+                    else {
+                        ids = [];
 
-                                       for ( i = 0; i < nodes.length; ++i ) {
-                                           ids.push( nodes[i].id );
-                                       }
-                                   }
-                                   Editor.Selection.select ( 'node', ids, true, false );
-                               }.bind(this),
+                        for ( i = 0; i < nodes.length; ++i ) {
+                            ids.push( nodes[i].id );
+                        }
+                    }
+                    Editor.Selection.select ( 'node', ids, true, false );
+                }.bind(this),
 
-                               // end
-                               function ( event, dx, dy, offsetx, offsety ) {
-                                   var magSqr = offsetx*offsetx + offsety*offsety;
-                                   if ( magSqr < 2.0 * 2.0 ) {
-                                       var node = this.hitTest( startx, starty );
+                // end
+                function ( event, dx, dy, offsetx, offsety ) {
+                    var magSqr = offsetx*offsetx + offsety*offsety;
+                    if ( magSqr < 2.0 * 2.0 ) {
+                        var node = this.hitTest( startx, starty );
 
-                                       if ( toggleMode ) {
-                                           if ( node ) {
-                                               if ( lastSelection.indexOf(node.id) === -1 ) {
-                                                   Editor.Selection.select ( 'node', node.id, false, true );
-                                               }
-                                               else {
-                                                   Editor.Selection.unselect ( 'node', node.id, true );
-                                               }
-                                           }
-                                       }
-                                       else {
-                                           if ( node ) {
-                                               Editor.Selection.select ( 'node', node.id, true, true );
-                                           }
-                                           else {
-                                               Editor.Selection.clear ( 'node' );
-                                           }
-                                       }
-                                   }
-                                   else {
-                                       Editor.Selection.confirm ();
-                                       this.$.gizmosView.fadeoutSelectRect();
-                                   }
-                               }.bind(this));
+                        if ( toggleMode ) {
+                            if ( node ) {
+                                if ( lastSelection.indexOf(node.id) === -1 ) {
+                                    Editor.Selection.select ( 'node', node.id, false, true );
+                                }
+                                else {
+                                    Editor.Selection.unselect ( 'node', node.id, true );
+                                }
+                            }
+                        }
+                        else {
+                            if ( node ) {
+                                Editor.Selection.select ( 'node', node.id, true, true );
+                            }
+                            else {
+                                Editor.Selection.clear ( 'node' );
+                            }
+                        }
+                    }
+                    else {
+                        Editor.Selection.confirm ();
+                        this.$.gizmosView.fadeoutSelectRect();
+                    }
+                }.bind(this)
+            );
 
             return;
         }
