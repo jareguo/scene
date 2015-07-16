@@ -72,9 +72,9 @@ Ipc.on('scene:drop', function ( uuids, type, x, y ) {
     });
 });
 
-Ipc.on('scene:create-assets', function ( uuids, nodeID ) {
+Ipc.on('scene:create-assets', function ( uuids, parentID ) {
     var parentNode;
-    if ( nodeID ) {
+    if ( parentID ) {
         parentNode = Fire.engine.getRuntimeInstanceById(parentID);
     }
     if ( !parentNode ) {
