@@ -179,6 +179,7 @@ Ipc.on('scene:node-set-property', function ( id, path, value, isMixin ) {
         var objToSet = isMixin ? node : Fire.node(node);
         try {
             Editor.setDeepPropertyByPath(objToSet, path, value);
+            Fire.engine.repaintInEditMode();
         }
         catch (e) {
             Editor.warn('Failed to set property %s of %s to %s, ' + e.message,
