@@ -47,11 +47,11 @@ Ipc.on('scene:drop', function ( uuids, type, x, y ) {
             function ( node, next ) {
                 var nodeID;
                 if ( node ) {
-                    var fireNode = Fire.node(node);
-                    nodeID = fireNode.id;
+                    var wrapper = Fire.node(node);
+                    nodeID = wrapper.id;
 
-                    fireNode.parent = Fire.engine.getCurrentScene();
-                    fireNode.scenePosition = window.sceneView.pixelToScene( Fire.v2(x,y) );
+                    wrapper.position = window.sceneView.pixelToScene( Fire.v2(x,y) );
+                    wrapper.parent = Fire.engine.getCurrentScene();
                 }
 
                 next ( null, nodeID );
@@ -102,15 +102,15 @@ Ipc.on('scene:create-assets', function ( uuids, nodeID ) {
             function ( node, next ) {
                 var nodeID;
                 if ( node ) {
-                    var fireNode = Fire.node(node);
-                    nodeID = fireNode.id;
+                    var wrapper = Fire.node(node);
+                    nodeID = wrapper.id;
 
                     if ( parentNode ) {
-                        fireNode.parent = parentNode;
+                        wrapper.parent = parentNode;
                     }
                     var center_x = Fire.engine.canvasSize.x/2;
                     var center_y = Fire.engine.canvasSize.y/2;
-                    fireNode.scenePosition = window.sceneView.pixelToScene( Fire.v2(center_x, center_y) );
+                    wrapper.scenePosition = window.sceneView.pixelToScene( Fire.v2(center_x, center_y) );
                 }
 
                 next ( null, nodeID );
@@ -151,10 +151,10 @@ Ipc.on('scene:create-new-node', function ( menuItem, parentID ) {
 
         var center_x = Fire.engine.canvasSize.x/2;
         var center_y = Fire.engine.canvasSize.y/2;
-        fireNode.scenePosition = window.sceneView.pixelToScene( Fire.v2(center_x, center_y) );
+        wrapper.scenePosition = window.sceneView.pixelToScene( Fire.v2(center_x, center_y) );
 
         Fire.engine.repaintInEditMode();
-        Editor.Selection.select('node', wrapperID, true, true );
+        Editor.Selection.select('node', wrapper.id, true, true );
     }
     else {
         Editor.error('Unknown node to create:', wrapperID);
