@@ -270,7 +270,7 @@ Ipc.on('scene:delete-nodes', function ( ids ) {
 });
 
 Ipc.on('scene:stash-and-reload', function () {
-    Editor.cacheScene(function () {
+    Editor.stashScene(function () {
         Ipc.sendToHost('scene:ask-for-reload');
     });
 });
