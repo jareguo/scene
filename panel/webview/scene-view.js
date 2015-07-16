@@ -106,6 +106,7 @@ Polymer( {
                 _resizeDebounceID = null;
                 var bcr = self.getBoundingClientRect();
                 Fire.engine.canvasSize = new Fire.v2( bcr.width, bcr.height );
+                Fire.engine.repaintInEditMode();
                 self._resize();
             }, 10);
         });
