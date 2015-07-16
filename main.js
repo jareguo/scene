@@ -1,6 +1,14 @@
 var Fs = require('fire-fs');
 var Path = require('fire-path');
 
+function _updateTitile () {
+    var url = Editor.assetdb.uuidToUrl(Editor.currentSceneUuid);
+    if ( !url ) {
+        url = 'Untitled';
+    }
+    Editor.mainWindow.nativeWin.setTitle( 'Fireball Editor - ' + url );
+}
+
 module.exports = {
     load: function () {
     },
@@ -13,12 +21,7 @@ module.exports = {
     },
 
     'scene:ready': function () {
-        var url = Editor.assetdb.uuidToUrl(Editor.currentSceneUuid);
-        if ( !url ) {
-            url = 'Untitled';
-        }
-
-        Editor.mainWindow.nativeWin.setTitle( 'Fireball Editor - ' + url );
+        _updateTitile();
     },
 
     'scene:save-scene': function (url, json) {
@@ -33,6 +36,9 @@ module.exports = {
                                          url, err.stack);
                                          return;
                 }
+
+                Editor.currentSceneUuid = results[0].uuid;
+                _updateTitile();
 
                 results = results.map( function(result) {
                     var parentPath = Path.dirname(result.path);
