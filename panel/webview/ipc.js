@@ -75,10 +75,10 @@ Ipc.on('scene:drop', function ( uuids, type, x, y ) {
 Ipc.on('scene:create-assets', function ( uuids, nodeID ) {
     var parentNode;
     if ( nodeID ) {
-        parentNode = Fire.node(Fire.engine.getRuntimeInstanceById(nodeID));
+        parentNode = Fire.engine.getRuntimeInstanceById(parentID);
     }
     if ( !parentNode ) {
-        parentNode = Fire.engine.getCurrentScene();
+        parentNode = Fire.engine.getCurrentRuntimeScene();
     }
 
     Editor.Selection.clear('node');
@@ -106,7 +106,7 @@ Ipc.on('scene:create-assets', function ( uuids, nodeID ) {
                     nodeID = wrapper.id;
 
                     if ( parentNode ) {
-                        wrapper.parent = parentNode;
+                        wrapper.runtimeParent = parentNode;
                     }
                     var center_x = Fire.engine.canvasSize.x/2;
                     var center_y = Fire.engine.canvasSize.y/2;
@@ -273,6 +273,34 @@ Ipc.on('scene:stash-and-reload', function () {
     Editor.cacheScene(function () {
         Ipc.sendToHost('scene:ask-for-reload');
     });
+});
+
+Ipc.on('selection:activated', function ( type, id ) {
+    if ( type !== 'node' || !id ) {
+        return;
+    }
+
+    var wrapper = Fire.engine.getInstanceById(id);
+    if ( wrapper && wrapper.constructor.animatableInEditor ) {
+        if ( wrapper.onFocusInEditor )
+            wrapper.onFocusInEditor();
+
+        Fire.engine.animatingInEditMode = true;
+    }
+});
+
+Ipc.on('selection:deactivated', function ( type, id ) {
+    if ( type !== 'node' ) {
+        return;
+    }
+
+    var wrapper = Fire.engine.getInstanceById(id);
+    if ( wrapper && wrapper.constructor.animatableInEditor ) {
+        if ( wrapper.onLostFocusInEditor )
+            wrapper.onLostFocusInEditor();
+
+        Fire.engine.animatingInEditMode = false;
+    }
 });
 
 Ipc.on('selection:selected', function ( type, ids ) {
