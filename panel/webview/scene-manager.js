@@ -6,6 +6,14 @@ function enterEditMode (next) {
     next();
 }
 
+function createScene (sceneJson, next) {
+    // Assets will be loaded by SceneWrapper.prototype.create, here we just deserialize the scene graph
+    var scene = Fire.deserialize(sceneJson);
+    Fire.engine._initScene(scene, function () {
+        next(null, scene);
+    });
+}
+
 Editor.initScene = function (callback) {
     var sceneJson = Editor.remote.stashedScene; // a remote sync method
     if (sceneJson) {
@@ -13,16 +21,7 @@ Editor.initScene = function (callback) {
         Async.waterfall(
             [
                 loadCompiledScript,
-                function (next) {
-                    // Assets will be loaded by SceneWrapper.prototype.create, here we just deserialize the scene graph
-                    var scene = Fire.deserialize(sceneJson);
-                    next(null, scene);
-                },
-                function (scene, next) {
-                    Fire.engine._initScene(scene, function () {
-                        next(null, scene);
-                    });
-                },
+                createScene.bind(this, sceneJson),
                 function (scene, next) {
                     Fire.engine._launchScene(scene);
                     Fire.engine.repaintInEditMode();
@@ -55,43 +54,31 @@ Editor.initScene = function (callback) {
     }
 };
 
-
-function dumpScene (next) {
+Editor.stashScene = function (next) {
     var scene = Fire.engine.getCurrentScene();
-    var sceneJson = Editor.serialize(scene, {stringify: false});
-    next(null, sceneJson);
-}
-
-function stashScene (jsonObj, next) {
-    // TODO - including current-selection, editor-camera...
+    var jsonObj = Editor.serialize(scene, {stringify: false});
     Editor.remote.stashedScene = jsonObj;
-    next();
-}
-
-function enterGameMode (next) {
-    // reset scene camera
-    var scene = Fire.engine.getCurrentScene();
-    scene.position = Fire.Vec2.zero;
-    scene.scale = Fire.Vec2.one;
-    // TODO - clear selection (gizmo)
-    next();
-}
-
-Editor.cacheScene = function (callback) {
-    Async.waterfall([
-        dumpScene,
-        stashScene,
-    ], callback);
+    next(null, jsonObj);
 };
 
 Editor.playScene = function (callback) {
     Async.waterfall(
         [
-            dumpScene,
-            stashScene,
-            enterGameMode,
-            function (next) {
-                Fire.engine.play();
+            Editor.stashScene,
+            createScene,    // instantiate a new scene to play
+            function (scene, next) {
+                // reset scene camera
+                scene.position = Fire.Vec2.zero;
+                scene.scale = Fire.Vec2.one;
+                // play new scene
+                Fire.engine._launchScene(scene, function () {
+                    //if (this.$.pause.active) {
+                    //    Fire.engine.step();
+                    //}
+                    //else {
+                        Fire.engine.play();
+                    //}
+                });
                 next();
             },
         ],
