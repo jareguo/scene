@@ -41,6 +41,7 @@ Editor.initScene = function (callback) {
                 var currentSceneUuid = Editor.remote.currentSceneUuid;
                 if ( currentSceneUuid ) {
                     Fire.engine._loadSceneByUuid(currentSceneUuid, function ( err ) {
+                        Fire.engine.repaintInEditMode();
                         next (err);
                     });
                     return;
