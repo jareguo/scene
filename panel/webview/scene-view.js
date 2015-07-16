@@ -269,6 +269,7 @@ Polymer( {
                                        var scene = Fire.engine.getCurrentScene();
                                        scene.position = Fire.v2(this.$.grid.xAxisOffset,
                                                                -this.$.grid.yAxisOffset);
+                                       Fire.engine.repaintInEditMode();
                                    }.bind(this),
 
                                    // end
@@ -393,6 +394,7 @@ Polymer( {
         var scene = Fire.engine.getCurrentScene();
         scene.scale = Fire.v2( this.$.grid.xAxisScale, this.$.grid.yAxisScale );
         scene.position = Fire.v2(this.$.grid.xAxisOffset, -this.$.grid.yAxisOffset);
+        Fire.engine.repaintInEditMode();
     },
 
     _onMouseMove: function ( event ) {
