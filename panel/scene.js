@@ -220,7 +220,6 @@ Editor.registerPanel( 'scene.panel', {
 
     'scene:stash-and-reload': function () {
         this._sendToView( 'scene:stash-and-reload' );
-        this._onViewDidStartLoading();
     },
 
     'selection:selected': function ( type, ids ) {
