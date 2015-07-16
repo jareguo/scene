@@ -5,11 +5,13 @@ Fire.engine.on('node-attach-to-scene', function ( event ) {
     var gizmoDef = Editor.gizmos[className];
     if ( gizmoDef ) {
         wrapper.gizmo = new gizmoDef( sceneView.$.gizmosView, wrapper );
-        wrapper.gizmo.repaint();
+        wrapper.gizmo.update();
     }
 
     // TODO:
     // wrapper.mixinGizmos =
+
+    Fire.engine.repaintInEditMode();
 });
 
 Fire.engine.on('node-detach-from-scene', function ( event ) {
@@ -21,24 +23,26 @@ Fire.engine.on('node-detach-from-scene', function ( event ) {
 
     // TODO:
     // wrapper.mixinGizmos =
+
+    Fire.engine.repaintInEditMode();
 });
 
-var _repaintGizmos = function (node) {
+var _updateGizmos = function (node) {
     var wrapper = Fire.node(node);
     if ( wrapper.gizmo ) {
-        wrapper.gizmo.repaint();
+        wrapper.gizmo.update();
     }
 
     // TODO:
     // wrapper.mixinGizmos =
 
     var runtimeChildren = wrapper.runtimeChildren;
-    runtimeChildren.map(_repaintGizmos);
+    runtimeChildren.map(_updateGizmos);
 };
 
 Fire.engine.on('post-update', function ( event ) {
-    sceneView.$.gizmosView.repaint();
+    sceneView.$.gizmosView.update();
 
     var wrapper = Fire.engine.getCurrentScene();
-    wrapper.runtimeChildren.map(_repaintGizmos);
+    wrapper.runtimeChildren.map(_updateGizmos);
 });

@@ -25,6 +25,7 @@ Editor.initScene = function (callback) {
                 },
                 function (scene, next) {
                     Fire.engine._launchScene(scene);
+                    Fire.engine.repaintInEditMode();
                     next();
                 },
                 enterEditMode,

@@ -116,12 +116,16 @@ Polymer( {
         var sceneWrapper = new SceneWrapperImpl();
         sceneWrapper.onAfterDeserialize();
         Fire.engine._launchScene(sceneWrapper);
+        Fire.engine.repaintInEditMode();
+
         Editor.remote.currentSceneUuid = null;
         Ipc.sendToHost('scene:ready');
     },
 
     loadScene: function ( uuid ) {
         Fire.engine._loadSceneByUuid(uuid, function (err) {
+            Fire.engine.repaintInEditMode();
+
             if (err) {
                 Ipc.sendToHost('scene:init-error', err);
             }
