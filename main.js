@@ -27,7 +27,20 @@ module.exports = {
     'scene:save-scene': function (url, json) {
         var fspath = Editor.assetdb._fspath(url);
         if ( Fs.existsSync(fspath) ) {
-            Editor.assetdb.save( url, json );
+            Editor.assetdb.save( url, json, function ( err, meta ) {
+                if ( err ) {
+                    Editor.assetdb.error('Failed to save scene %s', url, err.stack);
+                    return;
+                }
+
+                Editor.currentSceneUuid = meta.uuid;
+                _updateTitile();
+
+                Editor.sendToAll( 'asset-db:asset-changed', {
+                    type: meta['meta-type'],
+                    uuid: meta.uuid,
+                });
+            });
         }
         else {
             Editor.assetdb.create( url, json, function ( err, results ) {
