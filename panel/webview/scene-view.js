@@ -52,6 +52,24 @@ Polymer( {
         }.bind(this));
     },
 
+    reset: function ( x, y, scale ) {
+        this.scale = scale;
+
+        //
+        this.$.grid.xAxisSync ( x, scale );
+        this.$.grid.yAxisSync ( y, scale );
+        this.$.grid.repaint();
+
+        //
+        this.$.gizmosView.scale = scale;
+
+        //
+        var scene = Fire.engine.getCurrentScene();
+        scene.scale = Fire.v2( this.$.grid.xAxisScale, this.$.grid.yAxisScale );
+        scene.position = Fire.v2(this.$.grid.xAxisOffset, -this.$.grid.yAxisOffset);
+        Fire.engine.repaintInEditMode();
+    },
+
     _resize: function () {
         this.$.grid.resize();
         this.$.grid.repaint();
@@ -191,6 +209,10 @@ Polymer( {
     },
 
     select: function ( ids ) {
+        if ( Editor.states['scene-playing'] ) {
+            return;
+        }
+
         var nodeWrappers = ids.map(function ( id ) {
             var node = Fire.engine.getRuntimeInstanceById(id);
             return Fire.node(node);
@@ -199,6 +221,10 @@ Polymer( {
     },
 
     unselect: function ( ids ) {
+        if ( Editor.states['scene-playing'] ) {
+            return;
+        }
+
         var nodeWrappers = ids.map(function ( id ) {
             var node = Fire.engine.getRuntimeInstanceById(id);
             return Fire.node(node);
@@ -273,15 +299,6 @@ Polymer( {
 
     play: function () {
         var self = this;
-
-        // store selection, scene-view postion, scene-view scale
-        Editor.Selection.clear('node');
-
-        // reset scene gizmos, scene grid
-        self.$.grid.hidden = true;
-        self.$.gizmosView.reset();
-        self.$.gizmosView.hidden = true;
-
         //
         Editor.playScene(function (err) {
             if (err) {

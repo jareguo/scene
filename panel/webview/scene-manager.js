@@ -1,8 +1,26 @@
 var Async = require('async');
 
-function enterEditMode (next) {
+function enterEditMode ( stashedScene, next ) {
+    if ( stashedScene ) {
+        // restore selection
+        var selection = [];
+        var pathIDsList = stashedScene.sceneSelection;
+        pathIDsList.forEach( function ( pathIDs ) {
+            var node = findByPathIDs ( pathIDs );
+            if ( node ) {
+                selection.push(node.id);
+            }
+        });
+        Editor.Selection.select('node', selection, true, true);
+
+        // restore scene view
+
+        window.sceneView.reset(stashedScene.sceneOffsetX,
+                               stashedScene.sceneOffsetY,
+                               stashedScene.sceneScale );
+    }
+
     Editor.remote.stashedScene = null;
-    // TODO - restore selection (gizmo)
     next();
 }
 
@@ -14,8 +32,35 @@ function createScene (sceneJson, next) {
     });
 }
 
+function getPathIDs ( wrapper ) {
+    var pathIDs = [];
+    for (var w = wrapper; w && !w.isScene; w = w.parent) {
+        pathIDs.push(w.getSiblingIndex());
+    }
+    return pathIDs.reverse();
+}
+
+function findByPathIDs ( pathIDs ) {
+    // getCurrentScene
+    var scene = Fire.engine.getCurrentScene();
+    var node;
+    for ( var i = 0, children = scene.runtimeChildren;
+          i < pathIDs.length;
+          i++, children = node.runtimeChildren )
+    {
+        var index = pathIDs[i];
+        if (index < children.length) {
+            node = Fire.node(children[index]);
+            continue;
+        }
+        return null;
+    }
+    return node;
+}
+
 Editor.initScene = function (callback) {
-    var sceneJson = Editor.remote.stashedScene; // a remote sync method
+    var stashedScene = Editor.remote.stashedScene; // a remote sync method
+    var sceneJson = stashedScene ? stashedScene.sceneJson : null;
     if (sceneJson) {
         // load last editing scene
         Async.waterfall(
@@ -25,7 +70,7 @@ Editor.initScene = function (callback) {
                 function (scene, next) {
                     Fire.engine._launchScene(scene);
                     Fire.engine.repaintInEditMode();
-                    next();
+                    next( null, stashedScene );
                 },
                 enterEditMode,
             ],
@@ -46,7 +91,7 @@ Editor.initScene = function (callback) {
                     return;
                 }
 
-                next();
+                next( null, null );
             },
 
             enterEditMode,
@@ -55,10 +100,35 @@ Editor.initScene = function (callback) {
 };
 
 Editor.stashScene = function (next) {
-    // store the scene
+    // get scene json
     var scene = Fire.engine.getCurrentScene();
     var jsonObj = Editor.serialize(scene, {stringify: false});
-    Editor.remote.stashedScene = jsonObj;
+
+    // store selection
+    var selection = Editor.Selection.curSelection('node');
+    var paths = [];
+    for ( var i = 0; i < selection.length; ++i ) {
+        paths.push( getPathIDs( Fire.engine.getInstanceById(selection[i]) ) );
+    }
+
+    // store the scene, scene-view postion, scene-view scale
+    Editor.remote.stashedScene = {
+        sceneJson: jsonObj,
+        sceneScale: window.sceneView.scale,
+        sceneOffsetX: window.sceneView.$.grid.xAxisOffset,
+        sceneOffsetY: window.sceneView.$.grid.yAxisOffset,
+        sceneSelection: paths,
+    };
+
+    // reset selection
+    Editor.Selection.clear('node');
+
+    // reset scene gizmos, scene grid
+    window.sceneView.$.gizmosView.reset();
+
+    // reset Fire.engine editing state
+    Fire.engine.animatingInEditMode = false;
+
     next(null, jsonObj);
 };
 
@@ -73,6 +143,9 @@ Editor.playScene = function (callback) {
                 scene.scale = Fire.Vec2.one;
                 // play new scene
                 Fire.engine._launchScene(scene, function () {
+                    window.sceneView.$.grid.hidden = true;
+                    window.sceneView.$.gizmosView.hidden = true;
+
                     //if (this.$.pause.active) {
                     //    Fire.engine.step();
                     //}
