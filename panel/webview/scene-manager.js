@@ -15,9 +15,9 @@ function enterEditMode ( stashedScene, next ) {
 
         // restore scene view
 
-        window.sceneView.reset(stashedScene.sceneOffsetX,
-                               stashedScene.sceneOffsetY,
-                               stashedScene.sceneScale );
+        window.sceneView.init(stashedScene.sceneOffsetX,
+                              stashedScene.sceneOffsetY,
+                              stashedScene.sceneScale );
     }
 
     Editor.remote.stashedScene = null;
@@ -120,14 +120,8 @@ Editor.stashScene = function (next) {
         sceneSelection: paths,
     };
 
-    // reset selection
-    Editor.Selection.clear('node');
-
-    // reset scene gizmos, scene grid
-    window.sceneView.$.gizmosView.reset();
-
-    // reset Fire.engine editing state
-    Fire.engine.animatingInEditMode = false;
+    // reset scene view
+    window.sceneView.reset();
 
     next(null, jsonObj);
 };

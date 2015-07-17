@@ -52,7 +52,18 @@ Polymer( {
         }.bind(this));
     },
 
-    reset: function ( x, y, scale ) {
+    reset: function () {
+        // reset scene gizmos, scene grid
+        window.sceneView.$.gizmosView.reset();
+
+        // reset Fire.engine editing state
+        Fire.engine.animatingInEditMode = false;
+
+        // reset selection
+        Editor.Selection.clear('node');
+    },
+
+    init: function ( x, y, scale ) {
         this.scale = scale;
 
         //
@@ -134,7 +145,10 @@ Polymer( {
         var SceneWrapperImpl = Fire.engine.getCurrentScene().constructor;
         var sceneWrapper = new SceneWrapperImpl();
         sceneWrapper.onAfterDeserialize();
+
+        this.reset();
         Fire.engine._launchScene(sceneWrapper);
+        this.init( 0, 0, 1.0 );
         Fire.engine.repaintInEditMode();
 
         Editor.remote.currentSceneUuid = null;
@@ -142,7 +156,12 @@ Polymer( {
     },
 
     loadScene: function ( uuid ) {
+        var self = this;
+
+        self.reset();
+
         Fire.engine._loadSceneByUuid(uuid, function (err) {
+            self.init( 0, 0, 1.0 );
             Fire.engine.repaintInEditMode();
 
             if (err) {

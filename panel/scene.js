@@ -171,7 +171,6 @@ Editor.registerPanel( 'scene.panel', {
 
         Editor.sendToAll('scene:reloading');
 
-        Editor.Selection.clear('node');
         this._sendToView('scene:open-scene-by-uuid', uuid );
     },
 
