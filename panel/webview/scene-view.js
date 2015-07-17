@@ -162,6 +162,34 @@ Polymer( {
         return scene.transformPointToWorld( this.pixelToScene(pos) );
     },
 
+    activate: function ( id ) {
+        if ( Editor.states['scene-playing'] ) {
+            return;
+        }
+
+        var wrapper = Fire.engine.getInstanceById(id);
+        if ( wrapper && wrapper.constructor.animatableInEditor ) {
+            if ( wrapper.onFocusInEditor )
+                wrapper.onFocusInEditor();
+
+            Fire.engine.animatingInEditMode = true;
+        }
+    },
+
+    deactivate: function ( id ) {
+        if ( Editor.states['scene-playing'] ) {
+            return;
+        }
+
+        var wrapper = Fire.engine.getInstanceById(id);
+        if ( wrapper && wrapper.constructor.animatableInEditor ) {
+            if ( wrapper.onLostFocusInEditor )
+                wrapper.onLostFocusInEditor();
+
+            Fire.engine.animatingInEditMode = false;
+        }
+    },
+
     select: function ( ids ) {
         var nodeWrappers = ids.map(function ( id ) {
             var node = Fire.engine.getRuntimeInstanceById(id);
@@ -245,15 +273,21 @@ Polymer( {
 
     play: function () {
         var self = this;
+
+        // store selection, scene-view postion, scene-view scale
+        Editor.Selection.clear('node');
+
+        // reset scene gizmos, scene grid
+        self.$.grid.hidden = true;
+        self.$.gizmosView.reset();
+        self.$.gizmosView.hidden = true;
+
+        //
         Editor.playScene(function (err) {
             if (err) {
                 Ipc.sendToHost('scene:play-error', err);
                 return;
             }
-
-            self.$.grid.hidden = true;
-            self.$.gizmosView.hidden = true;
-
             Ipc.sendToHost('scene:playing');
         });
     },

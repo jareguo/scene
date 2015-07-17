@@ -55,6 +55,7 @@ Editor.initScene = function (callback) {
 };
 
 Editor.stashScene = function (next) {
+    // store the scene
     var scene = Fire.engine.getCurrentScene();
     var jsonObj = Editor.serialize(scene, {stringify: false});
     Editor.remote.stashedScene = jsonObj;

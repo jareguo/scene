@@ -280,13 +280,7 @@ Ipc.on('selection:activated', function ( type, id ) {
         return;
     }
 
-    var wrapper = Fire.engine.getInstanceById(id);
-    if ( wrapper && wrapper.constructor.animatableInEditor ) {
-        if ( wrapper.onFocusInEditor )
-            wrapper.onFocusInEditor();
-
-        Fire.engine.animatingInEditMode = true;
-    }
+    window.sceneView.activate(id);
 });
 
 Ipc.on('selection:deactivated', function ( type, id ) {
@@ -294,13 +288,7 @@ Ipc.on('selection:deactivated', function ( type, id ) {
         return;
     }
 
-    var wrapper = Fire.engine.getInstanceById(id);
-    if ( wrapper && wrapper.constructor.animatableInEditor ) {
-        if ( wrapper.onLostFocusInEditor )
-            wrapper.onLostFocusInEditor();
-
-        Fire.engine.animatingInEditMode = false;
-    }
+    window.sceneView.deactivate(id);
 });
 
 Ipc.on('selection:selected', function ( type, ids ) {

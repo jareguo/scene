@@ -39,6 +39,7 @@ Editor.registerPanel( 'scene.panel', {
         this._ipcList = [];
 
         Editor.states['scene-initializing'] = true;
+        Editor.states['scene-playing'] = false;
 
         this._initDroppable(this.$.dropArea);
 
@@ -152,6 +153,8 @@ Editor.registerPanel( 'scene.panel', {
     'scene:new-scene': function () {
         this.$.loader.hidden = false;
         Editor.states['scene-initializing'] = true;
+        Editor.states['scene-playing'] = false;
+
         Editor.sendToAll('scene:reloading');
 
         this._sendToView('scene:new-scene' );
@@ -164,6 +167,8 @@ Editor.registerPanel( 'scene.panel', {
     'scene:open-scene-by-uuid': function ( uuid ) {
         this.$.loader.hidden = false;
         Editor.states['scene-initializing'] = true;
+        Editor.states['scene-playing'] = false;
+
         Editor.sendToAll('scene:reloading');
 
         Editor.Selection.clear('node');
@@ -173,6 +178,7 @@ Editor.registerPanel( 'scene.panel', {
     'scene:play': function () {
         this.$.loader.hidden = false;
         Editor.states['scene-initializing'] = true;
+        Editor.states['scene-playing'] = true;
 
         this._sendToView('scene:play');
     },
@@ -180,6 +186,7 @@ Editor.registerPanel( 'scene.panel', {
     'scene:stop': function () {
         this.$.loader.hidden = false;
         Editor.states['scene-initializing'] = true;
+        Editor.states['scene-playing'] = false;
 
         this.$.view.reloadIgnoringCache();
         Editor.sendToAll('scene:reloading');
@@ -319,6 +326,8 @@ Editor.registerPanel( 'scene.panel', {
 
         // change scene states
         Editor.states['scene-initializing'] = true;
+        Editor.states['scene-playing'] = false;
+
         Editor.sendToAll('scene:reloading');
     },
 
@@ -378,7 +387,6 @@ Editor.registerPanel( 'scene.panel', {
             case 'scene:ready':
                 this.$.loader.hidden = true;
                 Editor.states['scene-initializing'] = false;
-                Editor.states['scene-playing'] = false;
 
                 Editor.sendToAll('scene:ready');
                 console.timeEnd('scene:reloading');
@@ -387,7 +395,6 @@ Editor.registerPanel( 'scene.panel', {
             case 'scene:playing':
                 this.$.loader.hidden = true;
                 Editor.states['scene-initializing'] = false;
-                Editor.states['scene-playing'] = true;
 
                 break;
 
