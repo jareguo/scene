@@ -202,6 +202,13 @@ Ipc.on('scene:node-mixin', function ( id, uuid ) {
     }
 });
 
+Ipc.on('scene:node-unmixin', function ( id, className ) {
+    var node = Fire.engine.getRuntimeInstanceById(id);
+    if (node) {
+        Fire.unMixin( node, className);
+    }
+});
+
 Ipc.on('scene:move-nodes', function ( ids, parentID, nextSiblingId ) {
     var parent;
 

@@ -208,6 +208,10 @@ Editor.registerPanel( 'scene.panel', {
         this._sendToView( 'scene:node-mixin', id, uuid );
     },
 
+    'scene:node-unmixin': function ( id, className ) {
+        this._sendToView( 'scene:node-unmixin', id, className );
+    },
+
     'scene:create-assets': function ( uuids, nodeID ) {
         this._sendToView( 'scene:create-assets', uuids, nodeID );
     },

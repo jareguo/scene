@@ -42,6 +42,7 @@
         "scene:query-node",
         "scene:node-set-property",
         "scene:node-mixin",
+        "scene:node-unmixin",
         "scene:create-assets",
         "scene:create-new-node",
         "scene:move-nodes",
