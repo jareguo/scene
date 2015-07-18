@@ -68,7 +68,9 @@ Editor.registerPanel( 'scene.panel', {
     },
 
     reload: function () {
-        this.$.view.reloadIgnoringCache();
+        if ( this._viewReady ) {
+            this.$.view.reloadIgnoringCache();
+        }
     },
 
     openDevTools: function () {
@@ -216,8 +218,10 @@ Editor.registerPanel( 'scene.panel', {
     },
 
     'scene:create-node-by-classid': function ( name, classid ) {
-        var parentID = Editor.Selection.contexts('node')[0] || Editor.Selection.curActivate('node');
-        this._sendToView( 'scene:create-node-by-classid', name, classid, parentID );
+        // TODO: check if use contenxt menu
+        // var parentID = Editor.Selection.contexts('node')[0] || Editor.Selection.curActivate('node');
+        var nodeID = Editor.Selection.curActivate('node');
+        this._sendToView( 'scene:create-node-by-classid', name, classid, nodeID );
     },
 
     'scene:move-nodes': function ( ids, parentID, nextSiblingId ) {
