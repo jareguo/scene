@@ -211,13 +211,13 @@ Editor.registerPanel( 'scene.panel', {
         this._sendToView( 'scene:node-unmixin', id, className );
     },
 
-    'scene:create-assets': function ( uuids, nodeID ) {
-        this._sendToView( 'scene:create-assets', uuids, nodeID );
+    'scene:create-nodes-by-uuids': function ( uuids, parentID ) {
+        this._sendToView( 'scene:create-nodes-by-uuids', uuids, parentID );
     },
 
-    'scene:create-new-node': function ( menuItem ) {
-        var parentId = Editor.Selection.contexts('node')[0] || Editor.Selection.curActivate('node');
-        this._sendToView( 'scene:create-new-node', menuItem, parentId );
+    'scene:create-node-by-classid': function ( name, classid ) {
+        var parentID = Editor.Selection.contexts('node')[0] || Editor.Selection.curActivate('node');
+        this._sendToView( 'scene:create-node-by-classid', name, classid, parentID );
     },
 
     'scene:move-nodes': function ( ids, parentID, nextSiblingId ) {

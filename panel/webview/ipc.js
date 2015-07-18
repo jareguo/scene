@@ -72,7 +72,7 @@ Ipc.on('scene:drop', function ( uuids, type, x, y ) {
     });
 });
 
-Ipc.on('scene:create-assets', function ( uuids, parentID ) {
+Ipc.on('scene:create-nodes-by-uuids', function ( uuids, parentID ) {
     var parentNode;
     if ( parentID ) {
         parentNode = Fire.engine.getRuntimeInstanceById(parentID);
@@ -131,7 +131,7 @@ Ipc.on('scene:create-assets', function ( uuids, parentID ) {
     });
 });
 
-Ipc.on('scene:create-new-node', function ( menuItem, parentID ) {
+Ipc.on('scene:create-node-by-classid', function ( name, classID, parentID ) {
     var parentNode;
     if ( parentID ) {
         parentNode = Fire.engine.getRuntimeInstanceById(parentID);
@@ -139,15 +139,12 @@ Ipc.on('scene:create-new-node', function ( menuItem, parentID ) {
     if ( !parentNode ) {
         parentNode = Fire.engine.getCurrentRuntimeScene();
     }
-    var wrapperID = menuItem.id;
-    var Wrapper = Fire.JS._getClassById(wrapperID);
+    var Wrapper = Fire.JS._getClassById(classID);
     if (Wrapper) {
         var wrapper = new Wrapper();
         wrapper.onAfterDeserialize();
         wrapper.runtimeParent = parentNode;
-
-        var menuPath = menuItem.menuPath;
-        wrapper.name = 'New ' + menuPath.split('/').slice(-1)[0];
+        wrapper.name = name;
 
         var center_x = Fire.engine.canvasSize.x/2;
         var center_y = Fire.engine.canvasSize.y/2;
@@ -157,7 +154,7 @@ Ipc.on('scene:create-new-node', function ( menuItem, parentID ) {
         Editor.Selection.select('node', wrapper.id, true, true );
     }
     else {
-        Editor.error('Unknown node to create:', wrapperID);
+        Editor.error('Unknown node to create:', classID);
     }
 });
 
