@@ -266,6 +266,11 @@ Editor.registerPanel( 'scene.panel', {
         this._sendToView( 'selection:hoverout', type, id );
     },
 
+    'selection:context': function ( type, id ) {
+        this._sendToView( '_selection:context', type, id );
+        this._sendToView( 'selection:context', type, id );
+    },
+
     'selection:changed': function ( type ) {
         this._sendToView( '_selection:changed', type );
         this._sendToView( 'selection:changed', type );

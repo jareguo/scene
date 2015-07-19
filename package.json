@@ -55,7 +55,8 @@
         "selection:deactivated",
         "selection:hoverin",
         "selection:hoverout",
-        "selection:changed"
+        "selection:changed",
+        "selection:context"
       ],
       "profiles": {
         "local": {
