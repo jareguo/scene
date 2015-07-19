@@ -217,11 +217,8 @@ Editor.registerPanel( 'scene.panel', {
         this._sendToView( 'scene:create-nodes-by-uuids', uuids, parentID );
     },
 
-    'scene:create-node-by-classid': function ( name, classid ) {
-        // TODO: check if use contenxt menu
-        // var parentID = Editor.Selection.contexts('node')[0] || Editor.Selection.curActivate('node');
-        var nodeID = Editor.Selection.curActivate('node');
-        this._sendToView( 'scene:create-node-by-classid', name, classid, nodeID );
+    'scene:create-node-by-classid': function ( name, classid, referenceID, position ) {
+        this._sendToView( 'scene:create-node-by-classid', name, classid, referenceID, position );
     },
 
     'scene:move-nodes': function ( ids, parentID, nextSiblingId ) {

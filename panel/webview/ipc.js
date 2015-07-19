@@ -131,11 +131,16 @@ Ipc.on('scene:create-nodes-by-uuids', function ( uuids, parentID ) {
     });
 });
 
-Ipc.on('scene:create-node-by-classid', function ( name, classID, parentID ) {
+Ipc.on('scene:create-node-by-classid', function ( name, classID, referenceID, position ) {
     var parentNode;
-    if ( parentID ) {
-        parentNode = Fire.engine.getRuntimeInstanceById(parentID);
+
+    if ( referenceID ) {
+        parentNode = Fire.engine.getRuntimeInstanceById(referenceID);
+        if ( position === 'sibling' ) {
+            parentNode = Fire.node(parentNode).runtimeParent;
+        }
     }
+
     if ( !parentNode ) {
         parentNode = Fire.engine.getCurrentRuntimeScene();
     }
