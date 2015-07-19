@@ -34,6 +34,7 @@
         "editor:dragstart",
         "editor:dragend",
         "editor:state-changed",
+        "scene:is-ready",
         "scene:new-scene",
         "scene:save-scene-from-page",
         "scene:open-scene-by-uuid",

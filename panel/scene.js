@@ -152,6 +152,12 @@ Editor.registerPanel( 'scene.panel', {
         this._sendToView('editor:state-changed', name, value);
     },
 
+    'scene:is-ready': function ( panelID ) {
+        if ( this._viewReady ) {
+            Editor.sendToPanel( panelID, 'scene:ready', this._viewReady );
+        }
+    },
+
     'scene:new-scene': function () {
         this.$.loader.hidden = false;
         Editor.states['scene-initializing'] = true;
