@@ -47,7 +47,7 @@ Ipc.on('scene:drop', function ( uuids, type, x, y ) {
             function ( node, next ) {
                 var nodeID;
                 if ( node ) {
-                    var wrapper = Fire.node(node);
+                    var wrapper = Fire(node);
                     nodeID = wrapper.id;
 
                     wrapper.position = window.sceneView.pixelToScene( Fire.v2(x,y) );
@@ -75,10 +75,10 @@ Ipc.on('scene:drop', function ( uuids, type, x, y ) {
 Ipc.on('scene:create-nodes-by-uuids', function ( uuids, parentID ) {
     var parentNode;
     if ( parentID ) {
-        parentNode = Fire.engine.getRuntimeInstanceById(parentID);
+        parentNode = Fire.engine.getInstanceByIdN(parentID);
     }
     if ( !parentNode ) {
-        parentNode = Fire.engine.getCurrentRuntimeScene();
+        parentNode = Fire.engine.getCurrentSceneN();
     }
 
     Editor.Selection.clear('node');
@@ -102,11 +102,11 @@ Ipc.on('scene:create-nodes-by-uuids', function ( uuids, parentID ) {
             function ( node, next ) {
                 var nodeID;
                 if ( node ) {
-                    var wrapper = Fire.node(node);
+                    var wrapper = Fire(node);
                     nodeID = wrapper.id;
 
                     if ( parentNode ) {
-                        wrapper.parent = Fire.node(parentNode);
+                        wrapper.parent = Fire(parentNode);
                     }
                     var center_x = Fire.engine.canvasSize.x/2;
                     var center_y = Fire.engine.canvasSize.y/2;
@@ -135,20 +135,20 @@ Ipc.on('scene:create-node-by-classid', function ( name, classID, referenceID, po
     var parentNode;
 
     if ( referenceID ) {
-        parentNode = Fire.engine.getRuntimeInstanceById(referenceID);
+        parentNode = Fire.engine.getInstanceByIdN(referenceID);
         if ( position === 'sibling' ) {
-            parentNode = Fire.node(parentNode).runtimeParent;
+            parentNode = Fire(parentNode).parentN;
         }
     }
 
     if ( !parentNode ) {
-        parentNode = Fire.engine.getCurrentRuntimeScene();
+        parentNode = Fire.engine.getCurrentSceneN();
     }
     var Wrapper = Fire.JS._getClassById(classID);
     if (Wrapper) {
         var wrapper = new Wrapper();
         wrapper.onAfterDeserialize();
-        wrapper.parent = Fire.node(parentNode);
+        wrapper.parent = Fire(parentNode);
         wrapper.name = name;
 
         var center_x = Fire.engine.canvasSize.x/2;
@@ -170,28 +170,28 @@ Ipc.on('scene:query-hierarchy', function ( queryID ) {
 
 
 Ipc.on('scene:query-node', function ( queryID, nodeID ) {
-    var node = Fire.engine.getRuntimeInstanceById(nodeID);
+    var node = Fire.engine.getInstanceByIdN(nodeID);
     var dump = Editor.getNodeDump(node);
     Editor.sendToWindows( 'scene:reply-query-node', queryID, dump );
 });
 
 Ipc.on('scene:node-set-property', function ( id, path, value, isMixin ) {
-    var node = Fire.engine.getRuntimeInstanceById(id);
+    var node = Fire.engine.getInstanceByIdN(id);
     if (node) {
-        var objToSet = isMixin ? node : Fire.node(node);
+        var objToSet = isMixin ? node : Fire(node);
         try {
             Editor.setDeepPropertyByPath(objToSet, path, value);
             Fire.engine.repaintInEditMode();
         }
         catch (e) {
             Editor.warn('Failed to set property %s of %s to %s, ' + e.message,
-                path, Fire.node(node).name, value);
+                path, Fire(node).name, value);
         }
     }
 });
 
 Ipc.on('scene:node-mixin', function ( id, uuid ) {
-    var node = Fire.engine.getRuntimeInstanceById(id);
+    var node = Fire.engine.getInstanceByIdN(id);
     if (node) {
         var className = Editor.compressUuid(uuid);
         var classToMix = Fire.JS._getClassById(className);
@@ -205,7 +205,7 @@ Ipc.on('scene:node-mixin', function ( id, uuid ) {
 });
 
 Ipc.on('scene:node-unmixin', function ( id, className ) {
-    var node = Fire.engine.getRuntimeInstanceById(id);
+    var node = Fire.engine.getInstanceByIdN(id);
     if (node) {
         Fire.unMixin( node, className);
     }
@@ -215,16 +215,16 @@ Ipc.on('scene:move-nodes', function ( ids, parentID, nextSiblingId ) {
     var parent;
 
     if (parentID)
-        parent = Fire.node(Fire.engine.getRuntimeInstanceById(parentID));
+        parent = Fire(Fire.engine.getInstanceByIdN(parentID));
     else
         parent = Fire.engine.getCurrentScene();
 
-    var next = nextSiblingId ? Fire.node(Fire.engine.getRuntimeInstanceById(nextSiblingId)) : null;
+    var next = nextSiblingId ? Fire(Fire.engine.getInstanceByIdN(nextSiblingId)) : null;
     var nextIndex = next ? next.getSiblingIndex() : -1;
 
     for (var i = 0; i < ids.length; i++) {
         var id = ids[i];
-        var node = Fire.node(Fire.engine.getRuntimeInstanceById(id));
+        var node = Fire(Fire.engine.getInstanceByIdN(id));
         if (node && (!parent || !parent.isChildOf(node))) {
             if (node.parent !== parent) {
                 // keep world transform not changed

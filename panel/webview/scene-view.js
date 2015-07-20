@@ -233,8 +233,8 @@ Polymer( {
         }
 
         var nodeWrappers = ids.map(function ( id ) {
-            var node = Fire.engine.getRuntimeInstanceById(id);
-            return Fire.node(node);
+            var node = Fire.engine.getInstanceByIdN(id);
+            return Fire(node);
         });
         this.$.gizmosView.select(nodeWrappers);
     },
@@ -245,25 +245,25 @@ Polymer( {
         }
 
         var nodeWrappers = ids.map(function ( id ) {
-            var node = Fire.engine.getRuntimeInstanceById(id);
-            return Fire.node(node);
+            var node = Fire.engine.getInstanceByIdN(id);
+            return Fire(node);
         });
 
         this.$.gizmosView.unselect(nodeWrappers);
     },
 
     hoverin: function ( id ) {
-        var node = Fire.engine.getRuntimeInstanceById(id);
+        var node = Fire.engine.getInstanceByIdN(id);
         if ( node ) {
-            var nodeWrapper = Fire.node(node);
+            var nodeWrapper = Fire(node);
             this.$.gizmosView.hoverin(nodeWrapper);
         }
     },
 
     hoverout: function ( id ) {
-        var node = Fire.engine.getRuntimeInstanceById(id);
+        var node = Fire.engine.getInstanceByIdN(id);
         if ( node ) {
-            var nodeWrapper = Fire.node(node);
+            var nodeWrapper = Fire(node);
             this.$.gizmosView.hoverout(nodeWrapper);
         }
     },
@@ -271,7 +271,7 @@ Polymer( {
     delete: function ( ids ) {
         for (var i = 0; i < ids.length; i++) {
             var id = ids[i];
-            var nodeWrapper = Fire.node(Fire.engine.getRuntimeInstanceById(id));
+            var nodeWrapper = Fire(Fire.engine.getInstanceByIdN(id));
             if (nodeWrapper) {
                 nodeWrapper.parent = null;
             }
@@ -288,7 +288,7 @@ Polymer( {
 
         var nodes = Fire.engine.getIntersectionList( new Fire.Rect(worldHitPoint.x, worldHitPoint.y, 1, 1) );
         nodes.forEach( function ( node ) {
-            var fireNode = Fire.node(node);
+            var fireNode = Fire(node);
             var aabb = fireNode.getWorldBounds();
             // TODO: calculate the OBB center instead
             var dist = worldHitPoint.sub(aabb.center).magSqr();
@@ -309,7 +309,7 @@ Polymer( {
         var results = [];
         var nodes = Fire.engine.getIntersectionList(worldRect);
         nodes.forEach( function ( node ) {
-            var fireNode = Fire.node(node);
+            var fireNode = Fire(node);
             results.push(fireNode);
         });
 
