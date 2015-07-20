@@ -106,7 +106,7 @@ Ipc.on('scene:create-nodes-by-uuids', function ( uuids, parentID ) {
                     nodeID = wrapper.id;
 
                     if ( parentNode ) {
-                        wrapper.runtimeParent = parentNode;
+                        wrapper.parent = Fire.node(parentNode);
                     }
                     var center_x = Fire.engine.canvasSize.x/2;
                     var center_y = Fire.engine.canvasSize.y/2;
@@ -148,7 +148,7 @@ Ipc.on('scene:create-node-by-classid', function ( name, classID, referenceID, po
     if (Wrapper) {
         var wrapper = new Wrapper();
         wrapper.onAfterDeserialize();
-        wrapper.runtimeParent = parentNode;
+        wrapper.parent = Fire.node(parentNode);
         wrapper.name = name;
 
         var center_x = Fire.engine.canvasSize.x/2;
@@ -164,7 +164,7 @@ Ipc.on('scene:create-node-by-classid', function ( name, classID, referenceID, po
 });
 
 Ipc.on('scene:query-hierarchy', function ( queryID ) {
-    var nodes = Fire.takeHierarchySnapshot();
+    var nodes = Editor.getHierarchyDump();
     Editor.sendToWindows( 'scene:reply-query-hierarchy', queryID, nodes );
 });
 
