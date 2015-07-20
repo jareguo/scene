@@ -227,24 +227,22 @@ Ipc.on('scene:move-nodes', function ( ids, parentID, nextSiblingId ) {
         var node = Fire.node(Fire.engine.getRuntimeInstanceById(id));
         if (node && (!parent || !parent.isChildOf(node))) {
             if (node.parent !== parent) {
-                // TODO: ask @jare
-                // // keep world transform not changed
-                // var worldPos = node.transform.worldPosition;
-                // var worldRotation = node.transform.worldRotation;
-                // var lossyScale = node.transform.worldScale;
+                // keep world transform not changed
+                var worldPos = node.worldPosition;
+                var worldRotation = node.worldRotation;
+                var lossyScale = node.worldScale;
 
                 node.parent = parent;
 
-                // TODO: ask @jare
-                // // restore world transform
-                // node.transform.worldPosition = worldPos;
-                // node.transform.worldRotation = worldRotation;
-                // if (parent) {
-                //     node.transform.scale = lossyScale.divSelf(parent.transform.worldScale);
-                // }
-                // else {
-                //     node.transform.scale = lossyScale;
-                // }
+                // restore world transform
+                node.worldPosition = worldPos;
+                node.worldRotation = worldRotation;
+                if (parent) {
+                    node.scale = lossyScale.divSelf(parent.worldScale);
+                }
+                else {
+                    node.scale = lossyScale;
+                }
 
                 if (next) {
                     node.setSiblingIndex(nextIndex);
