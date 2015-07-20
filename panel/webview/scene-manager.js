@@ -44,13 +44,13 @@ function findByPathIDs ( pathIDs ) {
     // getCurrentScene
     var scene = Fire.engine.getCurrentScene();
     var node;
-    for ( var i = 0, children = scene.runtimeChildren;
+    for ( var i = 0, children = scene.childrenN;
           i < pathIDs.length;
-          i++, children = node.runtimeChildren )
+          i++, children = node.childrenN )
     {
         var index = pathIDs[i];
         if (index < children.length) {
-            node = Fire.node(children[index]);
+            node = Fire(children[index]);
             continue;
         }
         return null;
