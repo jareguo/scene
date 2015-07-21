@@ -85,12 +85,14 @@ Editor.initScene = function (callback) {
                 var currentSceneUuid = Editor.remote.currentSceneUuid;
                 if ( currentSceneUuid ) {
                     Fire.engine._loadSceneByUuid(currentSceneUuid, function ( err ) {
+                        window.sceneView.adjustToCenter(10);
                         Fire.engine.repaintInEditMode();
                         next ( err, null );
                     });
                     return;
                 }
 
+                window.sceneView.adjustToCenter(10);
                 next( null, null );
             },
 

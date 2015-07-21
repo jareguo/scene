@@ -61,7 +61,8 @@
       ],
       "profiles": {
         "local": {
-          "collapses-status": []
+            "designWidth": 640,
+            "designHeight": 480
         }
       }
     }

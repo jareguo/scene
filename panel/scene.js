@@ -34,6 +34,11 @@ Editor.registerPanel( 'scene.panel', {
         },
     },
 
+    observers: [
+        '_designSizeChanged(profiles.local.designWidth)',
+        '_designSizeChanged(profiles.local.designHeight)',
+    ],
+
     ready: function () {
         this._viewReady = false;
         this._ipcList = [];
@@ -67,6 +72,11 @@ Editor.registerPanel( 'scene.panel', {
             //     return;
             // }
         }.bind(this));
+
+        this.async( function () {
+            this.designWidth = this.profiles.local.designWidth;
+            this.designHeight = this.profiles.local.designHeight;
+        });
     },
 
     reload: function () {
@@ -357,6 +367,8 @@ Editor.registerPanel( 'scene.panel', {
             transformTool: this.transformTool,
             coordinate: this.coordinate,
             pivot: this.pivot,
+            designWidth: this.designWidth,
+            designHeight: this.designHeight,
         });
     },
 
@@ -485,6 +497,16 @@ Editor.registerPanel( 'scene.panel', {
 
     _pivotChanged: function () {
         this._sendToView( 'scene:pivot-changed', this.pivot );
+    },
+
+    _designSizeChanged: function () {
+        if ( this.profiles.local.save ) {
+            this.profiles.local.save();
+        }
+
+        this._sendToView( 'scene:design-size-changed',
+                         this.profiles.local.designWidth,
+                         this.profiles.local.designHeight );
     },
 });
 

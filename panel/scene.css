@@ -22,6 +22,10 @@ editor-buttons-item i {
     padding: 0px;
 }
 
+editor-unit-input {
+    width: 80px;
+}
+
 span.space {
     margin-right: 5px;
 }

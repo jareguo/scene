@@ -33,7 +33,7 @@ Polymer( {
         this.$.grid.setScaleV( [5,2], 0.01, 1000 );
         this.$.grid.setMappingV( mappingV[0], mappingV[1], mappingV[2] );
 
-        this.$.grid.setAnchor( 0.0, 1.0 );
+        this.$.grid.setAnchor( 0.5, 0.5 );
 
         // make sure css reflow
         requestAnimationFrame( function () {
@@ -82,10 +82,22 @@ Polymer( {
     },
 
     _resize: function () {
+        // resize grid
         this.$.grid.resize();
         this.$.grid.repaint();
 
+        // resize gizmos
         this.$.gizmosView.resize();
+
+        // resize engine
+        var bcr = this.getBoundingClientRect();
+        Fire.engine.canvasSize = new Fire.v2( bcr.width, bcr.height );
+
+        // sync axis offset and scale from grid
+        var scene = Fire.engine.getCurrentScene();
+        scene.scale = Fire.v2(this.$.grid.xAxisScale, this.$.grid.yAxisScale);
+        scene.position = Fire.v2(this.$.grid.xAxisOffset, -this.$.grid.yAxisOffset);
+        Fire.engine.repaintInEditMode();
     },
 
     _initEngine: function () {
@@ -133,9 +145,6 @@ Polymer( {
             }
             _resizeDebounceID = setTimeout(function () {
                 _resizeDebounceID = null;
-                var bcr = self.getBoundingClientRect();
-                Fire.engine.canvasSize = new Fire.v2( bcr.width, bcr.height );
-                Fire.engine.repaintInEditMode();
                 self._resize();
             }, 10);
         });
@@ -148,7 +157,8 @@ Polymer( {
 
         this.reset();
         Fire.engine._launchScene(sceneWrapper);
-        this.init( 0, 0, 1.0 );
+
+        this.adjustToCenter(10);
         Fire.engine.repaintInEditMode();
 
         Editor.remote.currentSceneUuid = null;
@@ -161,7 +171,7 @@ Polymer( {
         self.reset();
 
         Fire.engine._loadSceneByUuid(uuid, function (err) {
-            self.init( 0, 0, 1.0 );
+            self.adjustToCenter(10);
             Fire.engine.repaintInEditMode();
 
             if (err) {
@@ -172,6 +182,40 @@ Polymer( {
                 Ipc.sendToHost('scene:ready');
             }
         });
+    },
+
+    adjustToCenter: function ( margin ) {
+        var bcr = this.getBoundingClientRect();
+        var fitWidth = bcr.width - margin * 2;
+        var fitHeigth = bcr.height - margin * 2;
+        var designWidth = this.$.gizmosView.designSize[0];
+        var designHeight = this.$.gizmosView.designSize[1];
+
+        if ( fitWidth < bcr.width && fitHeigth < bcr.height ) {
+            this.init( (bcr.width - designWidth)/2,
+                      -(bcr.height - designHeight)/2,
+                      1.0
+                     );
+        }
+        else {
+            var result = EditorUI.fitSize(designWidth, designHeight,
+                                          fitWidth, fitHeigth);
+
+            // move x
+            if ( result[0] < result[1] ) {
+                this.init( (bcr.width - result[0])/2,
+                          -margin,
+                          result[0]/designWidth
+                         );
+            }
+            // move y
+            else {
+                this.init( margin,
+                          -(bcr.height - result[1])/2,
+                          result[1]/designHeight
+                         );
+            }
+        }
     },
 
     sceneToPixel: function ( pos ) {
