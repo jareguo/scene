@@ -132,9 +132,15 @@ Editor.playScene = function (callback) {
             Editor.stashScene,
             createScene,    // instantiate a new scene to play
             function (scene, next) {
+                // setup scene list
+                Fire.engine._sceneInfos = Editor.remote.sceneList.map(function ( info ) {
+                    return { url: info.url, uuid: info.uuid };
+                });
+
                 // reset scene camera
                 scene.position = Fire.Vec2.zero;
                 scene.scale = Fire.Vec2.one;
+
                 // play new scene
                 Fire.engine._launchScene(scene, function () {
                     window.sceneView.$.grid.hidden = true;

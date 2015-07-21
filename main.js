@@ -53,20 +53,6 @@ module.exports = {
                 Editor.currentSceneUuid = results[0].uuid;
                 _updateTitile();
 
-                results = results.map( function(result) {
-                    var parentPath = Path.dirname(result.path);
-                    var mountID = Editor.assetdb._mountIDByPath(parentPath);
-                    var parentID = mountID ? mountID : Editor.assetdb.fspathToUuid(parentPath);
-
-                    return {
-                        name: Path.basenameNoExt(result.path),
-                        extname: Path.extname(result.path),
-                        uuid: result.uuid,
-                        type: result.type,
-                        parentUuid: parentID,
-                    };
-                });
-
                 //
                 Editor.sendToAll( 'asset-db:assets-created', results );
             });
