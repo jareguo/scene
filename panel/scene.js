@@ -43,28 +43,30 @@ Editor.registerPanel( 'scene.panel', {
 
         this._initDroppable(this.$.dropArea);
 
-        // TODO
         // beforeunload event
-        // window.addEventListener('beforeunload', function ( event ) {
-        //     var res = this.confirmCloseScene();
-        //     switch ( res ) {
-        //     // save
-        //     case 0:
-        //         this.saveCurrentScene();
-        //         event.returnValue = true;
-        //         return;
+        window.addEventListener('beforeunload', function ( event ) {
+            Editor.Selection.clear('node');
 
-        //     // cancel
-        //     case 1:
-        //         event.returnValue = false;
-        //         return;
+            // TODO
+            // var res = this.confirmCloseScene();
+            // switch ( res ) {
+            // // save
+            // case 0:
+            //     this.saveCurrentScene();
+            //     event.returnValue = true;
+            //     return;
 
-        //     // don't save
-        //     case 2:
-        //         event.returnValue = true;
-        //         return;
-        //     }
-        // }.bind(this));
+            // // cancel
+            // case 1:
+            //     event.returnValue = false;
+            //     return;
+
+            // // don't save
+            // case 2:
+            //     event.returnValue = true;
+            //     return;
+            // }
+        }.bind(this));
     },
 
     reload: function () {
