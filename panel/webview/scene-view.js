@@ -277,8 +277,8 @@ Polymer( {
         }
 
         var nodeWrappers = ids.map(function ( id ) {
-            var node = Fire.engine.getInstanceByIdN(id);
-            return Fire(node);
+            var node = Fire.engine.getInstanceById(id);
+            return node;
         });
         this.$.gizmosView.select(nodeWrappers);
     },
@@ -289,25 +289,25 @@ Polymer( {
         }
 
         var nodeWrappers = ids.map(function ( id ) {
-            var node = Fire.engine.getInstanceByIdN(id);
-            return Fire(node);
+            var node = Fire.engine.getInstanceById(id);
+            return node;
         });
 
         this.$.gizmosView.unselect(nodeWrappers);
     },
 
     hoverin: function ( id ) {
-        var node = Fire.engine.getInstanceByIdN(id);
+        var node = Fire.engine.getInstanceById(id);
         if ( node ) {
-            var nodeWrapper = Fire(node);
+            var nodeWrapper = node;
             this.$.gizmosView.hoverin(nodeWrapper);
         }
     },
 
     hoverout: function ( id ) {
-        var node = Fire.engine.getInstanceByIdN(id);
+        var node = Fire.engine.getInstanceById(id);
         if ( node ) {
-            var nodeWrapper = Fire(node);
+            var nodeWrapper = node;
             this.$.gizmosView.hoverout(nodeWrapper);
         }
     },
@@ -315,7 +315,7 @@ Polymer( {
     delete: function ( ids ) {
         for (var i = 0; i < ids.length; i++) {
             var id = ids[i];
-            var nodeWrapper = Fire(Fire.engine.getInstanceByIdN(id));
+            var nodeWrapper = Fire.engine.getInstanceById(id);
             if (nodeWrapper) {
                 nodeWrapper.parent = null;
             }
