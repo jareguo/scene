@@ -215,16 +215,16 @@ Ipc.on('scene:move-nodes', function ( ids, parentID, nextSiblingId ) {
     var parent;
 
     if (parentID)
-        parent = Fire(Fire.engine.getInstanceByIdN(parentID));
+        parent = Fire.engine.getInstanceById(parentID);
     else
         parent = Fire.engine.getCurrentScene();
 
-    var next = nextSiblingId ? Fire(Fire.engine.getInstanceByIdN(nextSiblingId)) : null;
+    var next = nextSiblingId ? Fire.engine.getInstanceById(nextSiblingId) : null;
     var nextIndex = next ? next.getSiblingIndex() : -1;
 
     for (var i = 0; i < ids.length; i++) {
         var id = ids[i];
-        var node = Fire(Fire.engine.getInstanceByIdN(id));
+        var node = Fire.engine.getInstanceById(id);
         if (node && (!parent || !parent.isChildOf(node))) {
             if (node.parent !== parent) {
                 // keep world transform not changed
