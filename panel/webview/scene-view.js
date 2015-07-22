@@ -20,9 +20,11 @@ Polymer( {
         },
     },
 
-    ready: function () {
+    created: function () {
         window.sceneView = this;
+    },
 
+    ready: function () {
         var mappingH = Fire.Runtime.Settings['mapping-h'];
         var mappingV = Fire.Runtime.Settings['mapping-v'];
 

@@ -3,18 +3,9 @@ var Async = require('async');
 function enterEditMode ( stashedScene, next ) {
     if ( stashedScene ) {
         // restore selection
-        var selection = [];
-        var pathIDsList = stashedScene.sceneSelection;
-        pathIDsList.forEach( function ( pathIDs ) {
-            var node = findByPathIDs ( pathIDs );
-            if ( node ) {
-                selection.push(node.uuid);
-            }
-        });
-        Editor.Selection.select('node', selection, true, true);
+        Editor.Selection.select('node', stashedScene.sceneSelection, true, true);
 
         // restore scene view
-
         window.sceneView.init(stashedScene.sceneOffsetX,
                               stashedScene.sceneOffsetY,
                               stashedScene.sceneScale );
@@ -30,32 +21,6 @@ function createScene (sceneJson, next) {
     Fire.engine._initScene(scene, function () {
         next(null, scene);
     });
-}
-
-function getPathIDs ( wrapper ) {
-    var pathIDs = [];
-    for (var w = wrapper; w && !w.isScene; w = w.parent) {
-        pathIDs.push(w.getSiblingIndex());
-    }
-    return pathIDs.reverse();
-}
-
-function findByPathIDs ( pathIDs ) {
-    // getCurrentScene
-    var scene = Fire.engine.getCurrentScene();
-    var node;
-    for ( var i = 0, children = scene.childrenN;
-          i < pathIDs.length;
-          i++, children = node.childrenN )
-    {
-        var index = pathIDs[i];
-        if (index < children.length) {
-            node = Fire(children[index]);
-            continue;
-        }
-        return null;
-    }
-    return node;
 }
 
 Editor.initScene = function (callback) {
@@ -106,20 +71,13 @@ Editor.stashScene = function (next) {
     var scene = Fire.engine.getCurrentScene();
     var jsonObj = Editor.serialize(scene, {stringify: false});
 
-    // store selection
-    var selection = Editor.Selection.curSelection('node');
-    var paths = [];
-    for ( var i = 0; i < selection.length; ++i ) {
-        paths.push( getPathIDs( Fire.engine.getInstanceById(selection[i]) ) );
-    }
-
     // store the scene, scene-view postion, scene-view scale
     Editor.remote.stashedScene = {
         sceneJson: jsonObj,
         sceneScale: window.sceneView.scale,
         sceneOffsetX: window.sceneView.$.grid.xAxisOffset,
         sceneOffsetY: window.sceneView.$.grid.yAxisOffset,
-        sceneSelection: paths,
+        sceneSelection: Editor.Selection.curSelection('node'),
     };
 
     // reset scene view

@@ -360,10 +360,10 @@ Editor.registerPanel( 'scene.panel', {
     },
 
     _onViewDomReady: function ( event ) {
-        this._viewReady = true;
     },
 
     _onViewDidFinishLoad: function ( event ) {
+        this._viewReady = true;
         this._sendToView( 'scene:init-scene-view', {
             transformTool: this.transformTool,
             coordinate: this.coordinate,
