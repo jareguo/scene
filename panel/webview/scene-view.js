@@ -60,9 +60,6 @@ Polymer( {
 
         // reset Fire.engine editing state
         Fire.engine.animatingInEditMode = false;
-
-        // reset selection
-        Editor.Selection.clear('node');
     },
 
     init: function ( x, y, scale ) {
@@ -322,6 +319,7 @@ Polymer( {
                 nodeWrapper.parent = null;
             }
         }
+        Editor.Selection.unselect('node', ids, true);
     },
 
     hitTest: function ( x, y ) {

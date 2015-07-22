@@ -28,7 +28,6 @@ Ipc.on('scene:play', function () {
 
 Ipc.on('scene:drop', function ( uuids, type, x, y ) {
     Editor.Selection.clear('node');
-
     Async.each( uuids, function ( uuid, done ) {
         Async.waterfall([
             function ( next ) {
