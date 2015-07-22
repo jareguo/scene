@@ -165,7 +165,8 @@ Ipc.on('scene:create-node-by-classid', function ( name, classID, referenceID, po
 
 Ipc.on('scene:query-hierarchy', function ( queryID ) {
     var nodes = Editor.getHierarchyDump();
-    Editor.sendToWindows( 'scene:reply-query-hierarchy', queryID, nodes );
+    var sceneUuid = Fire.engine.getCurrentScene().uuid;
+    Editor.sendToWindows( 'scene:reply-query-hierarchy', queryID, sceneUuid, nodes );
 });
 
 

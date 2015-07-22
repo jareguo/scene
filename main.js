@@ -20,6 +20,12 @@ module.exports = {
         Editor.Panel.open('scene.panel');
     },
 
+    'scene:open-by-uuid': function ( uuid ) {
+        Editor.Panel.open('scene.panel', {
+            uuid: uuid,
+        });
+    },
+
     'scene:ready': function () {
         _updateTitile();
     },

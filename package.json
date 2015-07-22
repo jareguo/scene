@@ -37,7 +37,6 @@
         "scene:is-ready",
         "scene:new-scene",
         "scene:save-scene-from-page",
-        "scene:open-scene-by-uuid",
         "scene:play",
         "scene:stop",
         "scene:query-hierarchy",

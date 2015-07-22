@@ -39,10 +39,12 @@ Editor.registerPanel( 'scene.panel', {
         '_designSizeChanged(profiles.local.designHeight)',
     ],
 
-    ready: function () {
+    created: function () {
         this._viewReady = false;
         this._ipcList = [];
+    },
 
+    ready: function () {
         Editor.states['scene-initializing'] = true;
         Editor.states['scene-playing'] = false;
 
@@ -152,6 +154,19 @@ Editor.registerPanel( 'scene.panel', {
         return 2;
     },
 
+    'panel:open': function ( argv ) {
+        if ( !argv || !argv.uuid )
+            return;
+
+        this.$.loader.hidden = false;
+        Editor.states['scene-initializing'] = true;
+        Editor.states['scene-playing'] = false;
+
+        Editor.sendToAll('scene:reloading');
+
+        this._sendToView('scene:open-scene-by-uuid', argv.uuid );
+    },
+
     'editor:dragstart': function () {
         this.$.dropArea.hidden = false;
     },
@@ -182,16 +197,6 @@ Editor.registerPanel( 'scene.panel', {
 
     'scene:save-scene-from-page': function ( url ) {
         this._sendToView('scene:save-scene-from-page', url );
-    },
-
-    'scene:open-scene-by-uuid': function ( uuid ) {
-        this.$.loader.hidden = false;
-        Editor.states['scene-initializing'] = true;
-        Editor.states['scene-playing'] = false;
-
-        Editor.sendToAll('scene:reloading');
-
-        this._sendToView('scene:open-scene-by-uuid', uuid );
     },
 
     'scene:play': function () {
@@ -292,10 +297,6 @@ Editor.registerPanel( 'scene.panel', {
     },
 
     _sendToView: function () {
-        if ( !this._viewReady ) {
-            return;
-        }
-
         var args = [].slice.call( arguments, 0 );
         this._ipcList.push(args);
 
@@ -312,7 +313,7 @@ Editor.registerPanel( 'scene.panel', {
 
     _flushIpc: function () {
         // NOTE: without EditorUI.importing, the webview.send sometimes blocking the HTMLImports
-        if ( EditorUI.importing ) {
+        if ( EditorUI.importing || !this._viewReady ) {
             if ( this._ipcList.length > 0 ) {
                 this._timeoutID = setTimeout( function () {
                     this._flushIpc();
