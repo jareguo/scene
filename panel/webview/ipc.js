@@ -48,7 +48,7 @@ Ipc.on('scene:drop', function ( uuids, type, x, y ) {
                 var nodeID;
                 if ( node ) {
                     var wrapper = Fire(node);
-                    nodeID = wrapper.id;
+                    nodeID = wrapper.uuid;
 
                     wrapper.position = window.sceneView.pixelToScene( Fire.v2(x,y) );
                     wrapper.parent = Fire.engine.getCurrentScene();
@@ -103,7 +103,7 @@ Ipc.on('scene:create-nodes-by-uuids', function ( uuids, parentID ) {
                 var nodeID;
                 if ( node ) {
                     var wrapper = Fire(node);
-                    nodeID = wrapper.id;
+                    nodeID = wrapper.uuid;
 
                     if ( parentNode ) {
                         wrapper.parent = Fire(parentNode);
@@ -156,7 +156,7 @@ Ipc.on('scene:create-node-by-classid', function ( name, classID, referenceID, po
         wrapper.scenePosition = window.sceneView.pixelToScene( Fire.v2(center_x, center_y) );
 
         Fire.engine.repaintInEditMode();
-        Editor.Selection.select('node', wrapper.id, true, true );
+        Editor.Selection.select('node', wrapper.uuid, true, true );
     }
     else {
         Editor.error('Unknown node to create:', classID);

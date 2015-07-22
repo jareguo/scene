@@ -452,15 +452,15 @@ Polymer( {
                         ids = lastSelection.slice();
 
                         for ( i = 0; i < nodes.length; ++i ) {
-                            if ( ids.indexOf(nodes[i].id) === -1 )
-                                ids.push( nodes[i].id );
+                            if ( ids.indexOf(nodes[i].uuid) === -1 )
+                                ids.push( nodes[i].uuid );
                         }
                     }
                     else {
                         ids = [];
 
                         for ( i = 0; i < nodes.length; ++i ) {
-                            ids.push( nodes[i].id );
+                            ids.push( nodes[i].uuid );
                         }
                     }
                     Editor.Selection.select ( 'node', ids, true, false );
@@ -474,17 +474,17 @@ Polymer( {
 
                         if ( toggleMode ) {
                             if ( node ) {
-                                if ( lastSelection.indexOf(node.id) === -1 ) {
-                                    Editor.Selection.select ( 'node', node.id, false, true );
+                                if ( lastSelection.indexOf(node.uuid) === -1 ) {
+                                    Editor.Selection.select ( 'node', node.uuid, false, true );
                                 }
                                 else {
-                                    Editor.Selection.unselect ( 'node', node.id, true );
+                                    Editor.Selection.unselect ( 'node', node.uuid, true );
                                 }
                             }
                         }
                         else {
                             if ( node ) {
-                                Editor.Selection.select ( 'node', node.id, true, true );
+                                Editor.Selection.select ( 'node', node.uuid, true, true );
                             }
                             else {
                                 Editor.Selection.clear ( 'node' );
@@ -532,7 +532,7 @@ Polymer( {
         event.stopPropagation();
 
         var node = this.hitTest( event.offsetX, event.offsetY );
-        var id = node ? node.id : null;
+        var id = node ? node.uuid : null;
         Editor.Selection.hover( 'node', id );
     },
 

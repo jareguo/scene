@@ -8,7 +8,7 @@ function enterEditMode ( stashedScene, next ) {
         pathIDsList.forEach( function ( pathIDs ) {
             var node = findByPathIDs ( pathIDs );
             if ( node ) {
-                selection.push(node.id);
+                selection.push(node.uuid);
             }
         });
         Editor.Selection.select('node', selection, true, true);
