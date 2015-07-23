@@ -157,7 +157,7 @@ Polymer( {
         this.reset();
         Fire.engine._launchScene(sceneWrapper);
 
-        this.adjustToCenter(10);
+        this.adjustToCenter(20);
         Fire.engine.repaintInEditMode();
 
         Editor.remote.currentSceneUuid = null;
@@ -170,7 +170,7 @@ Polymer( {
         self.reset();
 
         Fire.engine._loadSceneByUuid(uuid, function (err) {
-            self.adjustToCenter(10);
+            self.adjustToCenter(20);
             Fire.engine.repaintInEditMode();
 
             if (err) {
@@ -190,7 +190,7 @@ Polymer( {
         var designWidth = this.$.gizmosView.designSize[0];
         var designHeight = this.$.gizmosView.designSize[1];
 
-        if ( fitWidth < bcr.width && fitHeigth < bcr.height ) {
+        if ( designWidth <= fitWidth && designHeight <= fitHeigth ) {
             this.init( (bcr.width - designWidth)/2,
                       -(bcr.height - designHeight)/2,
                       1.0
@@ -199,17 +199,16 @@ Polymer( {
         else {
             var result = EditorUI.fitSize(designWidth, designHeight,
                                           fitWidth, fitHeigth);
-
             // move x
             if ( result[0] < result[1] ) {
                 this.init( (bcr.width - result[0])/2,
-                          -margin,
+                          -(bcr.height - result[1])/2,
                           result[0]/designWidth
                          );
             }
             // move y
             else {
-                this.init( margin,
+                this.init( (bcr.width - result[0])/2,
                           -(bcr.height - result[1])/2,
                           result[1]/designHeight
                          );
