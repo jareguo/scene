@@ -43,7 +43,7 @@ module.exports = {
                 _updateTitile();
 
                 Editor.sendToAll( 'asset-db:asset-changed', {
-                    type: meta['meta-type'],
+                    type: meta['asset-type'],
                     uuid: meta.uuid,
                 });
             });
