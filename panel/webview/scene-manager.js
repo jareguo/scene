@@ -45,7 +45,6 @@ Editor.initScene = function (callback) {
     else {
         Async.waterfall([
             loadCompiledScript,
-
             function ( next ) {
                 var currentSceneUuid = Editor.remote.currentSceneUuid;
                 if ( currentSceneUuid ) {
@@ -60,7 +59,6 @@ Editor.initScene = function (callback) {
                 window.sceneView.adjustToCenter(10);
                 next( null, null );
             },
-
             enterEditMode,
         ], callback );
     }
@@ -121,6 +119,13 @@ Editor.playScene = function (callback) {
 };
 
 function loadCompiledScript (next) {
+    if ( Editor.remote.Compiler.state !== 'idle' ) {
+        setTimeout( function () {
+            loadCompiledScript(next);
+        }, 100 );
+        return;
+    }
+
     function doLoad (src, cb) {
         var script = document.createElement('script');
         script.onload = function () {
