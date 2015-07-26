@@ -224,39 +224,39 @@ Ipc.on('scene:move-nodes', function ( ids, parentID, nextSiblingId ) {
 
     for (var i = 0; i < ids.length; i++) {
         var id = ids[i];
-        var node = Fire.engine.getInstanceById(id);
-        if (node && (!parent || !parent.isChildOf(node))) {
-            if (node.parent !== parent) {
+        var wrapper = Fire.engine.getInstanceById(id);
+        if (wrapper && (!parent || !parent.isChildOf(wrapper))) {
+            if (wrapper.parent !== parent) {
                 // keep world transform not changed
-                var worldPos = node.worldPosition;
-                var worldRotation = node.worldRotation;
-                var lossyScale = node.worldScale;
+                var worldPos = wrapper.worldPosition;
+                var worldRotation = wrapper.worldRotation;
+                var lossyScale = wrapper.worldScale;
 
-                node.parent = parent;
+                wrapper.parent = parent;
 
                 // restore world transform
-                node.worldPosition = worldPos;
-                node.worldRotation = worldRotation;
+                wrapper.worldPosition = worldPos;
+                wrapper.worldRotation = worldRotation;
                 if (parent) {
-                    node.scale = lossyScale.divSelf(parent.worldScale);
+                    wrapper.scale = lossyScale.divSelf(parent.worldScale);
                 }
                 else {
-                    node.scale = lossyScale;
+                    wrapper.scale = lossyScale;
                 }
 
                 if (next) {
-                    node.setSiblingIndex(nextIndex);
+                    wrapper.setSiblingIndex(nextIndex);
                     ++nextIndex;
                 }
             }
             else if (next) {
-                var lastIndex = node.getSiblingIndex();
+                var lastIndex = wrapper.getSiblingIndex();
                 var newIndex = nextIndex;
                 if (newIndex > lastIndex) {
                     --newIndex;
                 }
                 if (newIndex !== lastIndex) {
-                    node.setSiblingIndex(newIndex);
+                    wrapper.setSiblingIndex(newIndex);
                     if (lastIndex > newIndex) {
                         ++nextIndex;
                     }
@@ -266,7 +266,7 @@ Ipc.on('scene:move-nodes', function ( ids, parentID, nextSiblingId ) {
                 }
             }
             else {
-                node.setAsLastSibling();
+                wrapper.setAsLastSibling();
             }
         }
     }
