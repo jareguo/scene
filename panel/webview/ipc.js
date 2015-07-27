@@ -180,7 +180,7 @@ Ipc.on('scene:node-set-property', function ( info ) {
     if (node) {
         var objToSet = info.isMixin ? node : Fire(node);
         try {
-            Editor.setDeepPropertyByPath(objToSet, info.path, info.value);
+            Editor.setDeepPropertyByPath(objToSet, info.path, info.value, info.type);
             Fire.engine.repaintInEditMode();
         }
         catch (e) {
