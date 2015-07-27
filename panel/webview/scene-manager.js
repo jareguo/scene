@@ -85,6 +85,9 @@ Editor.stashScene = function (next) {
 };
 
 Editor.playScene = function (callback) {
+    // store selection
+    var selection = Editor.Selection.curSelection('node');
+
     Async.waterfall(
         [
             Editor.stashScene,
@@ -101,6 +104,10 @@ Editor.playScene = function (callback) {
 
                 // play new scene
                 Fire.engine._launchScene(scene, function () {
+                    // restore selection
+                    Editor.Selection.select('node', selection, true, true);
+
+                    //
                     window.sceneView.$.grid.hidden = true;
                     window.sceneView.$.gizmosView.hidden = true;
 

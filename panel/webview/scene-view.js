@@ -55,6 +55,8 @@ Polymer( {
     },
 
     reset: function () {
+        Editor.Selection.clear('node');
+
         // reset scene gizmos, scene grid
         window.sceneView.$.gizmosView.reset();
 
