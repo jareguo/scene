@@ -88,41 +88,38 @@ Editor.playScene = function (callback) {
     // store selection
     var selection = Editor.Selection.curSelection('node');
 
-    Async.waterfall(
-        [
-            Editor.stashScene,
-            createScene,    // instantiate a new scene to play
-            function (scene, next) {
-                // setup scene list
-                Fire.engine._sceneInfos = Editor.remote.sceneList.map(function ( info ) {
-                    return { url: info.url, uuid: info.uuid };
-                });
+    Async.waterfall([
+        Editor.stashScene,
+        createScene,    // instantiate a new scene to play
+        function (scene, next) {
+            // setup scene list
+            Fire.engine._sceneInfos = Editor.remote.sceneList.map(function ( info ) {
+                return { url: info.url, uuid: info.uuid };
+            });
 
-                // reset scene camera
-                scene.position = Fire.Vec2.zero;
-                scene.scale = Fire.Vec2.one;
+            // reset scene camera
+            scene.position = Fire.Vec2.zero;
+            scene.scale = Fire.Vec2.one;
 
-                // play new scene
-                Fire.engine._launchScene(scene, function () {
-                    // restore selection
-                    Editor.Selection.select('node', selection, true, true);
+            // play new scene
+            Fire.engine._launchScene(scene, function () {
+                // restore selection
+                Editor.Selection.select('node', selection, true, true);
 
-                    //
-                    window.sceneView.$.grid.hidden = true;
-                    window.sceneView.$.gizmosView.hidden = true;
+                //
+                window.sceneView.$.grid.hidden = true;
+                window.sceneView.$.gizmosView.hidden = true;
 
-                    //if (this.$.pause.active) {
-                    //    Fire.engine.step();
-                    //}
-                    //else {
-                        Fire.engine.play();
-                    //}
-                });
-                next();
-            },
-        ],
-        callback
-    );
+                //if (this.$.pause.active) {
+                //    Fire.engine.step();
+                //}
+                //else {
+                Fire.engine.play();
+                //}
+            });
+            next();
+        },
+    ], callback);
 };
 
 function loadCompiledScript (next) {
