@@ -223,8 +223,8 @@ Editor.registerPanel( 'scene.panel', {
         this._sendToView( 'scene:query-node', queryID, nodeID );
     },
 
-    'scene:node-set-property': function ( id, path, value, isMixin ) {
-        this._sendToView( 'scene:node-set-property', id, path, value, isMixin );
+    'scene:node-set-property': function ( info ) {
+        this._sendToView( 'scene:node-set-property', info );
     },
 
     'scene:node-mixin': function ( id, uuid ) {

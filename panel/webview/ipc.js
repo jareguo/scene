@@ -175,17 +175,17 @@ Ipc.on('scene:query-node', function ( queryID, nodeID ) {
     Editor.sendToWindows( 'scene:reply-query-node', queryID, dump );
 });
 
-Ipc.on('scene:node-set-property', function ( id, path, value, isMixin ) {
-    var node = Fire.engine.getInstanceByIdN(id);
+Ipc.on('scene:node-set-property', function ( info ) {
+    var node = Fire.engine.getInstanceByIdN(info.id);
     if (node) {
-        var objToSet = isMixin ? node : Fire(node);
+        var objToSet = info.isMixin ? node : Fire(node);
         try {
-            Editor.setDeepPropertyByPath(objToSet, path, value);
+            Editor.setDeepPropertyByPath(objToSet, info.path, info.value);
             Fire.engine.repaintInEditMode();
         }
         catch (e) {
             Editor.warn('Failed to set property %s of %s to %s, ' + e.message,
-                path, Fire(node).name, value);
+                info.path, Fire(node).name, info.value);
         }
     }
 });
