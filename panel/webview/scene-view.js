@@ -83,6 +83,10 @@ Polymer( {
     },
 
     _resize: function () {
+        if ( Fire.engine.isPlaying ) {
+            return;
+        }
+
         // resize grid
         this.$.grid.resize();
         this.$.grid.repaint();
