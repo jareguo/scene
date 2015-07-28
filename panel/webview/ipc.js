@@ -191,16 +191,24 @@ Ipc.on('scene:node-set-property', function ( info ) {
 });
 
 Ipc.on('scene:node-mixin', function ( id, uuid ) {
-    var node = Fire.engine.getInstanceByIdN(id);
-    if (node) {
+    if (uuid && Editor.isUuid(uuid)) {
+        // check script
         var className = Editor.compressUuid(uuid);
         var classToMix = Fire.JS._getClassById(className);
-        if (classToMix) {
+        if (!classToMix) {
+            return Editor.error('Can not find Behavior in the script "%s".', uuid);
+        }
+        //
+        var node = Fire.engine.getInstanceByIdN(id);
+        if (node) {
             Fire.mixin(node, classToMix);
         }
         else {
-            Editor.error('Can not find %s to mixin', uuid);
+            Editor.error('Can not find node to mixin: %s', id);
         }
+    }
+    else {
+        Editor.error('invalid script to mixin');
     }
 });
 
