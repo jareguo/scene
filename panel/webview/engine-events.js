@@ -45,7 +45,7 @@ var _updateGizmos = function (node) {
     // wrapper.mixinGizmos =
 
     var childrenN = wrapper.childrenN;
-    childrenN.map(_updateGizmos);
+    childrenN.forEach(_updateGizmos);
 };
 
 Fire.engine.on('post-update', function ( event ) {
@@ -56,5 +56,5 @@ Fire.engine.on('post-update', function ( event ) {
     sceneView.$.gizmosView.update();
 
     var wrapper = Fire.engine.getCurrentScene();
-    wrapper.childrenN.map(_updateGizmos);
+    wrapper.childrenN.forEach(_updateGizmos);
 });
