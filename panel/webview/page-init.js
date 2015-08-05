@@ -14,8 +14,8 @@
     Editor.require('app://engine-framework');
     require('./debug-helper');
 
-    // init canvas-assets
-    Editor.require('packages://canvas-assets/init');
+    // init fire-assets
+    Editor.require('packages://fire-assets/init');
 
     // init gizmos
     Editor.require('packages://ui-gizmos/init');
