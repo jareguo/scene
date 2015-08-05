@@ -31,16 +31,7 @@ Ipc.on('scene:drop', function ( uuids, type, x, y ) {
     Async.each( uuids, function ( uuid, done ) {
         Async.waterfall([
             function ( next ) {
-                Fire.AssetLibrary.loadAsset(uuid, next);
-            },
-
-            function ( asset, next ) {
-                if ( asset && asset.createNode ) {
-                    asset.createNode( next );
-                    return;
-                }
-
-                next ( null, null );
+                Editor.createNode(uuid, next);
             },
 
             function ( node, next ) {
@@ -86,16 +77,7 @@ Ipc.on('scene:create-nodes-by-uuids', function ( uuids, parentID ) {
     Async.each( uuids, function ( uuid, done ) {
         Async.waterfall([
             function ( next ) {
-                Fire.AssetLibrary.loadAsset(uuid, next);
-            },
-
-            function ( asset, next ) {
-                if ( asset && asset.createNode ) {
-                    asset.createNode( next );
-                    return;
-                }
-
-                next ( null, null );
+                Editor.createNode(uuid, next);
             },
 
             function ( node, next ) {
