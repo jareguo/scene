@@ -78,11 +78,12 @@ module.exports = {
             path += '.json';
         }
 
-        var url = Url.format({
-            protocol: '',
-            pathname: path,
-            slashes: true,
-        });
+        //var url = Url.format({
+        //    protocol: '',
+        //    pathname: path,
+        //    slashes: true,
+        //});
+        var url = path.replace(/\\/g, '/');
 
         reply({
             url: url,

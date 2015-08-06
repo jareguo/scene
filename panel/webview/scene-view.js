@@ -108,11 +108,12 @@ Polymer( {
 
     _initEngine: function () {
         // init asset library
-        var importUrl = Url.format({
-            protocol: '',
-            pathname: Editor.importPath,
-            slashes: true,
-        });
+        //var importUrl = Url.format({
+        //    protocol: '',
+        //    pathname: Editor.importPath,
+        //    slashes: true,
+        //});
+        var importUrl = Editor.importPath.replace(/\\/g, '/');
         Fire.AssetLibrary.init(importUrl);
 
         // init engine
