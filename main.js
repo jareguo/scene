@@ -67,9 +67,12 @@ module.exports = {
     },
 
     'scene:query-asset-info-by-uuid': function (reply, uuid) {
-        var Meta = Editor.require('app://asset-db/lib/meta');
-
         var path = Editor.assetdb.uuidToFspath(uuid);
+        if (!path) {
+            return reply(null);
+        }
+
+        var Meta = Editor.require('app://asset-db/lib/meta');
         var metaObj = Meta.load(Editor.assetdb, path + '.meta');
 
         if ( metaObj && !metaObj.useRawfile() ) {
