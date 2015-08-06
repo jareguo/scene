@@ -18,7 +18,7 @@
     Editor.require('packages://fire-assets/init');
 
     // init gizmos
-    Editor.require('packages://ui-gizmos/init');
+    Editor.require('packages://fire-gizmos/init');
 
     // init runtime
     var runtimeUrl = 'app://runtime/runtime-' + Editor.projectInfo.runtime + '/index.html';
