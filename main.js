@@ -1,5 +1,6 @@
 var Fs = require('fire-fs');
 var Path = require('fire-path');
+var Url = require('fire-url');
 
 function _updateTitile () {
     var url = Editor.assetdb.uuidToUrl(Editor.currentSceneUuid);
@@ -64,4 +65,26 @@ module.exports = {
             });
         }
     },
+
+    'scene:query-asset-info-by-uuid': function (reply, uuid) {
+        var Meta = Editor.require('app://asset-db/lib/meta');
+
+        var path = Editor.assetdb.uuidToFspath(uuid);
+        var metaObj = Meta.load(Editor.assetdb, path + '.meta');
+
+        if ( metaObj && !metaObj.useRawfile() ) {
+            path = Editor.assetdb._uuidToImportPathNoExt(uuid);
+        }
+
+        var url = Url.format({
+            protocol: '',
+            pathname: path,
+            slashes: true,
+        });
+
+        reply({
+            url: url,
+            type: metaObj['asset-type'],
+        });
+    }
 };
