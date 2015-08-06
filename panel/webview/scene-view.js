@@ -109,7 +109,7 @@ Polymer( {
     _initEngine: function () {
         // init asset library
         var importUrl = Url.format({
-            protocol: 'file',
+            protocol: '',
             pathname: Editor.importPath,
             slashes: true,
         });

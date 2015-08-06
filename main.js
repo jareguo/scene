@@ -73,7 +73,9 @@ module.exports = {
         var metaObj = Meta.load(Editor.assetdb, path + '.meta');
 
         if ( metaObj && !metaObj.useRawfile() ) {
+            // if imported, return imported asset url
             path = Editor.assetdb._uuidToImportPathNoExt(uuid);
+            path += '.json';
         }
 
         var url = Url.format({
