@@ -299,19 +299,11 @@ Polymer( {
     },
 
     hoverin: function ( id ) {
-        var node = Fire.engine.getInstanceById(id);
-        if ( node ) {
-            var nodeWrapper = node;
-            this.$.gizmosView.hoverin(nodeWrapper);
-        }
+        this.$.gizmosView.hoverin(id);
     },
 
     hoverout: function ( id ) {
-        var node = Fire.engine.getInstanceById(id);
-        if ( node ) {
-            var nodeWrapper = node;
-            this.$.gizmosView.hoverout(nodeWrapper);
-        }
+        this.$.gizmosView.hoverout(id);
     },
 
     delete: function ( ids ) {
