@@ -287,11 +287,7 @@ Polymer( {
             return;
         }
 
-        var nodeWrappers = ids.map(function ( id ) {
-            var node = Fire.engine.getInstanceById(id);
-            return node;
-        });
-        this.$.gizmosView.select(nodeWrappers);
+        this.$.gizmosView.select(ids);
     },
 
     unselect: function ( ids ) {
@@ -299,12 +295,7 @@ Polymer( {
             return;
         }
 
-        var nodeWrappers = ids.map(function ( id ) {
-            var node = Fire.engine.getInstanceById(id);
-            return node;
-        });
-
-        this.$.gizmosView.unselect(nodeWrappers);
+        this.$.gizmosView.unselect(ids);
     },
 
     hoverin: function ( id ) {
