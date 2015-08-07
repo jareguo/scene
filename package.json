@@ -4,8 +4,8 @@
   "description": "A scene editor",
   "author": "Firebox Technology",
   "hosts": {
-    "editor-framework": "^0.3.12",
-    "engine-framework": "^0.1.0"
+    "editor-framework": "^0.3.14",
+    "engine-framework": "^0.1.1"
   },
   "main": "main.js",
   "menus": {
@@ -24,11 +24,11 @@
       "width": "auto",
       "height": "auto",
       "shortcuts": {
-          "w": "selectMove",
-          "e": "selectRotate",
-          "r": "selectScale",
-          "command+backspace": "deleteCurrentSelected",
-          "del": "deleteCurrentSelected"
+        "w": "selectMove",
+        "e": "selectRotate",
+        "r": "selectScale",
+        "command+backspace": "deleteCurrentSelected",
+        "del": "deleteCurrentSelected"
       },
       "messages": [
         "editor:dragstart",
@@ -60,8 +60,8 @@
       ],
       "profiles": {
         "local": {
-            "designWidth": 640,
-            "designHeight": 480
+          "designWidth": 640,
+          "designHeight": 480
         }
       }
     }
