@@ -223,6 +223,10 @@ Editor.registerPanel( 'scene.panel', {
         this._sendToView( 'scene:query-node', queryID, nodeID );
     },
 
+    'scene:query-node-info': function ( sessionID, nodeID ) {
+        this._sendToView( 'scene:query-node-info', sessionID, nodeID );
+    },
+
     'scene:node-set-property': function ( info ) {
         this._sendToView( 'scene:node-set-property', info );
     },
