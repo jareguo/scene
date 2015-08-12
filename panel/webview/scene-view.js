@@ -165,7 +165,7 @@ Polymer( {
     newScene: function () {
         var SceneWrapperImpl = Fire.engine.getCurrentScene().constructor;
         var sceneWrapper = new SceneWrapperImpl();
-        sceneWrapper.onAfterDeserialize();
+        sceneWrapper.createAndAttachNode();
 
         this.reset();
         Fire.engine._launchScene(sceneWrapper);

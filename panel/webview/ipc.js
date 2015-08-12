@@ -128,7 +128,7 @@ Ipc.on('scene:create-node-by-classid', function ( name, classID, referenceID, po
     var Wrapper = Fire.JS._getClassById(classID);
     if (Wrapper) {
         var wrapper = new Wrapper();
-        wrapper.onAfterDeserialize();
+        wrapper.createAndAttachNode();
         wrapper.parent = Fire(parentNode);
         wrapper.name = name;
 
