@@ -277,13 +277,14 @@ Ipc.on('scene:delete-nodes', function ( ids ) {
 Ipc.on('scene:duplicate-nodes', function ( ids ) {
     for (var i = 0; i < ids.length; i++) {
         var id = ids[i];
-        var node = Fire.engine.getInstanceByIdN(id);
-        if (node) {
+        var wrapper = Fire.engine.getInstanceById(id);
+        if (wrapper) {
             // duplicate
-            var clone = Fire.instantiate(node);
+            var clone = Fire.instantiate(wrapper);
+            clone.parent = wrapper.parent;
             if (i === ids.length - 1) {
                 // select the last one
-                Editor.Selection.select('node', Fire(clone).uuid);
+                Editor.Selection.select('node', clone.uuid);
             }
         }
     }
