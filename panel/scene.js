@@ -255,6 +255,10 @@ Editor.registerPanel( 'scene.panel', {
         this._sendToView( 'scene:delete-nodes', ids );
     },
 
+    'scene:duplicate-nodes': function ( ids ) {
+        this._sendToView( 'scene:duplicate-nodes', ids );
+    },
+
     'scene:stash-and-reload': function () {
         this._sendToView( 'scene:stash-and-reload' );
     },

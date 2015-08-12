@@ -49,6 +49,7 @@
         "scene:create-nodes-by-uuids",
         "scene:move-nodes",
         "scene:delete-nodes",
+        "scene:duplicate-nodes",
         "scene:stash-and-reload",
         "selection:selected",
         "selection:unselected",

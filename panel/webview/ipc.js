@@ -274,6 +274,21 @@ Ipc.on('scene:delete-nodes', function ( ids ) {
     window.sceneView.delete(ids);
 });
 
+Ipc.on('scene:duplicate-nodes', function ( ids ) {
+    for (var i = 0; i < ids.length; i++) {
+        var id = ids[i];
+        var node = Fire.engine.getInstanceByIdN(id);
+        if (node) {
+            // duplicate
+            var clone = Fire.instantiate(node);
+            if (i === ids.length - 1) {
+                // select the last one
+                Editor.Selection.select('node', Fire(clone).uuid);
+            }
+        }
+    }
+});
+
 Ipc.on('scene:stash-and-reload', function () {
     Editor.stashScene(function () {
         Ipc.sendToHost('scene:ask-for-reload');
