@@ -74,11 +74,6 @@ Editor.registerPanel( 'scene.panel', {
             //     return;
             // }
         }.bind(this));
-
-        this.async( function () {
-            this.designWidth = this.profiles.local.designWidth;
-            this.designHeight = this.profiles.local.designHeight;
-        });
     },
 
     reload: function () {
@@ -388,8 +383,8 @@ Editor.registerPanel( 'scene.panel', {
             transformTool: this.transformTool,
             coordinate: this.coordinate,
             pivot: this.pivot,
-            designWidth: this.designWidth,
-            designHeight: this.designHeight,
+            designWidth: this.profiles.local.designWidth,
+            designHeight: this.profiles.local.designHeight,
         });
     },
 
