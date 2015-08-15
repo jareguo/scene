@@ -294,6 +294,8 @@ Ipc.on('scene:delete-nodes', function ( ids ) {
 });
 
 Ipc.on('scene:duplicate-nodes', function ( ids ) {
+    var clones = [];
+
     for (var i = 0; i < ids.length; i++) {
         var id = ids[i];
         var wrapper = Fire.engine.getInstanceById(id);
@@ -301,12 +303,13 @@ Ipc.on('scene:duplicate-nodes', function ( ids ) {
             // duplicate
             var clone = Fire.instantiate(wrapper);
             clone.parent = wrapper.parent;
-            if (i === ids.length - 1) {
-                // select the last one
-                Editor.Selection.select('node', clone.uuid);
-            }
+
+            clones.push(clone.uuid);
         }
     }
+
+    // select the last one
+    Editor.Selection.select('node', clones);
 });
 
 Ipc.on('scene:stash-and-reload', function () {
