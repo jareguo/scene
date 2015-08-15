@@ -165,10 +165,29 @@ Ipc.on('scene:query-node-info', function ( sessionID, nodeID ) {
     });
 });
 
+Ipc.on('scene:node-new-property', function ( info ) {
+    var node = Fire.engine.getInstanceByIdN(info.id);
+    if (node) {
+        var objToSet = info.mixinType ? node : Fire(node);
+        try {
+            // TODO: @Jare, please refine it
+            var ctor = Fire.JS.getClassByName(info.type);
+            if ( ctor ) {
+                Editor.setDeepPropertyByPath(objToSet, info.path, new ctor(), info.type);
+                Fire.engine.repaintInEditMode();
+            }
+        }
+        catch (e) {
+            Editor.warn('Failed to new property %s of %s to %s, ' + e.message,
+                info.path, Fire(node).name, info.value);
+        }
+    }
+});
+
 Ipc.on('scene:node-set-property', function ( info ) {
     var node = Fire.engine.getInstanceByIdN(info.id);
     if (node) {
-        var objToSet = info.isMixin ? node : Fire(node);
+        var objToSet = info.mixinType ? node : Fire(node);
         try {
             Editor.setDeepPropertyByPath(objToSet, info.path, info.value, info.type);
             Fire.engine.repaintInEditMode();

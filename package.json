@@ -42,6 +42,7 @@
         "scene:query-hierarchy",
         "scene:query-node",
         "scene:query-node-info",
+        "scene:node-new-property",
         "scene:node-set-property",
         "scene:node-mixin",
         "scene:node-unmixin",

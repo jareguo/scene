@@ -227,6 +227,10 @@ Editor.registerPanel( 'scene.panel', {
         this._sendToView( 'scene:query-node-info', sessionID, nodeID );
     },
 
+    'scene:node-new-property': function ( info ) {
+        this._sendToView( 'scene:node-new-property', info );
+    },
+
     'scene:node-set-property': function ( info ) {
         this._sendToView( 'scene:node-set-property', info );
     },
