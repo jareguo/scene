@@ -342,6 +342,10 @@ Ipc.on('scene:duplicate-nodes', function ( ids ) {
 });
 
 Ipc.on('scene:stash-and-reload', function () {
+    if ( Editor.states['scene-playing'] ) {
+        return;
+    }
+
     Editor.stashScene(function () {
         Ipc.sendToHost('scene:ask-for-reload');
     });
