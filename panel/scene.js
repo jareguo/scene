@@ -124,6 +124,15 @@ Editor.registerPanel( 'scene.panel', {
         Editor.sendToPanel( 'scene.panel', 'scene:delete-nodes', ids);
     },
 
+    duplicateCurrentSelected: function ( event ) {
+        if ( event ) {
+            event.stopPropagation();
+        }
+
+        var ids = Editor.Selection.curSelection('node');
+        Editor.sendToPanel( 'scene.panel', 'scene:duplicate-nodes', ids);
+    },
+
     confirmCloseScene: function () {
         var dirty = true;
         if ( dirty ) {

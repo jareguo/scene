@@ -294,19 +294,48 @@ Ipc.on('scene:delete-nodes', function ( ids ) {
 });
 
 Ipc.on('scene:duplicate-nodes', function ( ids ) {
-    var clones = [];
-
-    for (var i = 0; i < ids.length; i++) {
-        var id = ids[i];
-        var wrapper = Fire.engine.getInstanceById(id);
+    var wrappers = [];
+    for ( var i = 0; i < ids.length; ++i ) {
+         var wrapper = Fire.engine.getInstanceById(ids[i]);
         if (wrapper) {
-            // duplicate
-            var clone = Fire.instantiate(wrapper);
-            clone.parent = wrapper.parent;
-
-            clones.push(clone.uuid);
+            wrappers.push(wrapper);
         }
     }
+
+    // get top-level wrappers
+    var results = Editor.Utils.arrayCmpFilter ( wrappers, function ( a, b ) {
+        var parent;
+
+        // a contains b
+        parent = b.parent;
+        while ( parent ) {
+            if ( a === parent ) {
+                return 1;
+            }
+            parent = parent.parent;
+        }
+
+        // b contains a
+        parent = a.parent;
+        while ( parent ) {
+            if ( b === parent ) {
+                return -1;
+            }
+            parent = parent.parent;
+        }
+
+        return 0;
+    });
+
+
+    // duplicate results
+    var clones = [];
+    results.forEach(function ( wrapper ) {
+        var clone = Fire.instantiate(wrapper);
+        clone.parent = wrapper.parent;
+
+        clones.push(clone.uuid);
+    });
 
     // select the last one
     Editor.Selection.select('node', clones);
