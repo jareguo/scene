@@ -400,6 +400,7 @@ Ipc.on('scene:init-scene-view', function ( settings ) {
     window.sceneView.$.gizmosView.coordinate = settings.coordinate;
     window.sceneView.$.gizmosView.pivot = settings.pivot;
     window.sceneView.$.gizmosView.designSize = [settings.designWidth, settings.designHeight];
+    Fire.engine.designResolution = Fire.v2(settings.designWidth, settings.designHeight);
 });
 
 Ipc.on('scene:transform-tool-changed', function ( value ) {
@@ -419,5 +420,6 @@ Ipc.on('scene:pivot-changed', function ( value ) {
 
 Ipc.on('scene:design-size-changed', function ( w, h ) {
     window.sceneView.$.gizmosView.designSize = [w, h];
+    Fire.engine.designResolution = Fire.v2(w,h);
     Fire.engine.repaintInEditMode();
 });
