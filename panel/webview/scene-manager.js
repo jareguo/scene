@@ -84,6 +84,19 @@ Editor.stashScene = function (next) {
     next(null, jsonObj);
 };
 
+Editor.reloadScene = function (callback) {
+    Async.waterfall([
+        Editor.stashScene,
+        createScene,
+        function (scene, next) {
+            Fire.engine._launchScene(scene);
+            Fire.engine.repaintInEditMode();
+            next( null, Editor.remote.stashedScene );
+        },
+        enterEditMode,
+    ], callback );
+};
+
 Editor.playScene = function (callback) {
     // store selection
     var selection = Editor.Selection.curSelection('node');
