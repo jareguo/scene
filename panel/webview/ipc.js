@@ -351,6 +351,10 @@ Ipc.on('scene:stash-and-reload', function () {
     });
 });
 
+Ipc.on('scene:soft-reload', function () {
+    Editor.softReload();
+});
+
 Ipc.on('selection:activated', function ( type, id ) {
     if ( type !== 'node' || !id ) {
         return;

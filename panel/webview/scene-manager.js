@@ -1,4 +1,5 @@
 var Async = require('async');
+var sandbox = require('./sandbox');
 
 function enterEditMode ( stashedScene, next ) {
     if ( stashedScene ) {
@@ -30,7 +31,7 @@ Editor.initScene = function (callback) {
         // load last editing scene
         Async.waterfall(
             [
-                loadCompiledScript,
+                sandbox.loadCompiledScript,
                 createScene.bind(this, sceneJson),
                 function (scene, next) {
                     Fire.engine._launchScene(scene);
@@ -44,7 +45,7 @@ Editor.initScene = function (callback) {
     }
     else {
         Async.waterfall([
-            loadCompiledScript,
+            sandbox.loadCompiledScript,
             function ( next ) {
                 var currentSceneUuid = Editor.remote.currentSceneUuid;
                 if ( currentSceneUuid ) {
@@ -135,44 +136,7 @@ Editor.playScene = function (callback) {
     ], callback);
 };
 
-function loadCompiledScript (next) {
-    if ( Editor.remote.Compiler.state !== 'idle' ) {
-        setTimeout( function () {
-            loadCompiledScript(next);
-        }, 100 );
-        return;
-    }
-
-    function doLoad (src, cb) {
-        var script = document.createElement('script');
-        script.onload = function () {
-            console.timeEnd('load ' + src);
-            cb();
-        };
-        script.onerror = function () {
-            console.timeEnd('load ' + src);
-            //if (loadedScriptNodes.length > 0) {
-            //    loader.unloadAll();
-            //}
-            console.error('Failed to load %s', src);
-            cb(new Error('Failed to load ' + src));
-        };
-        script.setAttribute('type','text/javascript');
-        script.setAttribute('charset', 'utf-8');
-        script.setAttribute('src', src);    // FireUrl.addRandomQuery(src)
-        console.time('load ' + src);
-        document.head.appendChild(script);
-        //loadedScriptNodes.push(script);
-    }
-    var Path = require('path');
-    var scriptPath = Path.join(Editor.libraryPath, 'bundle.project.js');
-    var Fs = require('fire-fs');
-    Fs.exists(scriptPath, function (exists) {
-        if (exists) {
-            doLoad(scriptPath, next);
-        }
-        else {
-            next();
-        }
-    });
-}
+Editor.softReload = function () {
+    // hot update new compiled scripts
+    sandbox.reload();
+};
