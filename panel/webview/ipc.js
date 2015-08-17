@@ -170,10 +170,17 @@ Ipc.on('scene:node-new-property', function ( info ) {
     if (node) {
         var objToSet = info.mixinType ? node : Fire(node);
         try {
-            // TODO: @Jare, please refine it
             var ctor = Fire.JS.getClassByName(info.type);
             if ( ctor ) {
-                Editor.setDeepPropertyByPath(objToSet, info.path, new ctor(), info.type);
+                var obj;
+                try {
+                    obj = new ctor();
+                }
+                catch (e) {
+                    Editor.error('Can not create new info.type directly.\nInner message: ' + e.stack);
+                    return;
+                }
+                Editor.setDeepPropertyByPath(objToSet, info.path, obj, info.type);
                 Fire.engine.repaintInEditMode();
             }
         }
