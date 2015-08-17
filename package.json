@@ -54,6 +54,7 @@
         "scene:delete-nodes",
         "scene:duplicate-nodes",
         "scene:stash-and-reload",
+        "scene:soft-reload",
         "selection:selected",
         "selection:unselected",
         "selection:activated",

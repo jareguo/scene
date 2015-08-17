@@ -271,6 +271,10 @@ Editor.registerPanel( 'scene.panel', {
         this._sendToView( 'scene:stash-and-reload' );
     },
 
+    'scene:soft-reload': function () {
+        this._sendToView( 'scene:soft-reload' );
+    },
+
     'selection:selected': function ( type, ids ) {
         this._sendToView( '_selection:selected', type, ids );
         this._sendToView( 'selection:selected', type, ids );

@@ -352,6 +352,10 @@ Ipc.on('scene:stash-and-reload', function () {
 });
 
 Ipc.on('scene:soft-reload', function () {
+    if ( Editor.states['scene-playing'] ) {
+        return;
+    }
+
     Editor.softReload();
 });
 
