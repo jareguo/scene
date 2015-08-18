@@ -68,11 +68,11 @@ Editor.initScene = function (callback) {
 Editor.stashScene = function (next) {
     // get scene json
     var scene = Fire.engine.getCurrentScene();
-    var jsonObj = Editor.serialize(scene, {stringify: false});
+    var jsonText = Editor.serialize(scene, {stringify: true});
 
     // store the scene, scene-view postion, scene-view scale
     Editor.remote.stashedScene = {
-        sceneJson: jsonObj,
+        sceneJson: jsonText,
         sceneScale: window.sceneView.scale,
         sceneOffsetX: window.sceneView.$.grid.xAxisOffset,
         sceneOffsetY: window.sceneView.$.grid.yAxisOffset,
@@ -82,7 +82,7 @@ Editor.stashScene = function (next) {
     // reset scene view
     window.sceneView.reset();
 
-    next(null, jsonObj);
+    next(null, jsonText);
 };
 
 Editor.reloadScene = function (callback) {
