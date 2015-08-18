@@ -39,6 +39,7 @@
         "scene:is-ready",
         "scene:new-scene",
         "scene:save-scene-from-page",
+        "scene:play-on-device",
         "scene:play",
         "scene:stop",
         "scene:query-hierarchy",

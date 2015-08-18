@@ -202,6 +202,10 @@ Editor.registerPanel( 'scene.panel', {
         this._sendToView('scene:save-scene-from-page', url );
     },
 
+    'scene:play-on-device': function () {
+        this._sendToView('scene:play-on-device');
+    },
+
     'scene:play': function () {
         this.$.loader.hidden = false;
         Editor.states['scene-initializing'] = true;

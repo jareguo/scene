@@ -178,12 +178,10 @@ Polymer( {
     },
 
     loadScene: function ( uuid ) {
-        var self = this;
-
-        self.reset();
+        this.reset();
 
         Fire.engine._loadSceneByUuid(uuid, function (err) {
-            self.adjustToCenter(20);
+            this.adjustToCenter(20);
             Fire.engine.repaintInEditMode();
 
             if (err) {
@@ -193,7 +191,7 @@ Polymer( {
                 Editor.remote.currentSceneUuid = uuid;
                 Ipc.sendToHost('scene:ready');
             }
-        });
+        }.bind(this));
     },
 
     adjustToCenter: function ( margin ) {

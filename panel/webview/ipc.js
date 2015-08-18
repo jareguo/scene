@@ -22,6 +22,10 @@ Ipc.on('scene:open-scene-by-uuid', function ( uuid ) {
     window.sceneView.loadScene(uuid);
 });
 
+Ipc.on('scene:play-on-device', function () {
+    Editor.stashScene ();
+});
+
 Ipc.on('scene:play', function () {
     window.sceneView.play();
 });

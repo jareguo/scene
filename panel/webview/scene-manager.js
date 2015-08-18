@@ -17,6 +17,9 @@ function enterEditMode ( stashedScene, next ) {
 }
 
 function createScene (sceneJson, next) {
+    // reset scene view
+    window.sceneView.reset();
+
     // Assets will be loaded by SceneWrapper.prototype.create, here we just deserialize the scene graph
     var scene = Fire.deserialize(sceneJson);
     Fire.engine._initScene(scene, function () {
@@ -78,9 +81,6 @@ Editor.stashScene = function (next) {
         sceneOffsetY: window.sceneView.$.grid.yAxisOffset,
         sceneSelection: Editor.Selection.curSelection('node'),
     };
-
-    // reset scene view
-    window.sceneView.reset();
 
     next(null, jsonText);
 };
