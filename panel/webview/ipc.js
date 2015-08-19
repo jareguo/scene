@@ -23,7 +23,9 @@ Ipc.on('scene:open-scene-by-uuid', function ( uuid ) {
 });
 
 Ipc.on('scene:play-on-device', function () {
-    Editor.stashScene ();
+    Editor.stashScene( function () {
+        Editor.sendToCore( 'app:play-on-device' );
+    });
 });
 
 Ipc.on('scene:play', function () {

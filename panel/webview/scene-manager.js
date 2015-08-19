@@ -68,7 +68,7 @@ Editor.initScene = function (callback) {
     }
 };
 
-Editor.stashScene = function (next) {
+Editor.stashScene = function (callback) {
     // get scene json
     var scene = Fire.engine.getCurrentScene();
     var jsonText = Editor.serialize(scene, {stringify: true});
@@ -82,7 +82,9 @@ Editor.stashScene = function (next) {
         sceneSelection: Editor.Selection.curSelection('node'),
     };
 
-    next(null, jsonText);
+    if ( callback ) {
+        callback(null, jsonText);
+    }
 };
 
 Editor.reloadScene = function (callback) {
