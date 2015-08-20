@@ -60,7 +60,6 @@ module.exports = {
                 Editor.currentSceneUuid = results[0].uuid;
                 _updateTitile();
 
-                //
                 Editor.sendToAll( 'asset-db:assets-created', results );
             });
         }

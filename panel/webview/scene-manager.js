@@ -12,7 +12,6 @@ function enterEditMode ( stashedScene, next ) {
                               stashedScene.sceneScale );
     }
 
-    Editor.remote.stashedScene = null;
     next();
 }
 
@@ -80,6 +79,8 @@ Editor.stashScene = function (callback) {
         sceneOffsetX: window.sceneView.$.grid.xAxisOffset,
         sceneOffsetY: window.sceneView.$.grid.yAxisOffset,
         sceneSelection: Editor.Selection.curSelection('node'),
+        designWidth: window.sceneView.$.gizmosView.designSize[0],
+        designHeight: window.sceneView.$.gizmosView.designSize[1],
     };
 
     if ( callback ) {

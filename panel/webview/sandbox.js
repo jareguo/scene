@@ -43,6 +43,9 @@ var sandbox = {
 
             // reload
             Editor.initScene();
+
+            // reload connected browser
+            Editor.sendToCore('app:browser-reload');
         });
     },
 
