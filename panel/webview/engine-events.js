@@ -1,8 +1,4 @@
 Fire.engine.on('node-attach-to-scene', function ( event ) {
-    if ( Editor.states['scene-playing'] ) {
-        return;
-    }
-
     var wrapper = Fire(event.detail.targetN);
     var className = Fire.JS.getClassName(wrapper);
 
@@ -19,10 +15,6 @@ Fire.engine.on('node-attach-to-scene', function ( event ) {
 });
 
 Fire.engine.on('node-detach-from-scene', function ( event ) {
-    if ( Editor.states['scene-playing'] ) {
-        return;
-    }
-
     var wrapper = Fire(event.detail.targetN);
     if ( wrapper.gizmo ) {
         wrapper.gizmo.remove();
@@ -49,10 +41,6 @@ var _updateGizmos = function (node) {
 };
 
 Fire.engine.on('post-update', function ( event ) {
-    if ( Editor.states['scene-playing'] ) {
-        return;
-    }
-
     sceneView.$.gizmosView.update();
 
     var wrapper = Fire.engine.getCurrentScene();

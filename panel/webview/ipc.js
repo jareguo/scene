@@ -15,7 +15,14 @@ Ipc.on('scene:save-scene-from-page', function ( url ) {
     var sceneAsset = new Fire.Scene();
     sceneAsset.scene = Fire.engine.getCurrentScene();
 
-    Editor.sendToCore( 'scene:save-scene', url, Editor.serialize(sceneAsset) );
+    // NOTE: we stash scene because we want to save and reload the connected browser
+    Editor.stashScene(function () {
+        // reload connected browser
+        Editor.sendToCore('app:reload-on-device');
+
+        //
+        Editor.sendToCore( 'scene:save-scene', url, Editor.serialize(sceneAsset) );
+    });
 });
 
 Ipc.on('scene:open-scene-by-uuid', function ( uuid ) {
@@ -28,8 +35,10 @@ Ipc.on('scene:play-on-device', function () {
     });
 });
 
-Ipc.on('scene:play', function () {
-    window.sceneView.play();
+Ipc.on('scene:reload-on-device', function () {
+    Editor.stashScene( function () {
+        Editor.sendToCore( 'app:reload-on-device' );
+    });
 });
 
 Ipc.on('scene:drop', function ( uuids, type, x, y ) {
@@ -355,20 +364,12 @@ Ipc.on('scene:duplicate-nodes', function ( ids ) {
 });
 
 Ipc.on('scene:stash-and-reload', function () {
-    if ( Editor.states['scene-playing'] ) {
-        return;
-    }
-
     Editor.stashScene(function () {
         Ipc.sendToHost('scene:ask-for-reload');
     });
 });
 
 Ipc.on('scene:soft-reload', function () {
-    if ( Editor.states['scene-playing'] ) {
-        return;
-    }
-
     Editor.softReload();
 });
 

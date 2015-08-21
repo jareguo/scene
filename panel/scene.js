@@ -45,9 +45,6 @@ Editor.registerPanel( 'scene.panel', {
     },
 
     ready: function () {
-        Editor.states['scene-initializing'] = true;
-        Editor.states['scene-playing'] = false;
-
         this._initDroppable(this.$.dropArea);
 
         // beforeunload event
@@ -162,11 +159,7 @@ Editor.registerPanel( 'scene.panel', {
             return;
 
         this.$.loader.hidden = false;
-        Editor.states['scene-initializing'] = true;
-        Editor.states['scene-playing'] = false;
-
         Editor.sendToAll('scene:reloading');
-
         this._sendToView('scene:open-scene-by-uuid', argv.uuid );
     },
 
@@ -178,10 +171,6 @@ Editor.registerPanel( 'scene.panel', {
         this.$.dropArea.hidden = true;
     },
 
-    'editor:state-changed': function ( name, value ) {
-        this._sendToView('editor:state-changed', name, value);
-    },
-
     'scene:is-ready': function ( panelID ) {
         if ( this._viewReady ) {
             Editor.sendToPanel( panelID, 'scene:ready', this._viewReady );
@@ -190,11 +179,7 @@ Editor.registerPanel( 'scene.panel', {
 
     'scene:new-scene': function () {
         this.$.loader.hidden = false;
-        Editor.states['scene-initializing'] = true;
-        Editor.states['scene-playing'] = false;
-
         Editor.sendToAll('scene:reloading');
-
         this._sendToView('scene:new-scene' );
     },
 
@@ -206,21 +191,8 @@ Editor.registerPanel( 'scene.panel', {
         this._sendToView('scene:play-on-device');
     },
 
-    'scene:play': function () {
-        this.$.loader.hidden = false;
-        Editor.states['scene-initializing'] = true;
-        Editor.states['scene-playing'] = true;
-
-        this._sendToView('scene:play');
-    },
-
-    'scene:stop': function () {
-        this.$.loader.hidden = false;
-        Editor.states['scene-initializing'] = true;
-        Editor.states['scene-playing'] = false;
-
-        this.$.view.reloadIgnoringCache();
-        Editor.sendToAll('scene:reloading');
+    'scene:reload-on-device': function () {
+        this._sendToView('scene:reload-on-device');
     },
 
     'scene:query-hierarchy': function ( queryID ) {
@@ -376,9 +348,6 @@ Editor.registerPanel( 'scene.panel', {
         this._viewReady = false;
 
         // change scene states
-        Editor.states['scene-initializing'] = true;
-        Editor.states['scene-playing'] = false;
-
         Editor.sendToAll('scene:reloading');
     },
 
@@ -439,7 +408,6 @@ Editor.registerPanel( 'scene.panel', {
         switch ( event.channel ) {
             case 'scene:ready':
                 this.$.loader.hidden = true;
-                Editor.states['scene-initializing'] = false;
 
                 Editor.sendToAll('scene:ready');
                 console.timeEnd('scene:reloading');
@@ -447,8 +415,6 @@ Editor.registerPanel( 'scene.panel', {
 
             case 'scene:playing':
                 this.$.loader.hidden = true;
-                Editor.states['scene-initializing'] = false;
-
                 break;
 
             case 'scene:init-error':
@@ -456,7 +422,6 @@ Editor.registerPanel( 'scene.panel', {
                 Editor.failed('Failed to init scene: %s', err.stack);
 
                 this.$.loader.hidden = true;
-                Editor.states['scene-initializing'] = false;
                 break;
 
             case 'scene:play-error':
@@ -464,7 +429,6 @@ Editor.registerPanel( 'scene.panel', {
                 Editor.failed('Failed to play scene: %s', err.stack);
 
                 this.$.loader.hidden = true;
-                Editor.states['scene-initializing'] = false;
                 break;
 
             case 'scene:ask-for-reload':

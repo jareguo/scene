@@ -39,13 +39,14 @@ function reset () {
 var sandbox = {
     reload: function () {
         Editor.stashScene(function (err, json) {
+            // reload connected browser
+            Editor.sendToCore('app:reload-on-device');
+
+            //
             reset();
 
             // reload
             Editor.initScene();
-
-            // reload connected browser
-            Editor.sendToCore('app:browser-reload');
         });
     },
 

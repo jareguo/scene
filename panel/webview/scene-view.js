@@ -253,10 +253,6 @@ Polymer( {
     },
 
     activate: function ( id ) {
-        if ( Editor.states['scene-playing'] ) {
-            return;
-        }
-
         var wrapper = Fire.engine.getInstanceById(id);
         if ( wrapper && wrapper.constructor.animatableInEditor ) {
             if ( wrapper.onFocusInEditor )
@@ -267,10 +263,6 @@ Polymer( {
     },
 
     deactivate: function ( id ) {
-        if ( Editor.states['scene-playing'] ) {
-            return;
-        }
-
         var wrapper = Fire.engine.getInstanceById(id);
         if ( wrapper && wrapper.constructor.animatableInEditor ) {
             if ( wrapper.onLostFocusInEditor )
@@ -281,18 +273,10 @@ Polymer( {
     },
 
     select: function ( ids ) {
-        if ( Editor.states['scene-playing'] ) {
-            return;
-        }
-
         this.$.gizmosView.select(ids);
     },
 
     unselect: function ( ids ) {
-        if ( Editor.states['scene-playing'] ) {
-            return;
-        }
-
         this.$.gizmosView.unselect(ids);
     },
 
@@ -353,17 +337,18 @@ Polymer( {
         return results;
     },
 
-    play: function () {
-        var self = this;
-        //
-        Editor.playScene(function (err) {
-            if (err) {
-                Ipc.sendToHost('scene:play-error', err);
-                return;
-            }
-            Ipc.sendToHost('scene:playing');
-        });
-    },
+    // DISABLE
+    // play: function () {
+    //     var self = this;
+    //     //
+    //     Editor.playScene(function (err) {
+    //         if (err) {
+    //             Ipc.sendToHost('scene:play-error', err);
+    //             return;
+    //         }
+    //         Ipc.sendToHost('scene:playing');
+    //     });
+    // },
 
     _onMouseDown: function ( event ) {
         event.stopPropagation();
