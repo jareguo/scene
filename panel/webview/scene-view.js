@@ -1,6 +1,7 @@
 (function () {
 var Ipc = require('ipc');
-var Url = require('fire-url');
+var Path = require('fire-path');
+//var Url = require('fire-url');
 
 Polymer( {
     is: 'scene-view',
@@ -114,7 +115,8 @@ Polymer( {
         //    slashes: true,
         //});
         var importUrl = Editor.importPath.replace(/\\/g, '/');
-        Fire.AssetLibrary.init(importUrl);
+        var assetUrl = Path.join(Editor.projectInfo.path, 'assets').replace(/\\/g, '/');
+        Fire.AssetLibrary.init(importUrl, assetUrl);
 
         // init engine
         var canvasEL = this.$['runtime-canvas'];
