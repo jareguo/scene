@@ -126,6 +126,8 @@ Polymer( {
             width: bcr.width,
             height: bcr.height,
             canvas: canvasEL,
+            designWidth: bcr.width,
+            designHeight: bcr.height
         };
 
         Fire.engine.init(initOptions, function () {
