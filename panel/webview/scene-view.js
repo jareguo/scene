@@ -99,6 +99,7 @@ Polymer( {
         // resize engine
         var bcr = this.getBoundingClientRect();
         Fire.engine.canvasSize = new Fire.v2( bcr.width, bcr.height );
+        Fire.engine.designResolution = new Fire.v2( bcr.width, bcr.height );
 
         // sync axis offset and scale from grid
         var scene = Fire.engine.getCurrentScene();
