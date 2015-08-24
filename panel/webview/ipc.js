@@ -185,7 +185,14 @@ Ipc.on('scene:node-new-property', function ( info ) {
     if (node) {
         var objToSet = info.mixinType ? node : Fire(node);
         try {
-            var ctor = Fire.JS.getClassByName(info.type);
+            var id = info.type;
+            var ctor;
+            if (Fire.JS._isTempClassId(id)) {
+                ctor = Fire.JS._getClassById(id);
+            }
+            else {
+                ctor = Fire.JS.getClassByName(id);
+            }
             if ( ctor ) {
                 var obj;
                 try {
