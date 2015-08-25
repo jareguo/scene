@@ -376,8 +376,8 @@ Ipc.on('scene:stash-and-reload', function () {
     });
 });
 
-Ipc.on('scene:soft-reload', function () {
-    Editor.softReload();
+Ipc.on('scene:soft-reload', function (compiled) {
+    Editor.softReload(compiled);
 });
 
 Ipc.on('selection:activated', function ( type, id ) {

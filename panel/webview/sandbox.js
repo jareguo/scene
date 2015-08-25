@@ -37,7 +37,8 @@ function reset () {
 }
 
 var sandbox = {
-    reload: function () {
+    reload: function (compiled) {
+        this.compiled = compiled;
         Editor.stashScene(function (err, json) {
             // reload connected browser
             Editor.sendToCore('app:reload-on-device');
@@ -102,7 +103,11 @@ var sandbox = {
             node.remove();
         }
         loadedScriptNodes.length = 0;
-    }
+    },
+
+    compiled: false
 };
+
+Editor.Sandbox = sandbox;
 
 module.exports = sandbox;

@@ -247,8 +247,8 @@ Editor.registerPanel( 'scene.panel', {
         this._sendToView( 'scene:stash-and-reload' );
     },
 
-    'scene:soft-reload': function () {
-        this._sendToView( 'scene:soft-reload' );
+    'scene:soft-reload': function (compiled) {
+        this._sendToView( 'scene:soft-reload', compiled );
     },
 
     'selection:selected': function ( type, ids ) {

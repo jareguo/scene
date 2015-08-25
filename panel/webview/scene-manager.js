@@ -16,11 +16,15 @@ function enterEditMode ( stashedScene, next ) {
 }
 
 function createScene (sceneJson, next) {
+    //var MissingBehavior = require('./missing-behavior');
+
     // reset scene view
     window.sceneView.reset();
 
     // Assets will be loaded by SceneWrapper.prototype.create, here we just deserialize the scene graph
-    var scene = Fire.deserialize(sceneJson);
+    var scene = Fire.deserialize(sceneJson/*, null, {
+        classFinder: MissingBehavior.safeFindClass,
+    }*/);
     Fire.engine._initScene(scene, function () {
         next(null, scene);
     });
@@ -139,7 +143,7 @@ Editor.playScene = function (callback) {
     ], callback);
 };
 
-Editor.softReload = function () {
+Editor.softReload = function (compiled) {
     // hot update new compiled scripts
-    sandbox.reload();
+    sandbox.reload(compiled);
 };
