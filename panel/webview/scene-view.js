@@ -80,7 +80,8 @@ Polymer( {
         //
         var scene = Fire.engine.getCurrentScene();
         scene.scale = Fire.v2( this.$.grid.xAxisScale, this.$.grid.yAxisScale );
-        scene.position = Fire.v2(this.$.grid.xAxisOffset, -this.$.grid.yAxisOffset);
+        scene.position = Fire.v2(this.$.grid.xDirection*this.$.grid.xAxisOffset,
+                                 this.$.grid.yDirection*this.$.grid.yAxisOffset);
         Fire.engine.repaintInEditMode();
     },
 
@@ -104,7 +105,8 @@ Polymer( {
         // sync axis offset and scale from grid
         var scene = Fire.engine.getCurrentScene();
         scene.scale = Fire.v2(this.$.grid.xAxisScale, this.$.grid.yAxisScale);
-        scene.position = Fire.v2(this.$.grid.xAxisOffset, -this.$.grid.yAxisOffset);
+        scene.position = Fire.v2(this.$.grid.xDirection*this.$.grid.xAxisOffset,
+                                 this.$.grid.yDirection*this.$.grid.yAxisOffset);
         Fire.engine.repaintInEditMode();
     },
 
@@ -374,8 +376,8 @@ Polymer( {
                     this.$.grid.repaint();
 
                     var scene = Fire.engine.getCurrentScene();
-                    scene.position = Fire.v2(this.$.grid.xAxisOffset,
-                                             -this.$.grid.yAxisOffset);
+                    scene.position = Fire.v2(this.$.grid.xDirection*this.$.grid.xAxisOffset,
+                                             this.$.grid.yDirection*this.$.grid.yAxisOffset);
                     Fire.engine.repaintInEditMode();
                 }.bind(this),
 
@@ -507,7 +509,8 @@ Polymer( {
         //
         var scene = Fire.engine.getCurrentScene();
         scene.scale = Fire.v2( this.$.grid.xAxisScale, this.$.grid.yAxisScale );
-        scene.position = Fire.v2(this.$.grid.xAxisOffset, -this.$.grid.yAxisOffset);
+        scene.position = Fire.v2(this.$.grid.xDirection*this.$.grid.xAxisOffset,
+                                 this.$.grid.yDirection*this.$.grid.yAxisOffset);
         Fire.engine.repaintInEditMode();
     },
 
