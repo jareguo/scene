@@ -26,6 +26,10 @@ editor-unit-input {
     width: 80px;
 }
 
+span {
+    flex: none;
+}
+
 span.space {
     margin-right: 5px;
 }
