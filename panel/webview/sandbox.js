@@ -33,7 +33,9 @@ function reset () {
     Fire.LoadManager.reset();
     // 清除 browserify 声明的 require 后，除非用户另外找地方存了原来的 require，否则之前的脚本都将会被垃圾回收
     require = sysRequire;
+
     Fire._RFreset();
+    Editor.clearUrlToUuidCache();
 }
 
 var sandbox = {
