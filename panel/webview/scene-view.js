@@ -209,27 +209,27 @@ Polymer( {
         var designHeight = this.$.gizmosView.designSize[1];
 
         if ( designWidth <= fitWidth && designHeight <= fitHeigth ) {
-            this.init( (bcr.width - designWidth)/2,
-                      -(bcr.height - designHeight)/2,
-                      1.0
-                     );
+            this.init( this.$.grid.xDirection * (bcr.width - designWidth)/2,
+                       this.$.grid.yDirection * (bcr.height - designHeight)/2,
+                       1.0
+                    );
         }
         else {
             var result = EditorUI.fitSize(designWidth, designHeight,
                                           fitWidth, fitHeigth);
             // move x
             if ( result[0] < result[1] ) {
-                this.init( (bcr.width - result[0])/2,
-                          -(bcr.height - result[1])/2,
-                          result[0]/designWidth
-                         );
+                this.init( this.$.grid.xDirection * (bcr.width - result[0])/2,
+                           this.$.grid.yDirection * (bcr.height - result[1])/2,
+                           result[0]/designWidth
+                        );
             }
             // move y
             else {
-                this.init( (bcr.width - result[0])/2,
-                          -(bcr.height - result[1])/2,
-                          result[1]/designHeight
-                         );
+                this.init( this.$.grid.xDirection * (bcr.width - result[0])/2,
+                           this.$.grid.yDirection * (bcr.height - result[1])/2,
+                           result[1]/designHeight
+                        );
             }
         }
     },
