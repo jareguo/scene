@@ -215,8 +215,8 @@ Polymer( {
                     );
         }
         else {
-            var result = EditorUI.fitSize(designWidth, designHeight,
-                                          fitWidth, fitHeigth);
+            var result = Editor.Utils.fitSize(designWidth, designHeight,
+                                              fitWidth, fitHeigth);
             // move x
             if ( result[0] < result[1] ) {
                 this.init( this.$.grid.xDirection * (bcr.width - result[0])/2,
