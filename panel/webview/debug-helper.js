@@ -7,6 +7,21 @@ Fire.JS.get(Fire, '$0', function () {
     }
 });
 
+Fire.JS.get(Fire, '$0N', function () {
+    var wrapper = Fire.$0;
+    if (wrapper) {
+        return wrapper.targetN;
+    }
+});
+
 Fire.JS.get(Fire, '$s', function () {
     return Fire.engine.getCurrentScene();
+});
+
+Fire.JS.get(Fire, '$S', function () {
+    return Fire.engine.getCurrentScene();
+});
+
+Fire.JS.get(Fire, '$SN', function () {
+    return Fire.engine.getCurrentSceneN();
 });
