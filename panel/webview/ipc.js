@@ -169,6 +169,7 @@ Ipc.on('scene:query-hierarchy', function ( queryID ) {
 Ipc.on('scene:query-node', function ( queryID, nodeID ) {
     var node = Fire.engine.getInstanceByIdN(nodeID);
     var dump = Editor.getNodeDump(node);
+    dump = JSON.stringify(dump);    // 改成发送字符串，以免字典的顺序发生改变
     Editor.sendToWindows( 'scene:reply-query-node', queryID, dump );
 });
 
