@@ -174,9 +174,11 @@ Ipc.on('scene:query-node', function ( queryID, nodeID ) {
 
 Ipc.on('scene:query-node-info', function ( sessionID, nodeID ) {
     var nodeWrapper = Fire.engine.getInstanceById(nodeID);
+
     Editor.sendToWindows( 'scene:query-node-info:reply', sessionID, {
-        name: nodeWrapper.name,
+        name: nodeWrapper ? nodeWrapper.name : '',
         type: Fire.JS.getClassName(nodeWrapper),
+        missed: nodeWrapper ? false : true,
     });
 });
 
