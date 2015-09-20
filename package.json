@@ -54,6 +54,8 @@
         "scene:duplicate-nodes",
         "scene:stash-and-reload",
         "scene:soft-reload",
+        "scene:create-prefab",
+
         "selection:selected",
         "selection:unselected",
         "selection:activated",

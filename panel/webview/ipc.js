@@ -1,5 +1,6 @@
 var Ipc = require('ipc');
 var Async = require('async');
+var Url = require('fire-url');
 
 Ipc.on('scene:ipc-messages', function ( ipcList ) {
     for ( var i = 0; i < ipcList.length; ++i ) {
@@ -453,3 +454,12 @@ Ipc.on('scene:design-size-changed', function ( w, h ) {
     window.sceneView.$.gizmosView.designSize = [w, h];
     Fire.engine.repaintInEditMode();
 });
+
+Ipc.on('scene:create-prefab', function ( id, baseUrl ) {
+    var wrapper = Fire.engine.getInstanceById(id);
+    var prefab = Editor.createPrefabFrom(wrapper);
+
+    var url = Url.join(baseUrl, wrapper.name + '.prefab');
+    Editor.sendToCore('scene:save-prefab', url, Editor.serialize(prefab));
+});
+

@@ -65,6 +65,33 @@ module.exports = {
         }
     },
 
+    'scene:save-prefab': function (url, json) {
+        var fsPath = Editor.assetdb._fspath(url);
+        if ( Fs.existsSync(fsPath) ) {
+            Editor.assetdb.save( url, json, function ( err, meta ) {
+                if ( err ) {
+                    Editor.assetdb.error('Failed to save prefab %s, messages: %s',
+                        url, err.stack);
+                    return;
+                }
+                Editor.sendToAll( 'asset-db:asset-changed', {
+                    type: meta['asset-type'],
+                    uuid: meta.uuid,
+                });
+            });
+        }
+        else {
+            Editor.assetdb.create( url, json, function ( err, results ) {
+                if ( err ) {
+                    Editor.assetdb.error('Failed to create prefab %s, messages: %s',
+                        url, err.stack);
+                    return;
+                }
+                Editor.sendToAll( 'asset-db:assets-created', results );
+            });
+        }
+    },
+
     'scene:query-asset-info-by-uuid': function (reply, uuid) {
         var path = Editor.assetdb.uuidToFspath(uuid);
         if (!path) {

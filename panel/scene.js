@@ -247,8 +247,12 @@ Editor.registerPanel( 'scene.panel', {
         this._sendToView( 'scene:stash-and-reload' );
     },
 
-    'scene:soft-reload': function (compiled) {
+    'scene:soft-reload': function ( compiled ) {
         this._sendToView( 'scene:soft-reload', compiled );
+    },
+
+    'scene:create-prefab': function ( id, url ) {
+        this._sendToView('scene:create-prefab', id, url );
     },
 
     'selection:selected': function ( type, ids ) {
