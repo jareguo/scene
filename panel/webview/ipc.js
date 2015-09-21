@@ -337,24 +337,16 @@ Ipc.on('scene:duplicate-nodes', function ( ids ) {
 
     // get top-level wrappers
     var results = Editor.Utils.arrayCmpFilter ( wrappers, function ( a, b ) {
-        var parent;
-
-        // a contains b
-        parent = b.parent;
-        while ( parent ) {
-            if ( a === parent ) {
-                return 1;
-            }
-            parent = parent.parent;
+        if (a === b) {
+            return 0;
         }
 
-        // b contains a
-        parent = a.parent;
-        while ( parent ) {
-            if ( b === parent ) {
-                return -1;
-            }
-            parent = parent.parent;
+        if (b.isChildOf(a)) {
+            return 1;
+        }
+
+        if (a.isChildOf(b)) {
+            return -1;
         }
 
         return 0;
