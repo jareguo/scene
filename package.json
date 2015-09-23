@@ -55,6 +55,8 @@
         "scene:stash-and-reload",
         "scene:soft-reload",
         "scene:create-prefab",
+        "scene:apply-prefab",
+        "scene:revert-prefab",
 
         "selection:selected",
         "selection:unselected",

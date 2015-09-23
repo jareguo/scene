@@ -255,6 +255,14 @@ Editor.registerPanel( 'scene.panel', {
         this._sendToView('scene:create-prefab', id, url );
     },
 
+    'scene:apply-prefab': function ( id ) {
+        this._sendToView('scene:apply-prefab', id );
+    },
+
+    'scene:revert-prefab': function ( id ) {
+        this._sendToView('scene:revert-prefab', id );
+    },
+
     'selection:selected': function ( type, ids ) {
         this._sendToView( '_selection:selected', type, ids );
         this._sendToView( 'selection:selected', type, ids );

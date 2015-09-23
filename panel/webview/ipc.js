@@ -455,3 +455,11 @@ Ipc.on('scene:create-prefab', function ( id, baseUrl ) {
     Editor.sendToCore('scene:save-prefab', url, Editor.serialize(prefab));
 });
 
+Ipc.on('scene:apply-prefab', function ( id ) {
+    // TODO: @jare
+});
+
+Ipc.on('scene:revert-prefab', function ( id ) {
+    // TODO: @jare
+});
+
