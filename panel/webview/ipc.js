@@ -461,10 +461,18 @@ Ipc.on('scene:create-prefab', function ( id, baseUrl ) {
 });
 
 Ipc.on('scene:apply-prefab', function ( id ) {
-    // TODO: @jare
+    var wrapper = Fire.engine.getInstanceById(id);
+    if (!wrapper || !wrapper._prefab) {
+        return;
+    }
+    var uuid = wrapper._prefab.asset._uuid;
+    var prefab = Editor.createPrefabFrom(wrapper);
+    var json = Editor.serialize(prefab);
+
+    Editor.sendToCore('scene:apply-prefab', uuid, json);
 });
 
 Ipc.on('scene:revert-prefab', function ( id ) {
-    // TODO: @jare
+    Editor.log('TODO - revert');
 });
 

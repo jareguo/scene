@@ -96,6 +96,23 @@ module.exports = {
         }
     },
 
+    'scene:apply-prefab': function (uuid, json) {
+        var url = Editor.assetdb.uuidToUrl(uuid);
+        Editor.assetdb.save( url, json, function ( err, meta ) {
+            if ( err ) {
+                Editor.assetdb.error('Failed to apply prefab %s, messages: %s',
+                    url, err.stack);
+                //replyUuid( err );
+                return;
+            }
+            //replyUuid( null, meta.uuid );
+            Editor.sendToAll( 'asset-db:asset-changed', {
+                type: meta['asset-type'],
+                uuid: meta.uuid,
+            });
+        });
+    },
+
     'scene:query-asset-info-by-uuid': function (reply, uuid) {
         var path = Editor.assetdb.uuidToFspath(uuid);
         if (!path) {
