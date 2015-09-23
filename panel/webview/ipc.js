@@ -450,9 +450,14 @@ Ipc.on('scene:design-size-changed', function ( w, h ) {
 Ipc.on('scene:create-prefab', function ( id, baseUrl ) {
     var wrapper = Fire.engine.getInstanceById(id);
     var prefab = Editor.createPrefabFrom(wrapper);
-
+    var json = Editor.serialize(prefab);
     var url = Url.join(baseUrl, wrapper.name + '.prefab');
-    Editor.sendToCore('scene:save-prefab', url, Editor.serialize(prefab));
+
+    Editor.sendRequestToCore('scene:save-prefab', url, json, function (err, uuid) {
+        if (!err) {
+            Editor.linkWithPrefab(wrapper, uuid);
+        }
+    });
 });
 
 Ipc.on('scene:apply-prefab', function ( id ) {
