@@ -1,8 +1,8 @@
 (function () {
     Editor.isRuntime = true;
 
-    // mixin Editor for canvas-studio
-    Editor.require('app://canvas-studio/page/editor-init');
+    // mixin Editor for editor
+    Editor.require('app://editor/page/editor-init');
 
     // init scene manager
     require('./scene-manager');
