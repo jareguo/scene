@@ -3,9 +3,7 @@ var Ipc = require('ipc');
 var Path = require('fire-path');
 //var Url = require('fire-url');
 
-Polymer( {
-    is: 'scene-view',
-
+Editor.registerElement({
     listeners: {
         'mousedown': '_onMouseDown',
         'mousewheel': '_onMouseWheel',

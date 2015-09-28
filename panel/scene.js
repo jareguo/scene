@@ -1,7 +1,5 @@
 (function () {
 Editor.registerPanel( 'scene.panel', {
-    is: 'editor-scene',
-
     behaviors: [ EditorUI.droppable ],
 
     hostAttributes: {
