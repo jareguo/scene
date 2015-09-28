@@ -65,7 +65,7 @@ module.exports = {
         }
     },
 
-    'scene:save-prefab': function (replyUuid, url, json) {
+    'scene:create-prefab': function (replyUuid, url, json) {
         var fsPath = Editor.assetdb._fspath(url);
         if ( Fs.existsSync(fsPath) ) {
             Editor.assetdb.save( url, json, function ( err, meta ) {
@@ -90,7 +90,7 @@ module.exports = {
                     replyUuid( err );
                     return;
                 }
-                replyUuid( null, results.uuid );
+                replyUuid( null, results[0].uuid );
                 Editor.sendToAll( 'asset-db:assets-created', results );
             });
         }

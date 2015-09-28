@@ -451,13 +451,13 @@ Ipc.on('scene:design-size-changed', function ( w, h ) {
 
 Ipc.on('scene:create-prefab', function ( id, baseUrl ) {
     var wrapper = Fire.engine.getInstanceById(id);
-    var prefab = Editor.createPrefabFrom(wrapper);
+    var prefab = Editor.PrefabUtils.createPrefabFrom(wrapper);
     var json = Editor.serialize(prefab);
     var url = Url.join(baseUrl, wrapper.name + '.prefab');
 
-    Editor.sendRequestToCore('scene:save-prefab', url, json, function (err, uuid) {
+    Editor.sendRequestToCore('scene:create-prefab', url, json, function (err, uuid) {
         if (!err) {
-            Editor.linkWithPrefab(wrapper, uuid);
+            Editor.PrefabUtils.savePrefabUuid(wrapper, uuid);
         }
     });
 });
@@ -467,14 +467,23 @@ Ipc.on('scene:apply-prefab', function ( id ) {
     if (!wrapper || !wrapper._prefab) {
         return;
     }
+
+    wrapper = wrapper._prefab.rootWrapper;
     var uuid = wrapper._prefab.asset._uuid;
-    var prefab = Editor.createPrefabFrom(wrapper);
+    var prefab = Editor.PrefabUtils.createPrefabFrom(wrapper);
+    Editor.PrefabUtils.savePrefabUuid(wrapper, uuid);
     var json = Editor.serialize(prefab);
 
     Editor.sendToCore('scene:apply-prefab', uuid, json);
 });
 
 Ipc.on('scene:revert-prefab', function ( id ) {
-    Editor.log('TODO - revert');
+    var wrapper = Fire.engine.getInstanceById(id);
+    if (!wrapper || !wrapper._prefab) {
+        return;
+    }
+
+    wrapper = wrapper._prefab.rootWrapper;
+    Editor.PrefabUtils.revertPrefab(wrapper);
 });
 
