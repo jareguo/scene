@@ -161,11 +161,13 @@ Ipc.on('scene:create-node-by-classid', function ( name, classID, referenceID, po
 });
 
 Ipc.on('scene:query-hierarchy', function ( queryID ) {
+    if (!Fire.engine.isInitialized) {
+        return Editor.sendToWindows( 'scene:reply-query-hierarchy', queryID, '', [] );
+    }
     var nodes = Editor.getHierarchyDump();
     var sceneUuid = Fire.engine.getCurrentScene().uuid;
     Editor.sendToWindows( 'scene:reply-query-hierarchy', queryID, sceneUuid, nodes );
 });
-
 
 Ipc.on('scene:query-node', function ( queryID, nodeID ) {
     var node = Fire.engine.getInstanceByIdN(nodeID);
