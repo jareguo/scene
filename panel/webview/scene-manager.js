@@ -22,7 +22,7 @@ function createScene (sceneJson, next) {
     window.sceneView.reset();
 
     // Assets will be loaded by SceneWrapper.prototype.create, here we just deserialize the scene graph
-    var scene = Fire.deserialize(sceneJson/*, null, {
+    var scene = cc.deserialize(sceneJson/*, null, {
         classFinder: MissingBehavior.safeFindClass,
     }*/);
     cc.engine._initScene(scene, function () {
@@ -119,8 +119,8 @@ Editor.playScene = function (callback) {
             });
 
             // reset scene camera
-            scene.position = Fire.Vec2.zero;
-            scene.scale = Fire.Vec2.one;
+            scene.position = cc.Vec2.zero;
+            scene.scale = cc.Vec2.one;
 
             // play new scene
             cc.engine._launchScene(scene, function () {

@@ -164,7 +164,7 @@ function CustomEvent (type, bubbles) {
 }
 Event.CustomEvent = CustomEvent;
 
-Fire.Event = Event;
-Fire.CustomEvent = CustomEvent;
+cc.FireEvent = Event;
+cc.FireCustomEvent = CustomEvent;
 
 module.exports = Event;

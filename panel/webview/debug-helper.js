@@ -1,4 +1,4 @@
-Fire.JS.get(Fire, '$0', function () {
+cc.js.get(cc, '$0', function () {
     var selection = Editor.Selection.curSelection('node');
     if (selection.length > 0) {
         var id = selection[0];
@@ -7,21 +7,21 @@ Fire.JS.get(Fire, '$0', function () {
     }
 });
 
-Fire.JS.get(Fire, '$0N', function () {
-    var wrapper = Fire.$0;
+cc.js.get(cc, '$0N', function () {
+    var wrapper = cc.$0;
     if (wrapper) {
         return wrapper.targetN;
     }
 });
 
-Fire.JS.get(Fire, '$s', function () {
+cc.js.get(cc, '$s', function () {
     return cc(cc.director.getRunningScene());
 });
 
-Fire.JS.get(Fire, '$S', function () {
+cc.js.get(cc, '$S', function () {
     return cc(cc.director.getRunningScene());
 });
 
-Fire.JS.get(Fire, '$SN', function () {
+cc.js.get(cc, '$SN', function () {
     return cc.director.getRunningScene();
 });

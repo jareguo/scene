@@ -1,10 +1,10 @@
 var JS = cc.js;
-var Ticker = Fire._Ticker;
-var Time = Fire.Time;
+var Ticker = cc._Ticker;
+var Time = cc.Time;
 
 var EditorEngine = cc.FireClass({
     name: 'EditorEngine',
-    extends: Fire.Playable,
+    extends: cc.Playable,
 
     constructor: function () {
         var useDefaultMainLoop = arguments[0];
@@ -186,8 +186,8 @@ var EditorEngine = cc.FireClass({
             'showFPS'               : false,
             'frameRate'             : 60,
             'id'                    : options.id,
-            'renderMode'            : Fire.isEditor ? 2 : options.renderMode,                 // 0: auto, 1:Canvas, 2:Webgl
-            'registerSystemEvent'   : Fire.isEditor ? false : true,
+            'renderMode'            : cc.isEditor ? 2 : options.renderMode,                 // 0: auto, 1:Canvas, 2:Webgl
+            'registerSystemEvent'   : ! cc.isEditor,
             'jsList'                : []
         };
 
@@ -425,5 +425,7 @@ var EditorEngine = cc.FireClass({
         }
     }
 });
+
+cc.engine = new EditorEngine(false);
 
 module.exports = EditorEngine;

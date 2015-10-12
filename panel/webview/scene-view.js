@@ -25,8 +25,8 @@ Editor.registerElement({
     },
 
     ready: function () {
-        var mappingH = Fire.Runtime.Settings['mapping-h'];
-        var mappingV = Fire.Runtime.Settings['mapping-v'];
+        var mappingH = cc.Runtime.Settings['mapping-h'];
+        var mappingV = cc.Runtime.Settings['mapping-v'];
 
         // grid
         this.$.grid.setScaleH( [5,2], 0.01, 1000 );
@@ -77,8 +77,8 @@ Editor.registerElement({
 
         //
         var scene = cc(cc.director.getRunningScene());
-        scene.scale = Fire.v2( this.$.grid.xAxisScale, this.$.grid.yAxisScale );
-        scene.position = Fire.v2(this.$.grid.xDirection*this.$.grid.xAxisOffset,
+        scene.scale = cc.v2( this.$.grid.xAxisScale, this.$.grid.yAxisScale );
+        scene.position = cc.v2(this.$.grid.xDirection*this.$.grid.xAxisOffset,
                                  this.$.grid.yDirection*this.$.grid.yAxisOffset);
         cc.engine.repaintInEditMode();
     },
@@ -102,8 +102,8 @@ Editor.registerElement({
 
         // sync axis offset and scale from grid
         var scene = cc(cc.director.getRunningScene());
-        scene.scale = Fire.v2(this.$.grid.xAxisScale, this.$.grid.yAxisScale);
-        scene.position = Fire.v2(this.$.grid.xDirection*this.$.grid.xAxisOffset,
+        scene.scale = cc.v2(this.$.grid.xAxisScale, this.$.grid.yAxisScale);
+        scene.position = cc.v2(this.$.grid.xDirection*this.$.grid.xAxisOffset,
                                  this.$.grid.yDirection*this.$.grid.yAxisOffset);
         cc.engine.repaintInEditMode();
     },
@@ -117,10 +117,10 @@ Editor.registerElement({
         //});
         var importUrl = Editor.importPath.replace(/\\/g, '/');
         var assetUrl = Path.join(Editor.projectInfo.path, 'assets').replace(/\\/g, '/');
-        Fire.AssetLibrary.init(importUrl, assetUrl);
+        cc.AssetLibrary.init(importUrl, assetUrl);
 
         // init engine
-        var canvasEL = this.$['runtime-canvas'];
+        var canvasEL = this.$['engine-canvas'];
         var bcr = this.getBoundingClientRect();
         canvasEL.width  = bcr.width;
         canvasEL.height = bcr.height;
@@ -128,12 +128,10 @@ Editor.registerElement({
         var initOptions = {
             width: bcr.width,
             height: bcr.height,
-            id: canvasEL,
+            id: 'engine-canvas',
             designWidth: bcr.width,
             designHeight: bcr.height
         };
-
-        cc.engine = new EditorEngine(false);
 
         cc.engine.init(initOptions, function () {
             Editor.initScene(function (err) {
@@ -170,8 +168,7 @@ Editor.registerElement({
     },
 
     newScene: function () {
-        var SceneWrapperImpl = cc(cc.director.getRunningScene()).constructor;
-        var sceneWrapper = new SceneWrapperImpl();
+        var sceneWrapper = new cc.Runtime.SceneWrapper();
         sceneWrapper.createAndAttachNode();
 
         this.reset();
@@ -235,7 +232,7 @@ Editor.registerElement({
     },
 
     sceneToPixel: function ( pos ) {
-        return Fire.v2(
+        return cc.v2(
             this.$.grid.valueToPixelH(pos.x),
             this.$.grid.valueToPixelV(pos.y)
         );
@@ -248,7 +245,7 @@ Editor.registerElement({
     },
 
     pixelToScene: function (pos) {
-        return Fire.v2(
+        return cc.v2(
             this.$.grid.pixelToValueH(pos.x),
             this.$.grid.pixelToValueV(pos.y)
         );
@@ -310,13 +307,13 @@ Editor.registerElement({
         // TODO
         // this.$.gizmosView.rectHitTest( x, y, 1, 1 );
 
-        var worldHitPoint = this.pixelToWorld( Fire.v2(x,y) );
+        var worldHitPoint = this.pixelToWorld( cc.v2(x,y) );
         var minDist = Number.MAX_VALUE;
         var resultNode;
 
-        var nodes = cc.game.getIntersectionList( new Fire.Rect(worldHitPoint.x, worldHitPoint.y, 1, 1) );
+        var nodes = cc.game.getIntersectionList( new cc.Rect(worldHitPoint.x, worldHitPoint.y, 1, 1) );
         nodes.forEach( function ( node ) {
-            var fireNode = Fire(node);
+            var fireNode = cc(node);
             var aabb = fireNode.getWorldBounds();
             // TODO: calculate the OBB center instead
             var dist = worldHitPoint.sub(aabb.center).magSqr();
@@ -330,14 +327,14 @@ Editor.registerElement({
     },
 
     rectHitTest: function ( x, y, w, h ) {
-        var v1 = this.pixelToWorld( Fire.v2(x,y) );
-        var v2 = this.pixelToWorld( Fire.v2(x+w,y+h) );
-        var worldRect = Fire.Rect.fromMinMax(v1,v2);
+        var v1 = this.pixelToWorld( cc.v2(x,y) );
+        var v2 = this.pixelToWorld( cc.v2(x+w,y+h) );
+        var worldRect = cc.Rect.fromMinMax(v1,v2);
 
         var results = [];
         var nodes = cc.game.getIntersectionList(worldRect);
         nodes.forEach( function ( node ) {
-            var fireNode = Fire(node);
+            var fireNode = cc(node);
             results.push(fireNode);
         });
 
@@ -376,7 +373,7 @@ Editor.registerElement({
                     this.$.grid.repaint();
 
                     var scene = cc(cc.director.getRunningScene());
-                    scene.position = Fire.v2(this.$.grid.xDirection*this.$.grid.xAxisOffset,
+                    scene.position = cc.v2(this.$.grid.xDirection*this.$.grid.xAxisOffset,
                                              this.$.grid.yDirection*this.$.grid.yAxisOffset);
                     cc.engine.repaintInEditMode();
                 }.bind(this),
@@ -508,8 +505,8 @@ Editor.registerElement({
 
         //
         var scene = cc(cc.director.getRunningScene());
-        scene.scale = Fire.v2( this.$.grid.xAxisScale, this.$.grid.yAxisScale );
-        scene.position = Fire.v2(this.$.grid.xDirection*this.$.grid.xAxisOffset,
+        scene.scale = cc.v2( this.$.grid.xAxisScale, this.$.grid.yAxisScale );
+        scene.position = cc.v2(this.$.grid.xDirection*this.$.grid.xAxisOffset,
                                  this.$.grid.yDirection*this.$.grid.yAxisOffset);
         cc.engine.repaintInEditMode();
     },

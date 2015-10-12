@@ -1,5 +1,5 @@
-﻿var JS = require('../JS');
-var CallbacksHandler = require('../../../core/platform/callbacks-invoker').CallbacksHandler;
+﻿var JS = cc.js;
+var CallbacksHandler = cc._require('./cocos2d/core/platform/callbacks-invoker').CallbacksHandler;
 
 // Extends CallbacksHandler to handle and invoke event callbacks.
 function EventListeners () {

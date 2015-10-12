@@ -148,6 +148,6 @@ var Playable = (function () {
     return Playable;
 })();
 
-Fire.Playable = Playable;
+cc.Playable = Playable;
 
 module.exports = Playable;

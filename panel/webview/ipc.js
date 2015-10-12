@@ -13,7 +13,7 @@ Ipc.on('scene:new-scene', function () {
 });
 
 Ipc.on('scene:save-scene-from-page', function ( url ) {
-    var sceneAsset = new Fire.Scene();
+    var sceneAsset = new cc.SceneAsset();
     sceneAsset.scene = cc(cc.director.getRunningScene());
 
     // NOTE: we stash scene because we want to save and reload the connected browser
@@ -53,10 +53,10 @@ Ipc.on('scene:drop', function ( uuids, type, x, y ) {
             function ( node, next ) {
                 var nodeID;
                 if ( node ) {
-                    var wrapper = Fire(node);
+                    var wrapper = cc(node);
                     nodeID = wrapper.uuid;
 
-                    wrapper.position = window.sceneView.pixelToScene( Fire.v2(x,y) );
+                    wrapper.position = window.sceneView.pixelToScene( cc.v2(x,y) );
                     wrapper.parent = cc(cc.director.getRunningScene());
                 }
 
@@ -99,15 +99,15 @@ Ipc.on('scene:create-nodes-by-uuids', function ( uuids, parentID ) {
             function ( node, next ) {
                 var nodeID;
                 if ( node ) {
-                    var wrapper = Fire(node);
+                    var wrapper = cc(node);
                     nodeID = wrapper.uuid;
 
                     if ( parentNode ) {
-                        wrapper.parent = Fire(parentNode);
+                        wrapper.parent = cc(parentNode);
                     }
                     var center_x = cc.view.canvasSize.x/2;
                     var center_y = cc.view.canvasSize.y/2;
-                    wrapper.scenePosition = window.sceneView.pixelToScene( Fire.v2(center_x, center_y) );
+                    wrapper.scenePosition = window.sceneView.pixelToScene( cc.v2(center_x, center_y) );
                 }
 
                 next ( null, nodeID );
@@ -134,23 +134,23 @@ Ipc.on('scene:create-node-by-classid', function ( name, classID, referenceID, po
     if ( referenceID ) {
         parentNode = cc.engine.getInstanceByIdN(referenceID);
         if ( position === 'sibling' ) {
-            parentNode = Fire(parentNode).parentN;
+            parentNode = cc(parentNode).parentN;
         }
     }
 
     if ( !parentNode ) {
         parentNode = cc.director.getRunningScene();
     }
-    var Wrapper = Fire.JS._getClassById(classID);
+    var Wrapper = cc.js._getClassById(classID);
     if (Wrapper) {
         var wrapper = new Wrapper();
         wrapper.createAndAttachNode();
-        wrapper.parent = Fire(parentNode);
+        wrapper.parent = cc(parentNode);
         wrapper.name = name;
 
         var center_x = cc.view.canvasSize.x/2;
         var center_y = cc.view.canvasSize.y/2;
-        wrapper.scenePosition = window.sceneView.pixelToScene( Fire.v2(center_x, center_y) );
+        wrapper.scenePosition = window.sceneView.pixelToScene( cc.v2(center_x, center_y) );
 
         cc.engine.repaintInEditMode();
         Editor.Selection.select('node', wrapper.uuid, true, true );
@@ -181,7 +181,7 @@ Ipc.on('scene:query-node-info', function ( sessionID, nodeID ) {
 
     Editor.sendToWindows( 'scene:query-node-info:reply', sessionID, {
         name: nodeWrapper ? nodeWrapper.name : '',
-        type: Fire.JS.getClassName(nodeWrapper),
+        type: cc.js.getClassName(nodeWrapper),
         missed: nodeWrapper ? false : true,
     });
 });
@@ -189,15 +189,15 @@ Ipc.on('scene:query-node-info', function ( sessionID, nodeID ) {
 Ipc.on('scene:node-new-property', function ( info ) {
     var node = cc.engine.getInstanceByIdN(info.id);
     if (node) {
-        var objToSet = info.mixinType ? node : Fire(node);
+        var objToSet = info.mixinType ? node : cc(node);
         try {
             var id = info.type;
             var ctor;
-            if (Fire.JS._isTempClassId(id)) {
-                ctor = Fire.JS._getClassById(id);
+            if (cc.js._isTempClassId(id)) {
+                ctor = cc.js._getClassById(id);
             }
             else {
-                ctor = Fire.JS.getClassByName(id);
+                ctor = cc.js.getClassByName(id);
             }
             if ( ctor ) {
                 var obj;
@@ -214,7 +214,7 @@ Ipc.on('scene:node-new-property', function ( info ) {
         }
         catch (e) {
             Editor.warn('Failed to new property %s of %s to %s, ' + e.message,
-                info.path, Fire(node).name, info.value);
+                info.path, cc(node).name, info.value);
         }
     }
 });
@@ -222,14 +222,14 @@ Ipc.on('scene:node-new-property', function ( info ) {
 Ipc.on('scene:node-set-property', function ( info ) {
     var node = cc.engine.getInstanceByIdN(info.id);
     if (node) {
-        var objToSet = info.mixinType ? node : Fire(node);
+        var objToSet = info.mixinType ? node : cc(node);
         try {
             Editor.setDeepPropertyByPath(objToSet, info.path, info.value, info.type);
             cc.engine.repaintInEditMode();
         }
         catch (e) {
             Editor.warn('Failed to set property %s of %s to %s, ' + e.message,
-                info.path, Fire(node).name, info.value);
+                info.path, cc(node).name, info.value);
         }
     }
 });
@@ -238,14 +238,14 @@ Ipc.on('scene:node-mixin', function ( id, uuid ) {
     if (uuid && Editor.isUuid(uuid)) {
         // check script
         var className = Editor.compressUuid(uuid);
-        var classToMix = Fire.JS._getClassById(className);
+        var classToMix = cc.js._getClassById(className);
         if (!classToMix) {
             return Editor.error('Can not find Behavior in the script "%s".', uuid);
         }
         //
         var node = cc.engine.getInstanceByIdN(id);
         if (node) {
-            Fire.mixin(node, classToMix);
+            cc.mixin(node, classToMix);
         }
         else {
             Editor.error('Can not find node to mixin: %s', id);
@@ -259,7 +259,7 @@ Ipc.on('scene:node-mixin', function ( id, uuid ) {
 Ipc.on('scene:node-unmixin', function ( id, className ) {
     var node = cc.engine.getInstanceByIdN(id);
     if (node) {
-        Fire.unMixin( node, className);
+        cc.unMixin( node, className);
     }
 });
 
@@ -358,7 +358,7 @@ Ipc.on('scene:duplicate-nodes', function ( ids ) {
     // duplicate results
     var clones = [];
     results.forEach(function ( wrapper ) {
-        var clone = Fire.instantiate(wrapper);
+        var clone = cc.instantiate(wrapper);
         clone.parent = wrapper.parent;
 
         clones.push(clone.uuid);

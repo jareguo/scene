@@ -6,7 +6,7 @@ var startTime = 0;
  * !#en The interface to get time information from Fireball.
  *
  * See [Time](/en/scripting/time/)
- * !#zh Time 模块用于获得游戏里的时间和帧率相关信息。直接使用 Fire.Time.*** 访问即可。
+ * !#zh Time 模块用于获得游戏里的时间和帧率相关信息。直接使用 cc.Time.*** 访问即可。
  *
  * 请参考教程[计时和帧率](/zh/scripting/time/)
  *
@@ -97,6 +97,6 @@ var Time = {
     },
 };
 
-Fire.Time = Time;
+cc.Time = Time;
 
 module.exports = Time;

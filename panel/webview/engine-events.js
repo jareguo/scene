@@ -1,6 +1,6 @@
 cc.engine.on('node-attach-to-scene', function ( event ) {
-    var wrapper = Fire(event.detail.targetN);
-    var className = Fire.JS.getClassName(wrapper);
+    var wrapper = cc(event.detail.targetN);
+    var className = cc.js.getClassName(wrapper);
 
     var gizmoDef = Editor.gizmos[className];
     if ( gizmoDef ) {
@@ -15,7 +15,7 @@ cc.engine.on('node-attach-to-scene', function ( event ) {
 });
 
 cc.engine.on('node-detach-from-scene', function ( event ) {
-    var wrapper = Fire(event.detail.targetN);
+    var wrapper = cc(event.detail.targetN);
     if ( wrapper.gizmo ) {
         wrapper.gizmo.remove();
         wrapper.gizmo = null;
@@ -28,7 +28,7 @@ cc.engine.on('node-detach-from-scene', function ( event ) {
 });
 
 var _updateGizmos = function (node) {
-    var wrapper = Fire(node);
+    var wrapper = cc(node);
     if ( wrapper.gizmo ) {
         wrapper.gizmo.update();
     }

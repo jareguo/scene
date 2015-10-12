@@ -296,6 +296,6 @@ EventTarget.prototype._getBubblingTargets = function (type, array) {
     // Subclasses can override this method to make event propagable.
 };
 
-Fire.EventTarget = EventTarget;
+cc.FireEventTarget = EventTarget;
 
 module.exports = EventTarget;

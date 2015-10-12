@@ -13,28 +13,28 @@ var loadedScriptNodes = [];
 
 function init () {
     //sandbox.globalVarsChecker = new GlobalVarsChecker().record();
-    builtinClassIds = Fire.JS._registeredClassIds;
-    builtinClassNames = Fire.JS._registeredClassNames;
-    //builtinComponentMenus = Fire._componentMenuItems.slice();
-    //builtinCustomAssetMenus = Fire._customAssetMenuItems.slice();
+    builtinClassIds = cc.js._registeredClassIds;
+    builtinClassNames = cc.js._registeredClassNames;
+    //builtinComponentMenus = cc._componentMenuItems.slice();
+    //builtinCustomAssetMenus = cc._customAssetMenuItems.slice();
 }
 
 function reset () {
     // clear
-    Fire.FObject._deferredDestroy();
+    cc.Object._deferredDestroy();
     //// reset menus
-    //Fire._componentMenuItems = builtinComponentMenus.slice();
-    //Fire._customAssetMenuItems = builtinCustomAssetMenus.slice();
+    //cc._componentMenuItems = builtinComponentMenus.slice();
+    //cc._customAssetMenuItems = builtinCustomAssetMenus.slice();
     //// Editor.MainMenu.reset();
     // remove user classes
-    Fire.JS._registeredClassIds = builtinClassIds;
-    Fire.JS._registeredClassNames = builtinClassNames;
+    cc.js._registeredClassIds = builtinClassIds;
+    cc.js._registeredClassNames = builtinClassNames;
     ////
-    Fire.LoadManager.reset();
+    cc._LoadManager.reset();
     // 清除 browserify 声明的 require 后，除非用户另外找地方存了原来的 require，否则之前的脚本都将会被垃圾回收
     require = sysRequire;
 
-    Fire._RFreset();
+    cc._RFreset();
     Editor.clearUrlToUuidCache();
 }
 

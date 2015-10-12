@@ -55,6 +55,6 @@
     return Ticker;
 })();
 
-Fire._Ticker = Ticker;
+cc._Ticker = Ticker;
 
 module.exports = Ticker;
