@@ -60,8 +60,8 @@ Editor.registerElement({
         // reset scene gizmos, scene grid
         window.sceneView.$.gizmosView.reset();
 
-        // reset Fire.engine editing state
-        Fire.engine.animatingInEditMode = false;
+        // reset cc.engine editing state
+        cc.engine.animatingInEditMode = false;
     },
 
     init: function ( x, y, scale ) {
@@ -80,11 +80,11 @@ Editor.registerElement({
         scene.scale = Fire.v2( this.$.grid.xAxisScale, this.$.grid.yAxisScale );
         scene.position = Fire.v2(this.$.grid.xDirection*this.$.grid.xAxisOffset,
                                  this.$.grid.yDirection*this.$.grid.yAxisOffset);
-        Fire.engine.repaintInEditMode();
+        cc.engine.repaintInEditMode();
     },
 
     _resize: function () {
-        if ( Fire.engine.isPlaying ) {
+        if ( cc.engine.isPlaying ) {
             return;
         }
 
@@ -105,7 +105,7 @@ Editor.registerElement({
         scene.scale = Fire.v2(this.$.grid.xAxisScale, this.$.grid.yAxisScale);
         scene.position = Fire.v2(this.$.grid.xDirection*this.$.grid.xAxisOffset,
                                  this.$.grid.yDirection*this.$.grid.yAxisOffset);
-        Fire.engine.repaintInEditMode();
+        cc.engine.repaintInEditMode();
     },
 
     _initEngine: function () {
@@ -133,7 +133,9 @@ Editor.registerElement({
             designHeight: bcr.height
         };
 
-        EditorEngine.init(initOptions, function () {
+        cc.engine = new EditorEngine(false);
+
+        cc.engine.init(initOptions, function () {
             Editor.initScene(function (err) {
                 if (err) {
                     Ipc.sendToHost('scene:init-error', err);
@@ -147,8 +149,8 @@ Editor.registerElement({
         // beforeunload event
         window.addEventListener('beforeunload', function ( event ) {
             Editor.Selection.clear('node');
-            if ( Fire.engine.isPlaying ) {
-                Fire.engine.stop();
+            if ( cc.engine.isPlaying ) {
+                cc.engine.stop();
             }
         });
 
@@ -173,10 +175,10 @@ Editor.registerElement({
         sceneWrapper.createAndAttachNode();
 
         this.reset();
-        Fire.engine._launchScene(sceneWrapper);
+        cc.engine._launchScene(sceneWrapper);
 
         this.adjustToCenter(20);
-        Fire.engine.repaintInEditMode();
+        cc.engine.repaintInEditMode();
 
         Editor.remote.currentSceneUuid = null;
         Ipc.sendToHost('scene:ready');
@@ -185,9 +187,9 @@ Editor.registerElement({
     loadScene: function ( uuid ) {
         this.reset();
 
-        Fire.engine._loadSceneByUuid(uuid, function (err) {
+        cc.engine._loadSceneByUuid(uuid, function (err) {
             this.adjustToCenter(20);
-            Fire.engine.repaintInEditMode();
+            cc.engine.repaintInEditMode();
 
             if (err) {
                 Ipc.sendToHost('scene:init-error', err);
@@ -258,22 +260,22 @@ Editor.registerElement({
     },
 
     activate: function ( id ) {
-        var wrapper = Fire.engine.getInstanceById(id);
+        var wrapper = cc.engine.getInstanceById(id);
         if ( wrapper && wrapper.constructor.animatableInEditor ) {
             if ( wrapper.onFocusInEditor )
                 wrapper.onFocusInEditor();
 
-            Fire.engine.animatingInEditMode = true;
+            cc.engine.animatingInEditMode = true;
         }
     },
 
     deactivate: function ( id ) {
-        var wrapper = Fire.engine.getInstanceById(id);
+        var wrapper = cc.engine.getInstanceById(id);
         if ( wrapper && wrapper.constructor.animatableInEditor ) {
             if ( wrapper.onLostFocusInEditor )
                 wrapper.onLostFocusInEditor();
 
-            Fire.engine.animatingInEditMode = false;
+            cc.engine.animatingInEditMode = false;
         }
     },
 
@@ -296,7 +298,7 @@ Editor.registerElement({
     delete: function ( ids ) {
         for (var i = 0; i < ids.length; i++) {
             var id = ids[i];
-            var nodeWrapper = Fire.engine.getInstanceById(id);
+            var nodeWrapper = cc.engine.getInstanceById(id);
             if (nodeWrapper) {
                 nodeWrapper.parent = null;
             }
@@ -376,7 +378,7 @@ Editor.registerElement({
                     var scene = cc(cc.director.getRunningScene());
                     scene.position = Fire.v2(this.$.grid.xDirection*this.$.grid.xAxisOffset,
                                              this.$.grid.yDirection*this.$.grid.yAxisOffset);
-                    Fire.engine.repaintInEditMode();
+                    cc.engine.repaintInEditMode();
                 }.bind(this),
 
                 // end
@@ -509,7 +511,7 @@ Editor.registerElement({
         scene.scale = Fire.v2( this.$.grid.xAxisScale, this.$.grid.yAxisScale );
         scene.position = Fire.v2(this.$.grid.xDirection*this.$.grid.xAxisOffset,
                                  this.$.grid.yDirection*this.$.grid.yAxisOffset);
-        Fire.engine.repaintInEditMode();
+        cc.engine.repaintInEditMode();
     },
 
     _onMouseMove: function ( event ) {

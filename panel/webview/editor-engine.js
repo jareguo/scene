@@ -32,53 +32,49 @@ var EditorEngine = cc.FireClass({
 
         this._bindedTick = (CC_EDITOR || useDefaultMainLoop) && this._tick.bind(this);
 
-        // states
-        this._isCloning = false;    // deserializing or instantiating
         //this._isLockingScene = false;
 
-        if (CC_EDITOR) {
-            /**
-             * The maximum value the Time.deltaTime in edit mode.
-             * @property maxDeltaTimeInEM
-             * @type {Number}
-             * @private
-             */
-            this.maxDeltaTimeInEM = 1 / 30;
-            /**
-             * Is playing animation in edit mode.
-             * @property animatingInEditMode
-             * @type {Boolean}
-             * @private
-             */
-            this.animatingInEditMode = false;
+        /**
+         * The maximum value the Time.deltaTime in edit mode.
+         * @property maxDeltaTimeInEM
+         * @type {Number}
+         * @private
+         */
+        this.maxDeltaTimeInEM = 1 / 30;
+        /**
+         * Is playing animation in edit mode.
+         * @property animatingInEditMode
+         * @type {Boolean}
+         * @private
+         */
+        this.animatingInEditMode = false;
 
-            this._shouldRepaintInEM = false;
-            this._forceRepaintId = -1;
+        this._shouldRepaintInEM = false;
+        this._forceRepaintId = -1;
 
-            // used in getInstanceById and editor only
-            this.attachedWrappersForEditor = {};
+        // used in getInstanceById and editor only
+        this.attachedWrappersForEditor = {};
 
-            var attachedWrappersForEditor = this.attachedWrappersForEditor;
-            this.on('node-detach-from-scene', function (event) {
-                var node = event.detail.targetN;
-                if (node) {
-                    var uuid = cc(node).uuid;
-                    if (uuid) {
-                        delete attachedWrappersForEditor[uuid];
-                    }
+        var attachedWrappersForEditor = this.attachedWrappersForEditor;
+        this.on('node-detach-from-scene', function (event) {
+            var node = event.detail.targetN;
+            if (node) {
+                var uuid = cc(node).uuid;
+                if (uuid) {
+                    delete attachedWrappersForEditor[uuid];
                 }
-            });
-            this.on('node-attach-to-scene', function (event) {
-                var node = event.detail.targetN;
-                if (node) {
-                    var wrapper = cc(node);
-                    var uuid = wrapper.uuid;
-                    if (uuid) {
-                        attachedWrappersForEditor[uuid] = wrapper;
-                    }
+            }
+        });
+        this.on('node-attach-to-scene', function (event) {
+            var node = event.detail.targetN;
+            if (node) {
+                var wrapper = cc(node);
+                var uuid = wrapper.uuid;
+                if (uuid) {
+                    attachedWrappersForEditor[uuid] = wrapper;
                 }
-            });
-        }
+            }
+        });
     },
 
     properties: {
@@ -287,6 +283,27 @@ var EditorEngine = cc.FireClass({
         if (CC_EDITOR && !this._isUpdating) {
             this._shouldRepaintInEM = true;
         }
+    },
+
+    /**
+     * Returns the wrapper by wrapper id.
+     * @method getInstanceById
+     * @param {String} uuid
+     * @return {cc.Runtime.NodeWrapper}
+     */
+    getInstanceById: function (uuid) {
+        return this.attachedWrappersForEditor[uuid] || null;
+    },
+
+    /**
+     * Returns the node by wrapper id.
+     * @method getInstanceByIdN
+     * @param {String} uuid
+     * @return {RuntimeNode}
+     */
+    getInstanceByIdN: function (uuid) {
+        var wrapper = this.attachedWrappersForEditor[uuid];
+        return (wrapper && wrapper.targetN) || null;
     },
 
     // OVERRIDE
