@@ -43,6 +43,6 @@ var _updateGizmos = function (node) {
 Fire.engine.on('post-update', function ( event ) {
     sceneView.$.gizmosView.update();
 
-    var wrapper = Fire.engine.getCurrentScene();
+    var wrapper = cc(cc.director.getRunningScene());
     wrapper.childrenN.forEach(_updateGizmos);
 });

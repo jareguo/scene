@@ -76,7 +76,7 @@ Editor.registerElement({
         this.$.gizmosView.scale = scale;
 
         //
-        var scene = Fire.engine.getCurrentScene();
+        var scene = cc(cc.director.getRunningScene());
         scene.scale = Fire.v2( this.$.grid.xAxisScale, this.$.grid.yAxisScale );
         scene.position = Fire.v2(this.$.grid.xDirection*this.$.grid.xAxisOffset,
                                  this.$.grid.yDirection*this.$.grid.yAxisOffset);
@@ -97,11 +97,11 @@ Editor.registerElement({
 
         // resize engine
         var bcr = this.getBoundingClientRect();
-        Fire.engine.canvasSize = new Fire.v2( bcr.width, bcr.height );
-        Fire.engine.designResolution = new Fire.v2( bcr.width, bcr.height );
+        cc.view.setFrameSize(bcr.width, bcr.height);
+        cc.view.setDesignResolutionSize(bcr.width, bcr.height);
 
         // sync axis offset and scale from grid
-        var scene = Fire.engine.getCurrentScene();
+        var scene = cc(cc.director.getRunningScene());
         scene.scale = Fire.v2(this.$.grid.xAxisScale, this.$.grid.yAxisScale);
         scene.position = Fire.v2(this.$.grid.xDirection*this.$.grid.xAxisOffset,
                                  this.$.grid.yDirection*this.$.grid.yAxisOffset);
@@ -128,12 +128,12 @@ Editor.registerElement({
         var initOptions = {
             width: bcr.width,
             height: bcr.height,
-            canvas: canvasEL,
+            id: canvasEL,
             designWidth: bcr.width,
             designHeight: bcr.height
         };
 
-        Fire.engine.init(initOptions, function () {
+        EditorEngine.init(initOptions, function () {
             Editor.initScene(function (err) {
                 if (err) {
                     Ipc.sendToHost('scene:init-error', err);
@@ -168,7 +168,7 @@ Editor.registerElement({
     },
 
     newScene: function () {
-        var SceneWrapperImpl = Fire.engine.getCurrentScene().constructor;
+        var SceneWrapperImpl = cc(cc.director.getRunningScene()).constructor;
         var sceneWrapper = new SceneWrapperImpl();
         sceneWrapper.createAndAttachNode();
 
@@ -240,7 +240,7 @@ Editor.registerElement({
     },
 
     worldToPixel: function (pos) {
-        var scene = Fire.engine.getCurrentScene();
+        var scene = cc(cc.director.getRunningScene());
         var scenePos = scene.transformPointToLocal(pos);
         return this.sceneToPixel( scenePos );
     },
@@ -253,7 +253,7 @@ Editor.registerElement({
     },
 
     pixelToWorld: function (pos) {
-        var scene = Fire.engine.getCurrentScene();
+        var scene = cc(cc.director.getRunningScene());
         return scene.transformPointToWorld( this.pixelToScene(pos) );
     },
 
@@ -312,7 +312,7 @@ Editor.registerElement({
         var minDist = Number.MAX_VALUE;
         var resultNode;
 
-        var nodes = Fire.engine.getIntersectionList( new Fire.Rect(worldHitPoint.x, worldHitPoint.y, 1, 1) );
+        var nodes = cc.game.getIntersectionList( new Fire.Rect(worldHitPoint.x, worldHitPoint.y, 1, 1) );
         nodes.forEach( function ( node ) {
             var fireNode = Fire(node);
             var aabb = fireNode.getWorldBounds();
@@ -333,7 +333,7 @@ Editor.registerElement({
         var worldRect = Fire.Rect.fromMinMax(v1,v2);
 
         var results = [];
-        var nodes = Fire.engine.getIntersectionList(worldRect);
+        var nodes = cc.game.getIntersectionList(worldRect);
         nodes.forEach( function ( node ) {
             var fireNode = Fire(node);
             results.push(fireNode);
@@ -373,7 +373,7 @@ Editor.registerElement({
                     this.$.grid.pan( dx, dy );
                     this.$.grid.repaint();
 
-                    var scene = Fire.engine.getCurrentScene();
+                    var scene = cc(cc.director.getRunningScene());
                     scene.position = Fire.v2(this.$.grid.xDirection*this.$.grid.xAxisOffset,
                                              this.$.grid.yDirection*this.$.grid.yAxisOffset);
                     Fire.engine.repaintInEditMode();
@@ -505,7 +505,7 @@ Editor.registerElement({
         this.$.gizmosView.scale = newScale;
 
         //
-        var scene = Fire.engine.getCurrentScene();
+        var scene = cc(cc.director.getRunningScene());
         scene.scale = Fire.v2( this.$.grid.xAxisScale, this.$.grid.yAxisScale );
         scene.position = Fire.v2(this.$.grid.xDirection*this.$.grid.xAxisOffset,
                                  this.$.grid.yDirection*this.$.grid.yAxisOffset);

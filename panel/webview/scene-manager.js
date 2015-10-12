@@ -73,7 +73,7 @@ Editor.initScene = function (callback) {
 
 Editor.stashScene = function (callback) {
     // get scene json
-    var scene = Fire.engine.getCurrentScene();
+    var scene = cc(cc.director.getRunningScene());
     var jsonText = Editor.serialize(scene, {stringify: true});
 
     // store the scene, scene-view postion, scene-view scale

@@ -14,7 +14,7 @@ Ipc.on('scene:new-scene', function () {
 
 Ipc.on('scene:save-scene-from-page', function ( url ) {
     var sceneAsset = new Fire.Scene();
-    sceneAsset.scene = Fire.engine.getCurrentScene();
+    sceneAsset.scene = cc(cc.director.getRunningScene());
 
     // NOTE: we stash scene because we want to save and reload the connected browser
     Editor.stashScene(function () {
@@ -57,7 +57,7 @@ Ipc.on('scene:drop', function ( uuids, type, x, y ) {
                     nodeID = wrapper.uuid;
 
                     wrapper.position = window.sceneView.pixelToScene( Fire.v2(x,y) );
-                    wrapper.parent = Fire.engine.getCurrentScene();
+                    wrapper.parent = cc(cc.director.getRunningScene());
                 }
 
                 next ( null, nodeID );
@@ -84,7 +84,7 @@ Ipc.on('scene:create-nodes-by-uuids', function ( uuids, parentID ) {
         parentNode = Fire.engine.getInstanceByIdN(parentID);
     }
     if ( !parentNode ) {
-        parentNode = Fire.engine.getCurrentSceneN();
+        parentNode = cc.director.getRunningScene();
     }
 
     Editor.Selection.clear('node');
@@ -105,8 +105,8 @@ Ipc.on('scene:create-nodes-by-uuids', function ( uuids, parentID ) {
                     if ( parentNode ) {
                         wrapper.parent = Fire(parentNode);
                     }
-                    var center_x = Fire.engine.canvasSize.x/2;
-                    var center_y = Fire.engine.canvasSize.y/2;
+                    var center_x = cc.view.canvasSize.x/2;
+                    var center_y = cc.view.canvasSize.y/2;
                     wrapper.scenePosition = window.sceneView.pixelToScene( Fire.v2(center_x, center_y) );
                 }
 
@@ -139,7 +139,7 @@ Ipc.on('scene:create-node-by-classid', function ( name, classID, referenceID, po
     }
 
     if ( !parentNode ) {
-        parentNode = Fire.engine.getCurrentSceneN();
+        parentNode = cc.director.getRunningScene();
     }
     var Wrapper = Fire.JS._getClassById(classID);
     if (Wrapper) {
@@ -148,8 +148,8 @@ Ipc.on('scene:create-node-by-classid', function ( name, classID, referenceID, po
         wrapper.parent = Fire(parentNode);
         wrapper.name = name;
 
-        var center_x = Fire.engine.canvasSize.x/2;
-        var center_y = Fire.engine.canvasSize.y/2;
+        var center_x = cc.view.canvasSize.x/2;
+        var center_y = cc.view.canvasSize.y/2;
         wrapper.scenePosition = window.sceneView.pixelToScene( Fire.v2(center_x, center_y) );
 
         Fire.engine.repaintInEditMode();
@@ -165,7 +165,7 @@ Ipc.on('scene:query-hierarchy', function ( queryID ) {
         return Editor.sendToWindows( 'scene:reply-query-hierarchy', queryID, '', [] );
     }
     var nodes = Editor.getHierarchyDump();
-    var sceneUuid = Fire.engine.getCurrentScene().uuid;
+    var sceneUuid = cc(cc.director.getRunningScene()).uuid;
     Editor.sendToWindows( 'scene:reply-query-hierarchy', queryID, sceneUuid, nodes );
 });
 
@@ -269,7 +269,7 @@ Ipc.on('scene:move-nodes', function ( ids, parentID, nextSiblingId ) {
     if (parentID)
         parent = Fire.engine.getInstanceById(parentID);
     else
-        parent = Fire.engine.getCurrentScene();
+        parent = cc(cc.director.getRunningScene());
 
     var next = nextSiblingId ? Fire.engine.getInstanceById(nextSiblingId) : null;
     var nextIndex = next ? next.getSiblingIndex() : -1;

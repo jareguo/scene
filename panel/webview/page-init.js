@@ -29,5 +29,6 @@
         }
 
         require('./engine-events');
+        require('./editor-engine');
     });
 })();

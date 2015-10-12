@@ -15,13 +15,13 @@ Fire.JS.get(Fire, '$0N', function () {
 });
 
 Fire.JS.get(Fire, '$s', function () {
-    return Fire.engine.getCurrentScene();
+    return cc(cc.director.getRunningScene());
 });
 
 Fire.JS.get(Fire, '$S', function () {
-    return Fire.engine.getCurrentScene();
+    return cc(cc.director.getRunningScene());
 });
 
 Fire.JS.get(Fire, '$SN', function () {
-    return Fire.engine.getCurrentSceneN();
+    return cc.director.getRunningScene();
 });
