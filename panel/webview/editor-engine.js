@@ -23,9 +23,6 @@ var EditorEngine = cc.FireClass({
         this._isInitializing = false;
         this._isInitialized = false;
 
-        // Scene list
-        this._sceneInfos = [];
-
         // current scene
         this._loadingScene = '';
         this._emptySceneN = null;
@@ -139,8 +136,7 @@ var EditorEngine = cc.FireClass({
             return;
         }
         this._isInitializing = true;
-
-        this._sceneInfos = this._sceneInfos.concat(options.scenes);
+        
         //if (options.rawUrl) {
         //    cc.url.rawUrl = cc.path._setEndWithSep(options.rawUrl, true, '/');
         //}

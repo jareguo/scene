@@ -114,7 +114,7 @@ Editor.playScene = function (callback) {
         createScene,    // instantiate a new scene to play
         function (scene, next) {
             // setup scene list
-            cc.engine._sceneInfos = Editor.remote.sceneList.map(function ( info ) {
+            cc.game._sceneInfos = Editor.remote.sceneList.map(function ( info ) {
                 return { url: info.url, uuid: info.uuid };
             });
 
