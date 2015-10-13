@@ -2,7 +2,7 @@ Fire.JS.get(Fire, '$0', function () {
     var selection = Editor.Selection.curSelection('node');
     if (selection.length > 0) {
         var id = selection[0];
-        var node = Fire.engine.getInstanceById(id);
+        var node = cc.engine.getInstanceById(id);
         return node;
     }
 });
@@ -15,13 +15,13 @@ Fire.JS.get(Fire, '$0N', function () {
 });
 
 Fire.JS.get(Fire, '$s', function () {
-    return Fire.engine.getCurrentScene();
+    return cc(cc.director.getRunningScene());
 });
 
 Fire.JS.get(Fire, '$S', function () {
-    return Fire.engine.getCurrentScene();
+    return cc(cc.director.getRunningScene());
 });
 
 Fire.JS.get(Fire, '$SN', function () {
-    return Fire.engine.getCurrentSceneN();
+    return cc.director.getRunningScene();
 });

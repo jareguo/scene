@@ -25,7 +25,7 @@ function createScene (sceneJson, next) {
     var scene = Fire.deserialize(sceneJson/*, null, {
         classFinder: MissingBehavior.safeFindClass,
     }*/);
-    Fire.engine._initScene(scene, function () {
+    cc.engine._initScene(scene, function () {
         next(null, scene);
     });
 }
@@ -40,8 +40,8 @@ Editor.initScene = function (callback) {
                 sandbox.loadCompiledScript,
                 createScene.bind(this, sceneJson),
                 function (scene, next) {
-                    Fire.engine._launchScene(scene);
-                    Fire.engine.repaintInEditMode();
+                    cc.engine._launchScene(scene);
+                    cc.engine.repaintInEditMode();
                     next( null, stashedScene );
                 },
                 enterEditMode,
@@ -55,9 +55,9 @@ Editor.initScene = function (callback) {
             function ( next ) {
                 var currentSceneUuid = Editor.remote.currentSceneUuid;
                 if ( currentSceneUuid ) {
-                    Fire.engine._loadSceneByUuid(currentSceneUuid, function ( err ) {
+                    cc.engine._loadSceneByUuid(currentSceneUuid, function ( err ) {
                         window.sceneView.adjustToCenter(10);
-                        Fire.engine.repaintInEditMode();
+                        cc.engine.repaintInEditMode();
                         next ( err, null );
                     });
                     return;
@@ -73,7 +73,7 @@ Editor.initScene = function (callback) {
 
 Editor.stashScene = function (callback) {
     // get scene json
-    var scene = Fire.engine.getCurrentScene();
+    var scene = cc(cc.director.getRunningScene());
     var jsonText = Editor.serialize(scene, {stringify: true});
 
     // store the scene, scene-view postion, scene-view scale
@@ -97,8 +97,8 @@ Editor.reloadScene = function (callback) {
         Editor.stashScene,
         createScene,
         function (scene, next) {
-            Fire.engine._launchScene(scene);
-            Fire.engine.repaintInEditMode();
+            cc.engine._launchScene(scene);
+            cc.engine.repaintInEditMode();
             next( null, Editor.remote.stashedScene );
         },
         enterEditMode,
@@ -114,7 +114,7 @@ Editor.playScene = function (callback) {
         createScene,    // instantiate a new scene to play
         function (scene, next) {
             // setup scene list
-            Fire.engine._sceneInfos = Editor.remote.sceneList.map(function ( info ) {
+            cc.game._sceneInfos = Editor.remote.sceneList.map(function ( info ) {
                 return { url: info.url, uuid: info.uuid };
             });
 
@@ -123,7 +123,7 @@ Editor.playScene = function (callback) {
             scene.scale = Fire.Vec2.one;
 
             // play new scene
-            Fire.engine._launchScene(scene, function () {
+            cc.engine._launchScene(scene, function () {
                 // restore selection
                 Editor.Selection.select('node', selection, true, true);
 
@@ -132,10 +132,10 @@ Editor.playScene = function (callback) {
                 window.sceneView.$.gizmosView.hidden = true;
 
                 //if (this.$.pause.active) {
-                //    Fire.engine.step();
+                //    cc.engine.step();
                 //}
                 //else {
-                Fire.engine.play();
+                cc.engine.play();
                 //}
             });
             next();

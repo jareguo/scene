@@ -28,6 +28,12 @@
             return;
         }
 
+        require('./event/event-target');
+        require('./playable/playable');
+        require('./playable/ticker');
+        require('./playable/time');
+
         require('./engine-events');
+        require('./editor-engine');
     });
 })();

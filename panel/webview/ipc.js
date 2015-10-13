@@ -14,7 +14,7 @@ Ipc.on('scene:new-scene', function () {
 
 Ipc.on('scene:save-scene-from-page', function ( url ) {
     var sceneAsset = new Fire.Scene();
-    sceneAsset.scene = Fire.engine.getCurrentScene();
+    sceneAsset.scene = cc(cc.director.getRunningScene());
 
     // NOTE: we stash scene because we want to save and reload the connected browser
     Editor.stashScene(function () {
@@ -57,7 +57,7 @@ Ipc.on('scene:drop', function ( uuids, type, x, y ) {
                     nodeID = wrapper.uuid;
 
                     wrapper.position = window.sceneView.pixelToScene( Fire.v2(x,y) );
-                    wrapper.parent = Fire.engine.getCurrentScene();
+                    wrapper.parent = cc(cc.director.getRunningScene());
                 }
 
                 next ( null, nodeID );
@@ -72,7 +72,7 @@ Ipc.on('scene:drop', function ( uuids, type, x, y ) {
             if ( nodeID ) {
                 Editor.Selection.select('node', nodeID, false, true );
             }
-            Fire.engine.repaintInEditMode();
+            cc.engine.repaintInEditMode();
             done();
         });
     });
@@ -81,10 +81,10 @@ Ipc.on('scene:drop', function ( uuids, type, x, y ) {
 Ipc.on('scene:create-nodes-by-uuids', function ( uuids, parentID ) {
     var parentNode;
     if ( parentID ) {
-        parentNode = Fire.engine.getInstanceByIdN(parentID);
+        parentNode = cc.engine.getInstanceByIdN(parentID);
     }
     if ( !parentNode ) {
-        parentNode = Fire.engine.getCurrentSceneN();
+        parentNode = cc.director.getRunningScene();
     }
 
     Editor.Selection.clear('node');
@@ -105,8 +105,8 @@ Ipc.on('scene:create-nodes-by-uuids', function ( uuids, parentID ) {
                     if ( parentNode ) {
                         wrapper.parent = Fire(parentNode);
                     }
-                    var center_x = Fire.engine.canvasSize.x/2;
-                    var center_y = Fire.engine.canvasSize.y/2;
+                    var center_x = cc.view.canvasSize.x/2;
+                    var center_y = cc.view.canvasSize.y/2;
                     wrapper.scenePosition = window.sceneView.pixelToScene( Fire.v2(center_x, center_y) );
                 }
 
@@ -122,7 +122,7 @@ Ipc.on('scene:create-nodes-by-uuids', function ( uuids, parentID ) {
             if ( nodeID ) {
                 Editor.Selection.select('node', nodeID, false, true );
             }
-            Fire.engine.repaintInEditMode();
+            cc.engine.repaintInEditMode();
             done();
         });
     });
@@ -132,14 +132,14 @@ Ipc.on('scene:create-node-by-classid', function ( name, classID, referenceID, po
     var parentNode;
 
     if ( referenceID ) {
-        parentNode = Fire.engine.getInstanceByIdN(referenceID);
+        parentNode = cc.engine.getInstanceByIdN(referenceID);
         if ( position === 'sibling' ) {
             parentNode = Fire(parentNode).parentN;
         }
     }
 
     if ( !parentNode ) {
-        parentNode = Fire.engine.getCurrentSceneN();
+        parentNode = cc.director.getRunningScene();
     }
     var Wrapper = Fire.JS._getClassById(classID);
     if (Wrapper) {
@@ -148,11 +148,11 @@ Ipc.on('scene:create-node-by-classid', function ( name, classID, referenceID, po
         wrapper.parent = Fire(parentNode);
         wrapper.name = name;
 
-        var center_x = Fire.engine.canvasSize.x/2;
-        var center_y = Fire.engine.canvasSize.y/2;
+        var center_x = cc.view.canvasSize.x/2;
+        var center_y = cc.view.canvasSize.y/2;
         wrapper.scenePosition = window.sceneView.pixelToScene( Fire.v2(center_x, center_y) );
 
-        Fire.engine.repaintInEditMode();
+        cc.engine.repaintInEditMode();
         Editor.Selection.select('node', wrapper.uuid, true, true );
     }
     else {
@@ -161,23 +161,23 @@ Ipc.on('scene:create-node-by-classid', function ( name, classID, referenceID, po
 });
 
 Ipc.on('scene:query-hierarchy', function ( queryID ) {
-    if (!Fire.engine.isInitialized) {
+    if (!cc.engine.isInitialized) {
         return Editor.sendToWindows( 'scene:reply-query-hierarchy', queryID, '', [] );
     }
     var nodes = Editor.getHierarchyDump();
-    var sceneUuid = Fire.engine.getCurrentScene().uuid;
+    var sceneUuid = cc(cc.director.getRunningScene()).uuid;
     Editor.sendToWindows( 'scene:reply-query-hierarchy', queryID, sceneUuid, nodes );
 });
 
 Ipc.on('scene:query-node', function ( queryID, nodeID ) {
-    var node = Fire.engine.getInstanceByIdN(nodeID);
+    var node = cc.engine.getInstanceByIdN(nodeID);
     var dump = Editor.getNodeDump(node);
     dump = JSON.stringify(dump);    // 改成发送字符串，以免字典的顺序发生改变
     Editor.sendToWindows( 'scene:reply-query-node', queryID, dump );
 });
 
 Ipc.on('scene:query-node-info', function ( sessionID, nodeID ) {
-    var nodeWrapper = Fire.engine.getInstanceById(nodeID);
+    var nodeWrapper = cc.engine.getInstanceById(nodeID);
 
     Editor.sendToWindows( 'scene:query-node-info:reply', sessionID, {
         name: nodeWrapper ? nodeWrapper.name : '',
@@ -187,7 +187,7 @@ Ipc.on('scene:query-node-info', function ( sessionID, nodeID ) {
 });
 
 Ipc.on('scene:node-new-property', function ( info ) {
-    var node = Fire.engine.getInstanceByIdN(info.id);
+    var node = cc.engine.getInstanceByIdN(info.id);
     if (node) {
         var objToSet = info.mixinType ? node : Fire(node);
         try {
@@ -209,7 +209,7 @@ Ipc.on('scene:node-new-property', function ( info ) {
                     return;
                 }
                 Editor.setDeepPropertyByPath(objToSet, info.path, obj, info.type);
-                Fire.engine.repaintInEditMode();
+                cc.engine.repaintInEditMode();
             }
         }
         catch (e) {
@@ -220,12 +220,12 @@ Ipc.on('scene:node-new-property', function ( info ) {
 });
 
 Ipc.on('scene:node-set-property', function ( info ) {
-    var node = Fire.engine.getInstanceByIdN(info.id);
+    var node = cc.engine.getInstanceByIdN(info.id);
     if (node) {
         var objToSet = info.mixinType ? node : Fire(node);
         try {
             Editor.setDeepPropertyByPath(objToSet, info.path, info.value, info.type);
-            Fire.engine.repaintInEditMode();
+            cc.engine.repaintInEditMode();
         }
         catch (e) {
             Editor.warn('Failed to set property %s of %s to %s, ' + e.message,
@@ -243,7 +243,7 @@ Ipc.on('scene:node-mixin', function ( id, uuid ) {
             return Editor.error('Can not find Behavior in the script "%s".', uuid);
         }
         //
-        var node = Fire.engine.getInstanceByIdN(id);
+        var node = cc.engine.getInstanceByIdN(id);
         if (node) {
             Fire.mixin(node, classToMix);
         }
@@ -257,7 +257,7 @@ Ipc.on('scene:node-mixin', function ( id, uuid ) {
 });
 
 Ipc.on('scene:node-unmixin', function ( id, className ) {
-    var node = Fire.engine.getInstanceByIdN(id);
+    var node = cc.engine.getInstanceByIdN(id);
     if (node) {
         Fire.unMixin( node, className);
     }
@@ -267,16 +267,16 @@ Ipc.on('scene:move-nodes', function ( ids, parentID, nextSiblingId ) {
     var parent;
 
     if (parentID)
-        parent = Fire.engine.getInstanceById(parentID);
+        parent = cc.engine.getInstanceById(parentID);
     else
-        parent = Fire.engine.getCurrentScene();
+        parent = cc(cc.director.getRunningScene());
 
-    var next = nextSiblingId ? Fire.engine.getInstanceById(nextSiblingId) : null;
+    var next = nextSiblingId ? cc.engine.getInstanceById(nextSiblingId) : null;
     var nextIndex = next ? next.getSiblingIndex() : -1;
 
     for (var i = 0; i < ids.length; i++) {
         var id = ids[i];
-        var wrapper = Fire.engine.getInstanceById(id);
+        var wrapper = cc.engine.getInstanceById(id);
         if (wrapper && (!parent || !parent.isChildOf(wrapper))) {
             if (wrapper.parent !== parent) {
                 // keep world transform not changed
@@ -331,7 +331,7 @@ Ipc.on('scene:delete-nodes', function ( ids ) {
 Ipc.on('scene:duplicate-nodes', function ( ids ) {
     var wrappers = [];
     for ( var i = 0; i < ids.length; ++i ) {
-         var wrapper = Fire.engine.getInstanceById(ids[i]);
+         var wrapper = cc.engine.getInstanceById(ids[i]);
         if (wrapper) {
             wrappers.push(wrapper);
         }
@@ -431,26 +431,26 @@ Ipc.on('scene:init-scene-view', function ( settings ) {
 
 Ipc.on('scene:transform-tool-changed', function ( value ) {
     window.sceneView.$.gizmosView.transformTool = value;
-    Fire.engine.repaintInEditMode();
+    cc.engine.repaintInEditMode();
 });
 
 Ipc.on('scene:coordinate-changed', function ( value ) {
     window.sceneView.$.gizmosView.coordinate = value;
-    Fire.engine.repaintInEditMode();
+    cc.engine.repaintInEditMode();
 });
 
 Ipc.on('scene:pivot-changed', function ( value ) {
     window.sceneView.$.gizmosView.pivot = value;
-    Fire.engine.repaintInEditMode();
+    cc.engine.repaintInEditMode();
 });
 
 Ipc.on('scene:design-size-changed', function ( w, h ) {
     window.sceneView.$.gizmosView.designSize = [w, h];
-    Fire.engine.repaintInEditMode();
+    cc.engine.repaintInEditMode();
 });
 
 Ipc.on('scene:create-prefab', function ( id, baseUrl ) {
-    var wrapper = Fire.engine.getInstanceById(id);
+    var wrapper = cc.engine.getInstanceById(id);
     var prefab = Editor.PrefabUtils.createPrefabFrom(wrapper);
     var json = Editor.serialize(prefab);
     var url = Url.join(baseUrl, wrapper.name + '.prefab');
@@ -463,7 +463,7 @@ Ipc.on('scene:create-prefab', function ( id, baseUrl ) {
 });
 
 Ipc.on('scene:apply-prefab', function ( id ) {
-    var wrapper = Fire.engine.getInstanceById(id);
+    var wrapper = cc.engine.getInstanceById(id);
     if (!wrapper || !wrapper._prefab) {
         return;
     }
@@ -478,7 +478,7 @@ Ipc.on('scene:apply-prefab', function ( id ) {
 });
 
 Ipc.on('scene:revert-prefab', function ( id ) {
-    var wrapper = Fire.engine.getInstanceById(id);
+    var wrapper = cc.engine.getInstanceById(id);
     if (!wrapper || !wrapper._prefab) {
         return;
     }
