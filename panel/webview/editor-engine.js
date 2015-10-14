@@ -181,15 +181,16 @@ var EditorEngine = cc.FireClass({
 
     createGame: function (options, callback) {
         var config = {
-            'width'                 : options.width,
-            'height'                : options.height,
-            'showFPS'               : false,
-            'frameRate'             : 60,
-            'id'                    : options.id,
-            'renderMode'            : cc.isEditor ? 2 : options.renderMode,                 // 0: auto, 1:Canvas, 2:Webgl
-            'registerSystemEvent'   : ! cc.isEditor,
-            'jsList'                : []
-        };
+                'width'                 : options.width,
+                'height'                : options.height,
+                'showFPS'               : false,
+                'frameRate'             : 60,
+                'id'                    : options.id,
+                'renderMode'            : cc.isEditor ? 2 : options.renderMode,                 // 0: auto, 1:Canvas, 2:Webgl
+                'registerSystemEvent'   : ! cc.isEditor,
+                'jsList'                : []
+            },
+            self = this;
 
         cc.game.run(config, function () {
             cc.view.resizeWithBrowserSize(true);
@@ -204,7 +205,7 @@ var EditorEngine = cc.FireClass({
                 cc.game.canvas.style.imageRendering = "pixelated";
                 cc.director.setClearColor(cc.color(0,0,0,0));
             }
-            cc.view.setFrameSize(width, height);
+            cc.view.setFrameSize(config.width, config.height);
 
             cc.director.runScene(scene);
             cc.game.pause();
@@ -215,8 +216,6 @@ var EditorEngine = cc.FireClass({
                 cc.game.canvas.style.backgroundColor = '';
                 if (cc.imeDispatcher._domInputControl)
                     cc.imeDispatcher._domInputControl.setAttribute('tabindex', -1);
-
-                self._registerStepRuntime();
             }
 
             if (callback) {
