@@ -25,7 +25,7 @@ function createScene (sceneJson, next) {
     var scene = cc.deserialize(sceneJson/*, null, {
         classFinder: MissingBehavior.safeFindClass,
     }*/);
-    cc.engine._initScene(scene, function () {
+    cc.game._initScene(scene, function () {
         next(null, scene);
     });
 }

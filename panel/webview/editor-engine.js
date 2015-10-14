@@ -2,11 +2,11 @@ var JS = cc.js;
 var Ticker = cc._Ticker;
 var Time = cc.Time;
 
-var EditorEngine = cc.FireClass({
+var EditorEngine = cc.Class({
     name: 'EditorEngine',
     extends: cc.Playable,
 
-    constructor: function () {
+    ctor: function () {
         var useDefaultMainLoop = arguments[0];
 
         /**
