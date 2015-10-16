@@ -319,7 +319,7 @@ var EditorEngine = cc.Class({
         // }
         cc.game.resume();
 
-        if (CC_EDITOR && !this._useDefaultMainLoop) {
+        if ((CC_EDITOR || CC_TEST) && !this._useDefaultMainLoop) {
             this._tickStop();
         }
     },

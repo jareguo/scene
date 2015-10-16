@@ -105,8 +105,8 @@ Ipc.on('scene:create-nodes-by-uuids', function ( uuids, parentID ) {
                     if ( parentNode ) {
                         wrapper.parent = cc(parentNode);
                     }
-                    var center_x = cc.view.canvasSize.x/2;
-                    var center_y = cc.view.canvasSize.y/2;
+                    var center_x = cc.game.canvas.width / 2;
+                    var center_y = cc.game.canvas.height / 2;
                     wrapper.scenePosition = window.sceneView.pixelToScene( cc.v2(center_x, center_y) );
                 }
 
@@ -148,8 +148,8 @@ Ipc.on('scene:create-node-by-classid', function ( name, classID, referenceID, po
         wrapper.parent = cc(parentNode);
         wrapper.name = name;
 
-        var center_x = cc.view.canvasSize.x/2;
-        var center_y = cc.view.canvasSize.y/2;
+        var center_x = cc.game.canvas.width / 2;
+        var center_y = cc.game.canvas.height / 2;
         wrapper.scenePosition = window.sceneView.pixelToScene( cc.v2(center_x, center_y) );
 
         cc.engine.repaintInEditMode();
