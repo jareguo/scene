@@ -301,6 +301,30 @@ var EditorEngine = cc.Class({
         return (wrapper && wrapper.targetN) || null;
     },
 
+    getIntersectionList: function (rect) {
+        var scene = cc(cc.director.getRunningScene());
+        var list = [];
+
+        scene._deepQueryChildren(function (child) {
+
+            var bounds = child.getWorldBounds();
+
+            // if intersect aabb success, then try intersect obb
+            if (rect.intersects(bounds)) {
+                bounds = child.getWorldOrientedBounds();
+                var polygon = new Editor.Polygon(bounds);
+
+                if (Editor.Intersection.rectPolygon(rect, polygon)) {
+                    list.push(child.targetN);
+                }
+            }
+
+            return true;
+        });
+
+        return list;
+    },
+
     // OVERRIDE
 
     onError: function (error) {

@@ -40,7 +40,7 @@ Editor.initScene = function (callback) {
                 sandbox.loadCompiledScript,
                 createScene.bind(this, sceneJson),
                 function (scene, next) {
-                    cc.engine._launchScene(scene);
+                    cc.game._launchScene(scene);
                     cc.engine.repaintInEditMode();
                     next( null, stashedScene );
                 },
@@ -55,7 +55,7 @@ Editor.initScene = function (callback) {
             function ( next ) {
                 var currentSceneUuid = Editor.remote.currentSceneUuid;
                 if ( currentSceneUuid ) {
-                    cc.engine._loadSceneByUuid(currentSceneUuid, function ( err ) {
+                    cc.game._loadSceneByUuid(currentSceneUuid, function ( err ) {
                         window.sceneView.adjustToCenter(10);
                         cc.engine.repaintInEditMode();
                         next ( err, null );
@@ -97,7 +97,7 @@ Editor.reloadScene = function (callback) {
         Editor.stashScene,
         createScene,
         function (scene, next) {
-            cc.engine._launchScene(scene);
+            cc.game._launchScene(scene);
             cc.engine.repaintInEditMode();
             next( null, Editor.remote.stashedScene );
         },
@@ -123,7 +123,7 @@ Editor.playScene = function (callback) {
             scene.scale = cc.Vec2.one;
 
             // play new scene
-            cc.engine._launchScene(scene, function () {
+            cc.game._launchScene(scene, function () {
                 // restore selection
                 Editor.Selection.select('node', selection, true, true);
 

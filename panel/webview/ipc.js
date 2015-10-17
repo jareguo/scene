@@ -65,7 +65,7 @@ Ipc.on('scene:drop', function ( uuids, type, x, y ) {
 
         ], function ( err, nodeID ) {
             if ( err ) {
-                Editor.failed( 'Failed to drop asset %s, message: %s', uuid, err.stack );
+                Editor.failed( 'Failed to drop asset %s, message: %s', uuid, err.stack || err.errorMessage );
                 return;
             }
 
@@ -115,7 +115,7 @@ Ipc.on('scene:create-nodes-by-uuids', function ( uuids, parentID ) {
 
         ], function ( err, nodeID ) {
             if ( err ) {
-                Editor.failed( 'Failed to drop asset %s, message: %s', uuid, err.stack );
+                Editor.failed( 'Failed to drop asset %s, message: %s', uuid, err.stack || err.errorMessage );
                 return;
             }
 

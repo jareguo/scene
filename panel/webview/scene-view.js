@@ -172,7 +172,7 @@ Editor.registerElement({
         sceneWrapper.createAndAttachNode();
 
         this.reset();
-        cc.engine._launchScene(sceneWrapper);
+        cc.game._launchScene(sceneWrapper);
 
         this.adjustToCenter(20);
         cc.engine.repaintInEditMode();
@@ -184,7 +184,7 @@ Editor.registerElement({
     loadScene: function ( uuid ) {
         this.reset();
 
-        cc.engine._loadSceneByUuid(uuid, function (err) {
+        cc.game._loadSceneByUuid(uuid, function (err) {
             this.adjustToCenter(20);
             cc.engine.repaintInEditMode();
 
@@ -311,7 +311,7 @@ Editor.registerElement({
         var minDist = Number.MAX_VALUE;
         var resultNode;
 
-        var nodes = cc.game.getIntersectionList( new cc.Rect(worldHitPoint.x, worldHitPoint.y, 1, 1) );
+        var nodes = cc.engine.getIntersectionList( new cc.Rect(worldHitPoint.x, worldHitPoint.y, 1, 1) );
         nodes.forEach( function ( node ) {
             var fireNode = cc(node);
             var aabb = fireNode.getWorldBounds();
@@ -332,7 +332,7 @@ Editor.registerElement({
         var worldRect = cc.Rect.fromMinMax(v1,v2);
 
         var results = [];
-        var nodes = cc.game.getIntersectionList(worldRect);
+        var nodes = cc.engine.getIntersectionList(worldRect);
         nodes.forEach( function ( node ) {
             var fireNode = cc(node);
             results.push(fireNode);
