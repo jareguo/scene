@@ -1,5 +1,5 @@
 var JS = cc.js;
-var EventTarget = require('../event/event-target');
+var EventTarget = cc._require('./cocos2d/core/event');
 
 var Playable = (function () {
     /**
