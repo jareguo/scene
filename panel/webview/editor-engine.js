@@ -137,7 +137,7 @@ var EditorEngine = cc.Class({
             return;
         }
         this._isInitializing = true;
-        
+
         //if (options.rawUrl) {
         //    cc.url.rawUrl = cc.path._setEndWithSep(options.rawUrl, true, '/');
         //}
@@ -193,8 +193,6 @@ var EditorEngine = cc.Class({
             };
 
         cc.game.run(config, function () {
-            cc.view.resizeWithBrowserSize(true);
-
             var scene = new cc.Scene();
 
             // scene anchor point need be 0,0
@@ -205,7 +203,7 @@ var EditorEngine = cc.Class({
                 cc.game.canvas.style.imageRendering = 'pixelated';
                 cc.director.setClearColor(cc.color(0,0,0,0));
             }
-            cc.view.setFrameSize(config.width, config.height);
+            cc.view.setCanvasSize(config.width, config.height);
 
             cc.director.runScene(scene);
             cc.game.pause();
