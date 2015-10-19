@@ -1,4 +1,5 @@
-var JS = cc.js;
+'use strict';
+
 var Ticker = cc._Ticker;
 var Time = cc.Time;
 
@@ -189,8 +190,7 @@ var EditorEngine = cc.Class({
                 'renderMode'            : cc.isEditor ? 2 : options.renderMode,                 // 0: auto, 1:Canvas, 2:Webgl
                 'registerSystemEvent'   : ! cc.isEditor,
                 'jsList'                : []
-            },
-            self = this;
+            };
 
         cc.game.run(config, function () {
             cc.view.resizeWithBrowserSize(true);
@@ -202,7 +202,7 @@ var EditorEngine = cc.Class({
 
             if (CC_EDITOR) {
                 cc.view.enableRetina(false);
-                cc.game.canvas.style.imageRendering = "pixelated";
+                cc.game.canvas.style.imageRendering = 'pixelated';
                 cc.director.setClearColor(cc.color(0,0,0,0));
             }
             cc.view.setFrameSize(config.width, config.height);
@@ -408,7 +408,7 @@ var EditorEngine = cc.Class({
      * @method _tick
      * @private
      */
-    _tick: function (unused) {
+    _tick: function () {
         this._requestId = Ticker.requestAnimationFrame(this._bindedTick);
 
         var now = Ticker.now();
