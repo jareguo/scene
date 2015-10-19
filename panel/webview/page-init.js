@@ -14,7 +14,6 @@
     Editor.require('app://cocos2d/cocos2d-html5');
 
     // load editor engine
-    require('./event/event-target');
     require('./playable/playable');
     require('./playable/ticker');
     require('./playable/time');
