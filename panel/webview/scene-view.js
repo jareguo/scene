@@ -97,7 +97,7 @@ Editor.registerElement({
 
         // resize engine
         var bcr = this.getBoundingClientRect();
-        cc.view.setFrameSize(bcr.width, bcr.height);
+        cc.view.setCanvasSize(bcr.width, bcr.height);
         cc.view.setDesignResolutionSize(bcr.width, bcr.height);
 
         // sync axis offset and scale from grid
