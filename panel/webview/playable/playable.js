@@ -1,5 +1,6 @@
 var JS = cc.js;
-var EventTarget = cc._require('./cocos2d/core/event');
+var EventTarget = cc._require('./cocos2d/core/event/event-target');
+var CCObject = cc._require('./cocos2d/core/platform/CCObject');
 
 var Playable = (function () {
     /**
@@ -13,9 +14,10 @@ var Playable = (function () {
         this._stepOnce = false;
     }
 
-    JS.extend(Playable, EventTarget);
+    JS.extend(Playable, CCObject);
 
     var prototype = Playable.prototype;
+    EventTarget.polyfill(prototype);
 
     /**
      * Is playing?
