@@ -26,7 +26,8 @@ var EditorEngine = cc.Class({
 
         // current scene
         this._loadingScene = '';
-        this._emptySceneN = null;
+        // temp sg scene
+        this._emptySgScene = null;
 
         this._bindedTick = (CC_EDITOR || useDefaultMainLoop) && this._tick.bind(this);
 
@@ -50,29 +51,8 @@ var EditorEngine = cc.Class({
         this._shouldRepaintInEM = false;
         this._forceRepaintId = -1;
 
-        // used in getInstanceById and editor only
-        this.attachedWrappersForEditor = {};
-
-        var attachedWrappersForEditor = this.attachedWrappersForEditor;
-        this.on('node-detach-from-scene', function (event) {
-            var node = event.detail.targetN;
-            if (node) {
-                var uuid = cc(node).uuid;
-                if (uuid) {
-                    delete attachedWrappersForEditor[uuid];
-                }
-            }
-        });
-        this.on('node-attach-to-scene', function (event) {
-            var node = event.detail.targetN;
-            if (node) {
-                var wrapper = cc(node);
-                var uuid = wrapper.uuid;
-                if (uuid) {
-                    attachedWrappersForEditor[uuid] = wrapper;
-                }
-            }
-        });
+        // attached nodes and components used in getInstanceById
+        this.attachedObjsForEditor = {};
     },
 
     properties: {
@@ -143,18 +123,12 @@ var EditorEngine = cc.Class({
         //}
         //Resources._resBundle.init(options.resBundle);
 
-        cc.Runtime.Helpers.init();
-
         var self = this;
         this.createGame(options, function (err) {
             if (!err) {
                 if (CC_EDITOR && Editor.isPageLevel) {
-                    cc.Runtime.registerToCore();
+                    Editor.registerComponentsToCore();
                 }
-                //var scene = cc.director.getRunningScene()
-                //if (editorCallback.onSceneLoaded) {
-                //    editorCallback.onSceneLoaded(this._scene);
-                //}
             }
 
             self._isInitialized = true;
@@ -172,11 +146,8 @@ var EditorEngine = cc.Class({
             }
 
             // create empty scene
-            var sceneN = new cc.Scene();
-            var scene = cc(sceneN);
-            scene.createAndAttachNode();
-            self._emptySceneN = sceneN;
-            scene.retain();
+            var scene = new cc.Scene();
+            self._emptySgScene = scene;
         });
     },
 
@@ -193,7 +164,7 @@ var EditorEngine = cc.Class({
             };
 
         cc.game.run(config, function () {
-            var scene = new cc.Scene();
+            var scene = new cc.EScene();
 
             // scene anchor point need be 0,0
             scene.setAnchorPoint(0.0, 0.0);
@@ -261,7 +232,7 @@ var EditorEngine = cc.Class({
     tickInEditMode: function (deltaTime, updateAnimate) {
         if (CC_EDITOR) {
             // invoke updateInEditMode
-            cc(cc.director.getRunningScene())._callUpdateInEM(deltaTime);
+            //cc.director.getScene()._callUpdateInEM(deltaTime);
 
             if (updateAnimate) {
                 cc.director.engineUpdate(deltaTime);
@@ -279,28 +250,17 @@ var EditorEngine = cc.Class({
     },
 
     /**
-     * Returns the wrapper by wrapper id.
+     * Returns the node by id.
      * @method getInstanceById
      * @param {String} uuid
-     * @return {cc.Runtime.NodeWrapper}
+     * @return {cc.ENode}
      */
     getInstanceById: function (uuid) {
-        return this.attachedWrappersForEditor[uuid] || null;
-    },
-
-    /**
-     * Returns the node by wrapper id.
-     * @method getInstanceByIdN
-     * @param {String} uuid
-     * @return {RuntimeNode}
-     */
-    getInstanceByIdN: function (uuid) {
-        var wrapper = this.attachedWrappersForEditor[uuid];
-        return (wrapper && wrapper.targetN) || null;
+        return this.attachedObjsForEditor[uuid] || null;
     },
 
     getIntersectionList: function (rect) {
-        var scene = cc(cc.director.getRunningScene());
+        var scene = cc.director.getScene();
         var list = [];
 
         scene._deepQueryChildren(function (child) {
@@ -313,7 +273,7 @@ var EditorEngine = cc.Class({
                 var polygon = new Editor.Polygon(bounds);
 
                 if (Editor.Intersection.rectPolygon(rect, polygon)) {
-                    list.push(child.targetN);
+                    list.push(child);
                 }
             }
 
@@ -335,10 +295,9 @@ var EditorEngine = cc.Class({
         }
     },
     onResume: function () {
-        // if (CC_EDITOR) {
-        //     CCObject._clearDeferredDestroyTimer();
-        //     editorCallback.onEnginePlayed(true);
-        // }
+        if (CC_EDITOR) {
+            cc.Object._clearDeferredDestroyTimer();
+        }
         cc.game.resume();
 
         if ((CC_EDITOR || CC_TEST) && !this._useDefaultMainLoop) {
@@ -357,9 +316,9 @@ var EditorEngine = cc.Class({
         }
     },
     onPlay: function () {
-        //if (CC_EDITOR && ! this._isPaused) {
-        //    CCObject._clearDeferredDestroyTimer();
-        //}
+        if (CC_EDITOR && ! this._isPaused) {
+            cc.Object._clearDeferredDestroyTimer();
+        }
 
         this.playInEditor();
 

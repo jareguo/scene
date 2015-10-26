@@ -3,6 +3,23 @@ var Ipc = require('ipc');
 var Path = require('fire-path');
 //var Url = require('fire-url');
 
+function callOnFocusInTryCatch (c) {
+    try {
+        c.onFocusInEditor();
+    }
+    catch (e) {
+        cc._throw(e);
+    }
+}
+function callOnLostFocusInTryCatch (c) {
+    try {
+        c.onLostFocusInEditor();
+    }
+    catch (e) {
+        cc._throw(e);
+    }
+}
+
 Editor.registerElement({
     listeners: {
         'mousedown': '_onMouseDown',
@@ -25,8 +42,8 @@ Editor.registerElement({
     },
 
     ready: function () {
-        var mappingH = cc.Runtime.Settings['mapping-h'];
-        var mappingV = cc.Runtime.Settings['mapping-v'];
+        var mappingH = [1, 0, 1];
+        var mappingV = [0, 1, 1];
 
         // grid
         this.$.grid.setScaleH( [5,2], 0.01, 1000 );
@@ -76,10 +93,12 @@ Editor.registerElement({
         this.$.gizmosView.scale = scale;
 
         //
-        var scene = cc(cc.director.getRunningScene());
+        var scene = cc.director.getScene();
+        cc.director.getRunningScene();
+
         scene.scale = cc.v2( this.$.grid.xAxisScale, this.$.grid.yAxisScale );
-        scene.position = cc.v2(this.$.grid.xDirection*this.$.grid.xAxisOffset,
-                                 this.$.grid.yDirection*this.$.grid.yAxisOffset);
+        scene.setPosition(cc.v2( this.$.grid.xDirection * this.$.grid.xAxisOffset,
+                                 this.$.grid.yDirection * this.$.grid.yAxisOffset ));
         cc.engine.repaintInEditMode();
     },
 
@@ -101,10 +120,10 @@ Editor.registerElement({
         cc.view.setDesignResolutionSize(bcr.width, bcr.height);
 
         // sync axis offset and scale from grid
-        var scene = cc(cc.director.getRunningScene());
+        var scene = cc.director.getScene();
         scene.scale = cc.v2(this.$.grid.xAxisScale, this.$.grid.yAxisScale);
-        scene.position = cc.v2(this.$.grid.xDirection*this.$.grid.xAxisOffset,
-                                 this.$.grid.yDirection*this.$.grid.yAxisOffset);
+        scene.setPosition(cc.v2(this.$.grid.xDirection * this.$.grid.xAxisOffset,
+                                this.$.grid.yDirection * this.$.grid.yAxisOffset));
         cc.engine.repaintInEditMode();
     },
 
@@ -168,11 +187,10 @@ Editor.registerElement({
     },
 
     newScene: function () {
-        var sceneWrapper = new cc.Runtime.SceneWrapper();
-        sceneWrapper.createAndAttachNode();
+        var scene = new cc.EScene();
 
         this.reset();
-        cc.game._launchScene(sceneWrapper);
+        cc.game._launchScene(scene);
 
         this.adjustToCenter(20);
         cc.engine.repaintInEditMode();
@@ -239,7 +257,7 @@ Editor.registerElement({
     },
 
     worldToPixel: function (pos) {
-        var scene = cc(cc.director.getRunningScene());
+        var scene = cc.director.getScene();
         var scenePos = scene.transformPointToLocal(pos);
         return this.sceneToPixel( scenePos );
     },
@@ -252,27 +270,41 @@ Editor.registerElement({
     },
 
     pixelToWorld: function (pos) {
-        var scene = cc(cc.director.getRunningScene());
+        var scene = cc.director.getScene();
         return scene.transformPointToWorld( this.pixelToScene(pos) );
     },
 
     activate: function ( id ) {
-        var wrapper = cc.engine.getInstanceById(id);
-        if ( wrapper && wrapper.constructor.animatableInEditor ) {
-            if ( wrapper.onFocusInEditor )
-                wrapper.onFocusInEditor();
-
-            cc.engine.animatingInEditMode = true;
+        var node = cc.engine.getInstanceById(id);
+        if (node) {
+            for (var i = 0; i < node._components.length; ++i) {
+                var comp = node._components[0];
+                if (comp.constructor._executeInEditMode && comp.isValid) {
+                    if (comp.onFocusInEditor) {
+                        callOnFocusInTryCatch(comp);
+                    }
+                    if (comp.constructor._60fpsInEditMode) {
+                        cc.engine.animatingInEditMode = true;
+                    }
+                }
+            }
         }
     },
 
     deactivate: function ( id ) {
-        var wrapper = cc.engine.getInstanceById(id);
-        if ( wrapper && wrapper.constructor.animatableInEditor ) {
-            if ( wrapper.onLostFocusInEditor )
-                wrapper.onLostFocusInEditor();
-
-            cc.engine.animatingInEditMode = false;
+        var node = cc.engine.getInstanceById(id);
+        if (node && node.isValid) {
+            for (var i = 0; i < node._components.length; ++i) {
+                var comp = node._components[0];
+                if (comp.constructor._executeInEditMode && comp.isValid) {
+                    if (comp.onLostFocusInEditor) {
+                        callOnLostFocusInTryCatch(comp);
+                    }
+                    if (comp.constructor._60fpsInEditMode) {
+                        cc.engine.animatingInEditMode = false;
+                    }
+                }
+            }
         }
     },
 
@@ -295,9 +327,9 @@ Editor.registerElement({
     delete: function ( ids ) {
         for (var i = 0; i < ids.length; i++) {
             var id = ids[i];
-            var nodeWrapper = cc.engine.getInstanceById(id);
-            if (nodeWrapper) {
-                nodeWrapper.parent = null;
+            var node = cc.engine.getInstanceById(id);
+            if (node) {
+                node.destroy();
             }
         }
         Editor.Selection.unselect('node', ids, true);
@@ -313,13 +345,12 @@ Editor.registerElement({
 
         var nodes = cc.engine.getIntersectionList( new cc.Rect(worldHitPoint.x, worldHitPoint.y, 1, 1) );
         nodes.forEach( function ( node ) {
-            var fireNode = cc(node);
-            var aabb = fireNode.getWorldBounds();
+            var aabb = node.getWorldBounds();
             // TODO: calculate the OBB center instead
             var dist = worldHitPoint.sub(aabb.center).magSqr();
             if ( dist < minDist ) {
                 minDist = dist;
-                resultNode = fireNode;
+                resultNode = node;
             }
         });
 
@@ -334,8 +365,7 @@ Editor.registerElement({
         var results = [];
         var nodes = cc.engine.getIntersectionList(worldRect);
         nodes.forEach( function ( node ) {
-            var fireNode = cc(node);
-            results.push(fireNode);
+            results.push(node);
         });
 
         return results;
@@ -372,9 +402,9 @@ Editor.registerElement({
                     this.$.grid.pan( dx, dy );
                     this.$.grid.repaint();
 
-                    var scene = cc(cc.director.getRunningScene());
-                    scene.position = cc.v2(this.$.grid.xDirection*this.$.grid.xAxisOffset,
-                                             this.$.grid.yDirection*this.$.grid.yAxisOffset);
+                    var scene = cc.director.getScene();
+                    scene.setPosition(cc.v2(this.$.grid.xDirection * this.$.grid.xAxisOffset,
+                                            this.$.grid.yDirection * this.$.grid.yAxisOffset));
                     cc.engine.repaintInEditMode();
                 }.bind(this),
 
@@ -504,10 +534,10 @@ Editor.registerElement({
         this.$.gizmosView.scale = newScale;
 
         //
-        var scene = cc(cc.director.getRunningScene());
+        var scene = cc.director.getScene();
         scene.scale = cc.v2( this.$.grid.xAxisScale, this.$.grid.yAxisScale );
-        scene.position = cc.v2(this.$.grid.xDirection*this.$.grid.xAxisOffset,
-                                 this.$.grid.yDirection*this.$.grid.yAxisOffset);
+        scene.setPosition(cc.v2(this.$.grid.xDirection * this.$.grid.xAxisOffset,
+                                this.$.grid.yDirection * this.$.grid.yAxisOffset));
         cc.engine.repaintInEditMode();
     },
 

@@ -25,9 +25,7 @@ function createScene (sceneJson, next) {
     var scene = cc.deserialize(sceneJson/*, null, {
         classFinder: MissingBehavior.safeFindClass,
     }*/);
-    cc.game._initScene(scene, function () {
-        next(null, scene);
-    });
+    next(null, scene);
 }
 
 Editor.initScene = function (callback) {
@@ -73,7 +71,7 @@ Editor.initScene = function (callback) {
 
 Editor.stashScene = function (callback) {
     // get scene json
-    var scene = cc(cc.director.getRunningScene());
+    var scene = cc.director.getScene();
     var jsonText = Editor.serialize(scene, {stringify: true});
 
     // store the scene, scene-view postion, scene-view scale

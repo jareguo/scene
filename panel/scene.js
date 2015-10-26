@@ -213,12 +213,12 @@ Editor.registerPanel( 'scene.panel', {
         this._sendToView( 'scene:node-set-property', info );
     },
 
-    'scene:node-mixin': function ( id, uuid ) {
-        this._sendToView( 'scene:node-mixin', id, uuid );
+    'scene:component-add': function ( id, uuid ) {
+        this._sendToView( 'scene:component-add', id, uuid );
     },
 
-    'scene:node-unmixin': function ( id, className ) {
-        this._sendToView( 'scene:node-unmixin', id, className );
+    'scene:component-remove': function ( id, className ) {
+        this._sendToView( 'scene:component-remove', id, className );
     },
 
     'scene:create-nodes-by-uuids': function ( uuids, parentID ) {
