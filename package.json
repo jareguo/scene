@@ -26,6 +26,7 @@
         "w": "selectMove",
         "e": "selectRotate",
         "r": "selectScale",
+        "t": "selectRect",
         "command+backspace": "deleteCurrentSelected",
         "del": "deleteCurrentSelected",
         "command+d": "duplicateCurrentSelected",

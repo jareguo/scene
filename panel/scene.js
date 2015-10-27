@@ -89,6 +89,14 @@ Editor.registerPanel( 'scene.panel', {
         this.transformTool = 'move';
     },
 
+    selectRect: function ( event ) {
+        if ( event ) {
+            event.stopPropagation();
+        }
+
+        this.transformTool = 'rect';
+    },
+
     selectRotate: function ( event ) {
         if ( event ) {
             event.stopPropagation();
