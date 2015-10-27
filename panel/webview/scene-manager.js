@@ -38,7 +38,7 @@ Editor.initScene = function (callback) {
                 sandbox.loadCompiledScript,
                 createScene.bind(this, sceneJson),
                 function (scene, next) {
-                    cc.game._launchScene(scene);
+                    cc.director.runScene(scene);
                     cc.engine.repaintInEditMode();
                     next( null, stashedScene );
                 },
@@ -95,7 +95,7 @@ Editor.reloadScene = function (callback) {
         Editor.stashScene,
         createScene,
         function (scene, next) {
-            cc.game._launchScene(scene);
+            cc.director.runScene(scene);
             cc.engine.repaintInEditMode();
             next( null, Editor.remote.stashedScene );
         },
@@ -121,7 +121,7 @@ Editor.playScene = function (callback) {
             scene.scale = cc.Vec2.one;
 
             // play new scene
-            cc.game._launchScene(scene, function () {
+            cc.director.runScene(scene, function () {
                 // restore selection
                 Editor.Selection.select('node', selection, true, true);
 

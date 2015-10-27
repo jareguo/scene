@@ -190,7 +190,7 @@ Editor.registerElement({
         var scene = new cc.EScene();
 
         this.reset();
-        cc.game._launchScene(scene);
+        cc.director.runScene(scene);
 
         this.adjustToCenter(20);
         cc.engine.repaintInEditMode();
