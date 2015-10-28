@@ -263,7 +263,23 @@ var EditorEngine = cc.Class({
         var scene = cc.director.getScene();
         var list = [];
 
-        scene._deepQueryChildren(function (child) {
+        function deepQueryChildren (root, cb) {
+            function traversal (node, cb) {
+                var children = node.children;
+
+                for (var i = 0; i<children.length; i++) {
+                    var child = children[i];
+
+                    if (!cb( child )) break;
+
+                    traversal(child, cb);
+                }
+            }
+
+            traversal(root, cb);
+        }
+
+        deepQueryChildren(scene, function (child) {
 
             var bounds = child.getWorldBounds();
 
