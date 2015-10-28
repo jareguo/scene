@@ -25,8 +25,8 @@ Editor.registerElement({
     },
 
     ready: function () {
-        var mappingH = cc.Runtime.Settings['mapping-h'];
-        var mappingV = cc.Runtime.Settings['mapping-v'];
+        var mappingH = [0,1,1];
+        var mappingV = [1,0,1];
 
         // grid
         this.$.grid.setScaleH( [5,2], 0.01, 1000 );
