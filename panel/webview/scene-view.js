@@ -43,7 +43,7 @@ Editor.registerElement({
 
     ready: function () {
         var mappingH = [0, 1, 1];
-        var mappingV = [0, 1, 1];
+        var mappingV = [1, 0, 1];
 
         // grid
         this.$.grid.setScaleH( [5,2], 0.01, 1000 );
