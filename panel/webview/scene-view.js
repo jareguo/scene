@@ -42,8 +42,8 @@ Editor.registerElement({
     },
 
     ready: function () {
-        var mappingH = [1, 0, 1];
-        var mappingV = [0, 1, 1];
+        var mappingH = [0, 1, 1];
+        var mappingV = [1, 0, 1];
 
         // grid
         this.$.grid.setScaleH( [5,2], 0.01, 1000 );
@@ -258,7 +258,7 @@ Editor.registerElement({
 
     worldToPixel: function (pos) {
         var scene = cc.director.getScene();
-        var scenePos = scene.transformPointToLocal(pos);
+        var scenePos = scene.convertToNodeSpaceAR(pos);
         return this.sceneToPixel( scenePos );
     },
 
@@ -271,7 +271,7 @@ Editor.registerElement({
 
     pixelToWorld: function (pos) {
         var scene = cc.director.getScene();
-        return scene.transformPointToWorld( this.pixelToScene(pos) );
+        return scene.convertToWorldSpaceAR(this.pixelToScene(pos));
     },
 
     activate: function ( id ) {
