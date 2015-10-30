@@ -132,8 +132,6 @@ var EditorEngine = cc.Class({
             self._isInitialized = true;
             self._isInitializing = false;
 
-            cc.view.setDesignResolutionSize(options.designWidth, options.designHeight, cc.ResolutionPolicy.SHOW_ALL);
-
             callback(err);
 
             if (CC_EDITOR) {
@@ -168,6 +166,8 @@ var EditorEngine = cc.Class({
                 cc.game.canvas.style.imageRendering = 'pixelated';
                 cc.director.setClearColor(cc.color(0,0,0,0));
             }
+
+            cc.view.setDesignResolutionSize(options.designWidth, options.designHeight, cc.ResolutionPolicy.SHOW_ALL);
             cc.view.setCanvasSize(config.width, config.height);
 
             cc.director.runScene(scene);
