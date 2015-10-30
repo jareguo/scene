@@ -138,6 +138,7 @@ var EditorEngine = cc.Class({
                 // start main loop for editor after initialized
                 self._tickStart();
                 // start timer to force repaint the scene in edit mode
+                //noinspection SillyAssignmentJS
                 self.forceRepaintIntervalInEM = self.forceRepaintIntervalInEM;
             }
         });

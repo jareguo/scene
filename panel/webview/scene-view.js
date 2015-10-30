@@ -509,8 +509,6 @@ Editor.registerElement({
                     }
                 }.bind(this)
             );
-
-            return;
         }
     },
 
@@ -558,7 +556,6 @@ Editor.registerElement({
 
         if ( Editor.KeyCode(event.which) === 'shift' ) {
             this.style.cursor = '-webkit-grab';
-            return;
         }
     },
 
