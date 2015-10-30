@@ -26,8 +26,6 @@ var EditorEngine = cc.Class({
 
         // current scene
         this._loadingScene = '';
-        // temp sg scene
-        this._emptySgScene = null;
 
         this._bindedTick = (CC_EDITOR || useDefaultMainLoop) && this._tick.bind(this);
 
@@ -144,10 +142,6 @@ var EditorEngine = cc.Class({
                 // start timer to force repaint the scene in edit mode
                 self.forceRepaintIntervalInEM = self.forceRepaintIntervalInEM;
             }
-
-            // create empty scene
-            var scene = new cc.Scene();
-            self._emptySgScene = scene;
         });
     },
 
