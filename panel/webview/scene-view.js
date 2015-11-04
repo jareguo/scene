@@ -202,7 +202,7 @@ Editor.registerElement({
     loadScene: function ( uuid ) {
         this.reset();
 
-        cc.game._loadSceneByUuid(uuid, function (err) {
+        cc.director._loadSceneByUuid(uuid, function (err) {
             this.adjustToCenter(20);
             cc.engine.repaintInEditMode();
 

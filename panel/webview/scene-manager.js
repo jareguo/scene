@@ -53,7 +53,7 @@ Editor.initScene = function (callback) {
             function ( next ) {
                 var currentSceneUuid = Editor.remote.currentSceneUuid;
                 if ( currentSceneUuid ) {
-                    cc.game._loadSceneByUuid(currentSceneUuid, function ( err ) {
+                    cc.director._loadSceneByUuid(currentSceneUuid, function ( err ) {
                         window.sceneView.adjustToCenter(10);
                         cc.engine.repaintInEditMode();
                         next ( err, null );
