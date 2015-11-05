@@ -153,7 +153,8 @@ var EditorEngine = cc.Class({
                 'id'                    : options.id,
                 'renderMode'            : cc.isEditor ? 2 : options.renderMode,                 // 0: auto, 1:Canvas, 2:Webgl
                 'registerSystemEvent'   : ! cc.isEditor,
-                'jsList'                : []
+                'jsList'                : [],
+                'noCache'               : true,
             };
 
         cc.game.run(config, function () {
