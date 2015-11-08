@@ -222,8 +222,16 @@ Ipc.on('scene:node-new-property', function ( info ) {
 Ipc.on('scene:node-set-property', function ( info ) {
     var nodeOrComp = cc.engine.getInstanceById(info.id);
     if (nodeOrComp) {
+        // 兼容旧版 Inspector
+        if (info.mixinType) {
+            nodeOrComp = nodeOrComp.getComponent(info.mixinType);
+            if (!cc.isValid(nodeOrComp)) {
+                return;
+            }
+        }
+        //
         try {
-            Editor.setDeepPropertyByPath(nodeOrComp, info.path, info.value, info.type);
+            Editor.setPropertyByPath(nodeOrComp, info.path, info.value, info.type);
             cc.engine.repaintInEditMode();
         }
         catch (e) {
@@ -237,14 +245,14 @@ Ipc.on('scene:component-add', function ( id, uuid ) {
     if (uuid && Editor.isUuid(uuid)) {
         // check script
         var className = Editor.compressUuid(uuid);
-        var classToMix = cc.js._getClassById(className);
-        if (!classToMix) {
+        var Comp = cc.js._getClassById(className);
+        if (!Comp) {
             return Editor.error('Can not find cc.Component in the script "%s".', uuid);
         }
         //
         var node = cc.engine.getInstanceById(id);
         if (node) {
-            node.addComponent(classToMix);
+            node.addComponent(Comp);
         }
         else {
             Editor.error('Can not find node to add component: %s', id);
