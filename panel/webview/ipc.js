@@ -14,7 +14,7 @@ Ipc.on('scene:new-scene', function () {
 
 Ipc.on('scene:save-scene-from-page', function ( url ) {
     var sceneAsset = new cc.SceneAsset();
-    sceneAsset.scene = cc(cc.director.getRunningScene());
+    sceneAsset.scene = cc.director.getScene();
 
     // NOTE: we stash scene because we want to save and reload the connected browser
     Editor.stashScene(function () {
@@ -53,11 +53,10 @@ Ipc.on('scene:drop', function ( uuids, type, x, y ) {
             function ( node, next ) {
                 var nodeID;
                 if ( node ) {
-                    var wrapper = cc(node);
-                    nodeID = wrapper.uuid;
+                    nodeID = node.uuid;
 
-                    wrapper.position = window.sceneView.pixelToScene( cc.v2(x,y) );
-                    wrapper.parent = cc(cc.director.getRunningScene());
+                    node.setPosition(window.sceneView.pixelToScene( cc.v2(x,y) ));
+                    node.parent = cc.director.getScene();
                 }
 
                 next ( null, nodeID );
@@ -81,10 +80,10 @@ Ipc.on('scene:drop', function ( uuids, type, x, y ) {
 Ipc.on('scene:create-nodes-by-uuids', function ( uuids, parentID ) {
     var parentNode;
     if ( parentID ) {
-        parentNode = cc.engine.getInstanceByIdN(parentID);
+        parentNode = cc.engine.getInstanceById(parentID);
     }
     if ( !parentNode ) {
-        parentNode = cc.director.getRunningScene();
+        parentNode = cc.director.getScene();
     }
 
     Editor.Selection.clear('node');
@@ -99,19 +98,18 @@ Ipc.on('scene:create-nodes-by-uuids', function ( uuids, parentID ) {
             function ( node, next ) {
                 var nodeID;
                 if ( node ) {
-                    var wrapper = cc(node);
-                    nodeID = wrapper.uuid;
+                    nodeID = node.uuid;
 
                     if ( parentNode ) {
-                        wrapper.parent = cc(parentNode);
+                        node.parent = parentNode;
                     }
                     var center_x = cc.game.canvas.width / 2;
                     var center_y = cc.game.canvas.height / 2;
-                    wrapper.scenePosition = window.sceneView.pixelToScene( cc.v2(center_x, center_y) );
+                    node.scenePosition = window.sceneView.pixelToScene( cc.v2(center_x, center_y) );
                 }
 
                 next ( null, nodeID );
-            },
+            }
 
         ], function ( err, nodeID ) {
             if ( err ) {
@@ -129,34 +127,37 @@ Ipc.on('scene:create-nodes-by-uuids', function ( uuids, parentID ) {
 });
 
 Ipc.on('scene:create-node-by-classid', function ( name, classID, referenceID, position ) {
-    var parentNode;
+    var parent;
 
     if ( referenceID ) {
-        parentNode = cc.engine.getInstanceByIdN(referenceID);
+        parent = cc.engine.getInstanceById(referenceID);
         if ( position === 'sibling' ) {
-            parentNode = cc(parentNode).parentN;
+            parent = parent.parent;
         }
     }
-
-    if ( !parentNode ) {
-        parentNode = cc.director.getRunningScene();
+    if ( !parent ) {
+        parent = cc.director.getScene();
     }
-    var Wrapper = cc.js._getClassById(classID);
-    if (Wrapper) {
-        var wrapper = new Wrapper();
-        wrapper.createAndAttachNode();
-        wrapper.parent = cc(parentNode);
-        wrapper.name = name;
 
-        var center_x = cc.game.canvas.width / 2;
-        var center_y = cc.game.canvas.height / 2;
-        wrapper.scenePosition = window.sceneView.pixelToScene( cc.v2(center_x, center_y) );
+    var node = new cc.ENode(name);
+    node.parent = parent;
 
-        cc.engine.repaintInEditMode();
-        Editor.Selection.select('node', wrapper.uuid, true, true );
-    }
-    else {
-        Editor.error('Unknown node to create:', classID);
+    var center_x = cc.game.canvas.width / 2;
+    var center_y = cc.game.canvas.height / 2;
+    node.scenePosition = window.sceneView.pixelToScene( cc.v2(center_x, center_y) );
+
+    cc.engine.repaintInEditMode();
+    Editor.Selection.select('node', node.uuid, true, true );
+
+    if (classID) {
+        // add component
+        var Component = cc.js._getClassById(classID);
+        if (Component) {
+            node.addComponent(Component);
+        }
+        else {
+            Editor.error('Unknown node to create:', classID);
+        }
     }
 });
 
@@ -165,31 +166,30 @@ Ipc.on('scene:query-hierarchy', function ( queryID ) {
         return Editor.sendToWindows( 'scene:reply-query-hierarchy', queryID, '', [] );
     }
     var nodes = Editor.getHierarchyDump();
-    var sceneUuid = cc(cc.director.getRunningScene()).uuid;
+    var sceneUuid = cc.director.getScene().uuid;
     Editor.sendToWindows( 'scene:reply-query-hierarchy', queryID, sceneUuid, nodes );
 });
 
 Ipc.on('scene:query-node', function ( queryID, nodeID ) {
-    var node = cc.engine.getInstanceByIdN(nodeID);
+    var node = cc.engine.getInstanceById(nodeID);
     var dump = Editor.getNodeDump(node);
     dump = JSON.stringify(dump);    // 改成发送字符串，以免字典的顺序发生改变
     Editor.sendToWindows( 'scene:reply-query-node', queryID, dump );
 });
 
 Ipc.on('scene:query-node-info', function ( sessionID, nodeID ) {
-    var nodeWrapper = cc.engine.getInstanceById(nodeID);
+    var node = cc.engine.getInstanceById(nodeID);
 
     Editor.sendToWindows( 'scene:query-node-info:reply', sessionID, {
-        name: nodeWrapper ? nodeWrapper.name : '',
-        type: cc.js.getClassName(nodeWrapper),
-        missed: nodeWrapper ? false : true,
+        name: node ? node.name : '',
+        type: cc.js.getClassName(node),
+        missed: node ? false : true,
     });
 });
 
 Ipc.on('scene:node-new-property', function ( info ) {
-    var node = cc.engine.getInstanceByIdN(info.id);
-    if (node) {
-        var objToSet = info.mixinType ? node : cc(node);
+    var nodeOrComp = cc.engine.getInstanceById(info.id);
+    if (nodeOrComp) {
         try {
             var id = info.type;
             var ctor;
@@ -208,60 +208,71 @@ Ipc.on('scene:node-new-property', function ( info ) {
                     Editor.error('Can not create new info.type directly.\nInner message: ' + e.stack);
                     return;
                 }
-                Editor.setDeepPropertyByPath(objToSet, info.path, obj, info.type);
+                Editor.setDeepPropertyByPath(nodeOrComp, info.path, obj, info.type);
                 cc.engine.repaintInEditMode();
             }
         }
         catch (e) {
             Editor.warn('Failed to new property %s of %s to %s, ' + e.message,
-                info.path, cc(node).name, info.value);
+                info.path, nodeOrComp.name, info.value);
         }
     }
 });
 
 Ipc.on('scene:node-set-property', function ( info ) {
-    var node = cc.engine.getInstanceByIdN(info.id);
-    if (node) {
-        var objToSet = info.mixinType ? node : cc(node);
+    var nodeOrComp = cc.engine.getInstanceById(info.id);
+    if (nodeOrComp) {
+        // 兼容旧版 Inspector
+        if (info.mixinType) {
+            nodeOrComp = nodeOrComp.getComponent(info.mixinType);
+            if (!cc.isValid(nodeOrComp)) {
+                return;
+            }
+        }
+        //
         try {
-            Editor.setDeepPropertyByPath(objToSet, info.path, info.value, info.type);
+            Editor.setPropertyByPath(nodeOrComp, info.path, info.value, info.type);
             cc.engine.repaintInEditMode();
         }
         catch (e) {
             Editor.warn('Failed to set property %s of %s to %s, ' + e.message,
-                info.path, cc(node).name, info.value);
+                info.path, nodeOrComp.name, info.value);
         }
     }
 });
 
-Ipc.on('scene:node-mixin', function ( id, uuid ) {
+Ipc.on('scene:component-add', function ( id, uuid ) {
     if (uuid && Editor.isUuid(uuid)) {
         // check script
         var className = Editor.compressUuid(uuid);
-        var classToMix = cc.js._getClassById(className);
-        if (!classToMix) {
-            return Editor.error('Can not find Behavior in the script "%s".', uuid);
+        var Comp = cc.js._getClassById(className);
+        if (!Comp) {
+            return Editor.error('Can not find cc.Component in the script "%s".', uuid);
         }
         //
-        var node = cc.engine.getInstanceByIdN(id);
+        var node = cc.engine.getInstanceById(id);
         if (node) {
-            cc.mixin(node, classToMix);
+            node.addComponent(Comp);
         }
         else {
-            Editor.error('Can not find node to mixin: %s', id);
+            Editor.error('Can not find node to add component: %s', id);
         }
     }
     else {
-        Editor.error('invalid script to mixin');
+        Editor.error('invalid script to add component');
     }
 });
 
-Ipc.on('scene:node-unmixin', function ( id, className ) {
-    var node = cc.engine.getInstanceByIdN(id);
+Ipc.on('scene:component-remove', function ( id, className ) {
+    var node = cc.engine.getInstanceById(id);
     if (node) {
-        cc.unMixin( node, className);
+        node.getComponent(className).destroy();
     }
 });
+
+function getSiblingIndex (node) {
+    return node._parent._children.indexOf(node);
+}
 
 Ipc.on('scene:move-nodes', function ( ids, parentID, nextSiblingId ) {
     var parent;
@@ -269,46 +280,46 @@ Ipc.on('scene:move-nodes', function ( ids, parentID, nextSiblingId ) {
     if (parentID)
         parent = cc.engine.getInstanceById(parentID);
     else
-        parent = cc(cc.director.getRunningScene());
+        parent = cc.director.getScene();
 
     var next = nextSiblingId ? cc.engine.getInstanceById(nextSiblingId) : null;
-    var nextIndex = next ? next.getSiblingIndex() : -1;
+    var nextIndex = next ? getSiblingIndex(next) : -1;
 
     for (var i = 0; i < ids.length; i++) {
         var id = ids[i];
-        var wrapper = cc.engine.getInstanceById(id);
-        if (wrapper && (!parent || !parent.isChildOf(wrapper))) {
-            if (wrapper.parent !== parent) {
+        var node = cc.engine.getInstanceById(id);
+        if (node && (!parent || !parent.isChildOf(node))) {
+            if (node.parent !== parent) {
                 // keep world transform not changed
-                var worldPos = wrapper.worldPosition;
-                var worldRotation = wrapper.worldRotation;
-                var lossyScale = wrapper.worldScale;
+                var worldPos = node.worldPosition;
+                var worldRotation = node.worldRotation;
+                var lossyScale = node.worldScale;
 
-                wrapper.parent = parent;
+                node.parent = parent;
 
                 // restore world transform
-                wrapper.worldPosition = worldPos;
-                wrapper.worldRotation = worldRotation;
+                node.worldPosition = worldPos;
+                node.worldRotation = worldRotation;
                 if (parent) {
-                    wrapper.scale = lossyScale.divSelf(parent.worldScale);
+                    node.scale = lossyScale.divSelf(parent.worldScale);
                 }
                 else {
-                    wrapper.scale = lossyScale;
+                    node.scale = lossyScale;
                 }
 
                 if (next) {
-                    wrapper.setSiblingIndex(nextIndex);
+                    node.setSiblingIndex(nextIndex);
                     ++nextIndex;
                 }
             }
             else if (next) {
-                var lastIndex = wrapper.getSiblingIndex();
+                var lastIndex = getSiblingIndex(node);
                 var newIndex = nextIndex;
                 if (newIndex > lastIndex) {
                     --newIndex;
                 }
                 if (newIndex !== lastIndex) {
-                    wrapper.setSiblingIndex(newIndex);
+                    node.setSiblingIndex(newIndex);
                     if (lastIndex > newIndex) {
                         ++nextIndex;
                     }
@@ -318,7 +329,8 @@ Ipc.on('scene:move-nodes', function ( ids, parentID, nextSiblingId ) {
                 }
             }
             else {
-                wrapper.setAsLastSibling();
+                // move to bottom
+                node.setSiblingIndex(-1);
             }
         }
     }
@@ -329,16 +341,16 @@ Ipc.on('scene:delete-nodes', function ( ids ) {
 });
 
 Ipc.on('scene:duplicate-nodes', function ( ids ) {
-    var wrappers = [];
+    var nodes = [];
     for ( var i = 0; i < ids.length; ++i ) {
-         var wrapper = cc.engine.getInstanceById(ids[i]);
-        if (wrapper) {
-            wrappers.push(wrapper);
+         var node = cc.engine.getInstanceById(ids[i]);
+        if (node) {
+            nodes.push(node);
         }
     }
 
     // get top-level wrappers
-    var results = Editor.Utils.arrayCmpFilter ( wrappers, function ( a, b ) {
+    var results = Editor.Utils.arrayCmpFilter ( nodes, function ( a, b ) {
         if (a === b) {
             return 0;
         }
@@ -357,9 +369,9 @@ Ipc.on('scene:duplicate-nodes', function ( ids ) {
 
     // duplicate results
     var clones = [];
-    results.forEach(function ( wrapper ) {
-        var clone = cc.instantiate(wrapper);
-        clone.parent = wrapper.parent;
+    results.forEach(function ( node ) {
+        var clone = cc.instantiate(node);
+        clone.parent = node.parent;
 
         clones.push(clone.uuid);
     });
@@ -450,40 +462,40 @@ Ipc.on('scene:design-size-changed', function ( w, h ) {
 });
 
 Ipc.on('scene:create-prefab', function ( id, baseUrl ) {
-    var wrapper = cc.engine.getInstanceById(id);
-    var prefab = Editor.PrefabUtils.createPrefabFrom(wrapper);
+    var node = cc.engine.getInstanceById(id);
+    var prefab = Editor.PrefabUtils.createPrefabFrom(node);
     var json = Editor.serialize(prefab);
-    var url = Url.join(baseUrl, wrapper.name + '.prefab');
+    var url = Url.join(baseUrl, node.name + '.prefab');
 
     Editor.sendRequestToCore('scene:create-prefab', url, json, function (err, uuid) {
         if (!err) {
-            Editor.PrefabUtils.savePrefabUuid(wrapper, uuid);
+            Editor.PrefabUtils.savePrefabUuid(node, uuid);
         }
     });
 });
 
 Ipc.on('scene:apply-prefab', function ( id ) {
-    var wrapper = cc.engine.getInstanceById(id);
-    if (!wrapper || !wrapper._prefab) {
+    var node = cc.engine.getInstanceById(id);
+    if (!node || !node._prefab) {
         return;
     }
 
-    wrapper = wrapper._prefab.rootWrapper;
-    var uuid = wrapper._prefab.asset._uuid;
-    var prefab = Editor.PrefabUtils.createPrefabFrom(wrapper);
-    Editor.PrefabUtils.savePrefabUuid(wrapper, uuid);
+    node = node._prefab.root;
+    var uuid = node._prefab.asset._uuid;
+    var prefab = Editor.PrefabUtils.createPrefabFrom(node);
+    Editor.PrefabUtils.savePrefabUuid(node, uuid);
     var json = Editor.serialize(prefab);
 
     Editor.sendToCore('scene:apply-prefab', uuid, json);
 });
 
 Ipc.on('scene:revert-prefab', function ( id ) {
-    var wrapper = cc.engine.getInstanceById(id);
-    if (!wrapper || !wrapper._prefab) {
+    var node = cc.engine.getInstanceById(id);
+    if (!node || !node._prefab) {
         return;
     }
 
-    wrapper = wrapper._prefab.rootWrapper;
-    Editor.PrefabUtils.revertPrefab(wrapper);
+    node = node._prefab.root;
+    Editor.PrefabUtils.revertPrefab(node);
 });
 

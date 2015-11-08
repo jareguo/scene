@@ -25,9 +25,7 @@ function createScene (sceneJson, next) {
     var scene = cc.deserialize(sceneJson/*, null, {
         classFinder: MissingBehavior.safeFindClass,
     }*/);
-    cc.game._initScene(scene, function () {
-        next(null, scene);
-    });
+    next(null, scene);
 }
 
 Editor.initScene = function (callback) {
@@ -40,7 +38,7 @@ Editor.initScene = function (callback) {
                 sandbox.loadCompiledScript,
                 createScene.bind(this, sceneJson),
                 function (scene, next) {
-                    cc.game._launchScene(scene);
+                    cc.director.runScene(scene);
                     cc.engine.repaintInEditMode();
                     next( null, stashedScene );
                 },
@@ -55,7 +53,7 @@ Editor.initScene = function (callback) {
             function ( next ) {
                 var currentSceneUuid = Editor.remote.currentSceneUuid;
                 if ( currentSceneUuid ) {
-                    cc.game._loadSceneByUuid(currentSceneUuid, function ( err ) {
+                    cc.director._loadSceneByUuid(currentSceneUuid, function ( err ) {
                         window.sceneView.adjustToCenter(10);
                         cc.engine.repaintInEditMode();
                         next ( err, null );
@@ -73,7 +71,7 @@ Editor.initScene = function (callback) {
 
 Editor.stashScene = function (callback) {
     // get scene json
-    var scene = cc(cc.director.getRunningScene());
+    var scene = cc.director.getScene();
     var jsonText = Editor.serialize(scene, {stringify: true});
 
     // store the scene, scene-view postion, scene-view scale
@@ -97,7 +95,7 @@ Editor.reloadScene = function (callback) {
         Editor.stashScene,
         createScene,
         function (scene, next) {
-            cc.game._launchScene(scene);
+            cc.director.runScene(scene);
             cc.engine.repaintInEditMode();
             next( null, Editor.remote.stashedScene );
         },
@@ -123,7 +121,7 @@ Editor.playScene = function (callback) {
             scene.scale = cc.Vec2.one;
 
             // play new scene
-            cc.game._launchScene(scene, function () {
+            cc.director.runScene(scene, function () {
                 // restore selection
                 Editor.Selection.select('node', selection, true, true);
 

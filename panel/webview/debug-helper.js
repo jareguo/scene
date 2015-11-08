@@ -1,3 +1,5 @@
+"use strict";
+
 cc.js.get(cc, '$0', function () {
     var selection = Editor.Selection.curSelection('node');
     if (selection.length > 0) {
@@ -7,21 +9,21 @@ cc.js.get(cc, '$0', function () {
     }
 });
 
-cc.js.get(cc, '$0N', function () {
-    var wrapper = cc.$0;
-    if (wrapper) {
-        return wrapper.targetN;
-    }
-});
+// cc.$c0, cc.$c1, ...
+for (let i = 0; i < 5; ++i) {
+    cc.js.get(cc, '$c' + i, function () {
+        var selected = cc.$0;
+        if (selected) {
+            return selected._components[i];
+        }
+    });
+}
 
 cc.js.get(cc, '$s', function () {
-    return cc(cc.director.getRunningScene());
+    return cc.director.getScene();
 });
 
 cc.js.get(cc, '$S', function () {
-    return cc(cc.director.getRunningScene());
+    return cc.director.getScene();
 });
 
-cc.js.get(cc, '$SN', function () {
-    return cc.director.getRunningScene();
-});
