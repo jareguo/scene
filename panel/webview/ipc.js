@@ -241,13 +241,20 @@ Ipc.on('scene:node-set-property', function ( info ) {
     }
 });
 
-Ipc.on('scene:component-add', function ( id, uuid ) {
-    if (uuid && Editor.isUuid(uuid)) {
-        // check script
-        var className = Editor.compressUuid(uuid);
-        var Comp = cc.js._getClassById(className);
+Ipc.on('scene:component-add', function ( id, compId ) {
+    if (compId) {
+        var isScript = Editor.isUuid(compId);
+        if (isScript) {
+            compId = Editor.compressUuid(compId);
+        }
+        var Comp = cc.js._getClassById(compId);
         if (!Comp) {
-            return Editor.error('Can not find cc.Component in the script "%s".', uuid);
+            if (isScript) {
+                return Editor.error('Can not find cc.Component in the script "%s".', compId);
+            }
+            else {
+                return Editor.error('Failed to get component "%s".', compId);
+            }
         }
         //
         var node = cc.engine.getInstanceById(id);
@@ -255,11 +262,11 @@ Ipc.on('scene:component-add', function ( id, uuid ) {
             node.addComponent(Comp);
         }
         else {
-            Editor.error('Can not find node to add component: %s', id);
+            Editor.error('Can not find node ' + id);
         }
     }
     else {
-        Editor.error('invalid script to add component');
+        Editor.error('invalid compId to add component');
     }
 });
 
