@@ -416,6 +416,22 @@ Ipc.on('selection:activated', function ( type, id ) {
             var dump = Editor.getAnimationNodeDump(node);
             Editor.sendToWindows('scene:animation-node-activated', dump);
         }
+
+        // Another Choose, select AnimationNode's child will also trigger scene:animation-node-activated
+
+        // var animationNode = node;
+        // var isAnimationNode = animationNode.getComponent(cc.AnimationComponent);;
+
+        // while (animationNode && !(animationNode instanceof cc.EScene)) {
+        //     isAnimationNode = animationNode.getComponent(cc.AnimationComponent);
+        //     if (isAnimationNode) {
+        //         var dump = Editor.getAnimationNodeDump(animationNode);
+        //         Editor.sendToWindows('scene:animation-node-activated', dump);
+        //         break;
+        //     }
+
+        //     animationNode = animationNode.parent;
+        // }
     }
 
     window.sceneView.activate(id);
