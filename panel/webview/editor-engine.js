@@ -277,17 +277,22 @@ var EditorEngine = cc.Class({
 
         deepQueryChildren(scene, function (child) {
 
-            var bounds = child.getWorldBounds();
+            child._components.forEach(function (component) {
+                var size = component.localSize;
+                if (size.width === 0 || size.height === 0) return;
 
-            // if intersect aabb success, then try intersect obb
-            if (rect.intersects(bounds)) {
-                bounds = child.getWorldOrientedBounds();
-                var polygon = new Editor.Polygon(bounds);
+                var bounds = child.getWorldBounds(size);
 
-                if (Editor.Intersection.rectPolygon(rect, polygon)) {
-                    list.push(child);
+                // if intersect aabb success, then try intersect obb
+                if (rect.intersects(bounds)) {
+                    bounds = child.getWorldOrientedBounds(size);
+                    var polygon = new Editor.Polygon(bounds);
+
+                    if (Editor.Intersection.rectPolygon(rect, polygon)) {
+                        list.push(child);
+                    }
                 }
-            }
+            });
 
             return true;
         });
