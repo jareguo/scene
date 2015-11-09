@@ -177,6 +177,12 @@ Ipc.on('scene:query-node', function ( queryID, nodeID ) {
     Editor.sendToWindows( 'scene:reply-query-node', queryID, dump );
 });
 
+Ipc.on('scene:query-animation-node', function (queryID, nodeID, childName) {
+    var node = cc.engine.getInstanceById(nodeID);
+    var dump = Editor.getAnimationNodeDump(node, childName);
+    Editor.sendToWindows( 'scene:reply-animation-node', queryID, dump );
+});
+
 Ipc.on('scene:query-node-info', function ( sessionID, nodeID ) {
     var node = cc.engine.getInstanceById(nodeID);
 
@@ -400,6 +406,32 @@ Ipc.on('scene:soft-reload', function (compiled) {
 Ipc.on('selection:activated', function ( type, id ) {
     if ( type !== 'node' || !id ) {
         return;
+    }
+
+    var node = cc.engine.getInstanceById(id);
+    if (node) {
+        var isAnimationNode = node.getComponent(cc.AnimationComponent);
+
+        if (isAnimationNode) {
+            var dump = Editor.getAnimationNodeDump(node);
+            Editor.sendToWindows('scene:animation-node-activated', dump);
+        }
+
+        // Another Choose, select AnimationNode's child will also trigger scene:animation-node-activated
+
+        // var animationNode = node;
+        // var isAnimationNode = animationNode.getComponent(cc.AnimationComponent);;
+
+        // while (animationNode && !(animationNode instanceof cc.EScene)) {
+        //     isAnimationNode = animationNode.getComponent(cc.AnimationComponent);
+        //     if (isAnimationNode) {
+        //         var dump = Editor.getAnimationNodeDump(animationNode);
+        //         Editor.sendToWindows('scene:animation-node-activated', dump);
+        //         break;
+        //     }
+
+        //     animationNode = animationNode.parent;
+        // }
     }
 
     window.sceneView.activate(id);
