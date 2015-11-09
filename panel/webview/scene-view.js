@@ -271,7 +271,7 @@ Editor.registerElement({
 
     pixelToWorld: function (pos) {
         var scene = cc.director.getScene();
-        return scene.convertToWorldSpaceAR(this.pixelToScene(pos));
+        return cc.v2(scene.convertToWorldSpaceAR(this.pixelToScene(pos)));
     },
 
     activate: function ( id ) {
