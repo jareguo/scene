@@ -276,10 +276,13 @@ var EditorEngine = cc.Class({
         }
 
         deepQueryChildren(scene, function (child) {
+            var components = child._components;
 
-            child._components.forEach(function (component) {
+            for (var i = 0, l = components.length; i < l; i++) {
+                var component = components[i];
                 var size = component.localSize;
-                if (size.width === 0 || size.height === 0) return;
+
+                if (size.width === 0 || size.height === 0) continue;
 
                 var bounds = child.getWorldBounds(size);
 
@@ -290,9 +293,10 @@ var EditorEngine = cc.Class({
 
                     if (Editor.Intersection.rectPolygon(rect, polygon)) {
                         list.push(child);
+                        break;
                     }
                 }
-            });
+            }
 
             return true;
         });
