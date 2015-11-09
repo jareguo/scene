@@ -410,18 +410,11 @@ Ipc.on('selection:activated', function ( type, id ) {
 
     var node = cc.engine.getInstanceById(id);
     if (node) {
-        var animationNode = node;
-        var isAnimationNode = false;
+        var isAnimationNode = node.getComponent(cc.AnimationComponent);
 
-        while (animationNode && !(animationNode instanceof cc.EScene)) {
-            isAnimationNode = animationNode.getComponent(cc.AnimationComponent);
-            if (isAnimationNode) {
-                var dump = Editor.getAnimationNodeDump(animationNode);
-                Editor.sendToWindows('scene:animation-node-activated', dump);
-                break;
-            }
-
-            animationNode = animationNode.parent;
+        if (isAnimationNode) {
+            var dump = Editor.getAnimationNodeDump(node);
+            Editor.sendToWindows('scene:animation-node-activated', dump);
         }
     }
 
