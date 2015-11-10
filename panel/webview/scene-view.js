@@ -283,7 +283,7 @@ Editor.registerElement({
                     if (comp.onFocusInEditor) {
                         callOnFocusInTryCatch(comp);
                     }
-                    if (comp.constructor._60fpsInEditMode) {
+                    if (comp.constructor._playOnFocus) {
                         cc.engine.animatingInEditMode = true;
                     }
                 }
@@ -300,7 +300,7 @@ Editor.registerElement({
                     if (comp.onLostFocusInEditor) {
                         callOnLostFocusInTryCatch(comp);
                     }
-                    if (comp.constructor._60fpsInEditMode) {
+                    if (comp.constructor._playOnFocus) {
                         cc.engine.animatingInEditMode = false;
                     }
                 }
