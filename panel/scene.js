@@ -160,7 +160,7 @@ Editor.registerPanel( 'scene.panel', {
         return 2;
     },
 
-    'panel:open': function ( argv ) {
+    'panel:run': function ( argv ) {
         if ( !argv || !argv.uuid )
             return;
 
