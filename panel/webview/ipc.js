@@ -193,7 +193,7 @@ Ipc.on('scene:query-node-info', function ( sessionID, nodeID ) {
     });
 });
 
-Ipc.on('scene:node-new-property', function ( info ) {
+Ipc.on('scene:new-property', function ( info ) {
     var nodeOrComp = cc.engine.getInstanceById(info.id);
     if (nodeOrComp) {
         try {
@@ -225,7 +225,7 @@ Ipc.on('scene:node-new-property', function ( info ) {
     }
 });
 
-Ipc.on('scene:node-set-property', function ( info ) {
+Ipc.on('scene:set-property', function ( info ) {
     var nodeOrComp = cc.engine.getInstanceById(info.id);
     if (nodeOrComp) {
         // 兼容旧版 Inspector
@@ -276,10 +276,10 @@ Ipc.on('scene:component-add', function ( id, compId ) {
     }
 });
 
-Ipc.on('scene:component-remove', function ( id, className ) {
-    var node = cc.engine.getInstanceById(id);
-    if (node) {
-        node.getComponent(className).destroy();
+Ipc.on('scene:component-remove', function ( id, uuid ) {
+    var comp = cc.engine.getInstanceById(uuid);
+    if (comp) {
+        comp.destroy();
     }
 });
 
