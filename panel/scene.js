@@ -213,20 +213,20 @@ Editor.registerPanel( 'scene.panel', {
         this._sendToView( 'scene:query-node-info', sessionID, nodeID );
     },
 
-    'scene:node-new-property': function ( info ) {
-        this._sendToView( 'scene:node-new-property', info );
+    'scene:new-property': function ( info ) {
+        this._sendToView( 'scene:new-property', info );
     },
 
-    'scene:node-set-property': function ( info ) {
-        this._sendToView( 'scene:node-set-property', info );
+    'scene:set-property': function ( info ) {
+        this._sendToView( 'scene:set-property', info );
     },
 
     'scene:component-add': function ( id, uuid ) {
         this._sendToView( 'scene:component-add', id, uuid );
     },
 
-    'scene:component-remove': function ( id, className ) {
-        this._sendToView( 'scene:component-remove', id, className );
+    'scene:component-remove': function ( id, uuid ) {
+        this._sendToView( 'scene:component-remove', id, uuid );
     },
 
     'scene:create-nodes-by-uuids': function ( uuids, parentID ) {
