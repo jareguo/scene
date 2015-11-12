@@ -9,8 +9,15 @@ cc.js.get(cc, '$0', function () {
     }
 });
 
-// cc.$c0, cc.$c1, ...
-for (let i = 0; i < 5; ++i) {
+cc.js.get(cc, '$c', function () {
+    var selected = cc.$0;
+    if (selected) {
+        return selected._components[0];
+    }
+});
+
+// cc.$c1, cc.$c2, ...
+for (let i = 1; i < 5; ++i) {
     cc.js.get(cc, '$c' + i, function () {
         var selected = cc.$0;
         if (selected) {

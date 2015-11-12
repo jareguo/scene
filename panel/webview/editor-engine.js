@@ -51,6 +51,9 @@ var EditorEngine = cc.Class({
 
         // attached nodes and components used in getInstanceById
         this.attachedObjsForEditor = {};
+
+        this._designWidth = 0;
+        this._designHeight = 0;
     },
 
     properties: {
@@ -302,6 +305,17 @@ var EditorEngine = cc.Class({
         });
 
         return list;
+    },
+
+    // set the user defined desigin resolution for current scene
+    setDesignResolutionSize: function (width, height, resolutionPolicy) {
+        this._designWidth = width;
+        this._designHeight = height;
+    },
+
+    // returns the desigin resolution set before
+    getDesignResolutionSize: function () {
+        return cc.size(this._designWidth, this._designHeight);
     },
 
     // OVERRIDE
