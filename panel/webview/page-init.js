@@ -25,10 +25,10 @@
     //
     require('./engine-events');
     require('./debug-helper');
-    
+
     // init fire-assets
-    Editor.require('packages://fire-assets/init');
-    
+    Editor.require('app://editor/share/register-fire-assets');
+
     // init gizmos
     Editor.require('packages://fire-gizmos/init');
 })();
