@@ -92,10 +92,17 @@ Editor.registerElement({
         //
         this.$.gizmosView.scale = scale;
 
-        //
-        var scene = cc.director.getScene();
-        cc.director.getRunningScene();
+        // override some attributes to make the transform of Scene not serializable
+        var SceneTransformProps = ['_position', '_rotationX', '_rotationY', '_scaleX', '_scaleY', '_skewX', '_skewY'];
+        SceneTransformProps.forEach(function (prop) {
+            var attr = cc.Class.attr(cc.EScene, prop);
+            attr = cc.js.addon({
+                serializable: false
+            }, attr);
+            cc.Class.attr(cc.EScene.prototype, prop, attr);
+        });
 
+        var scene = cc.director.getScene();
         scene.scale = cc.v2( this.$.grid.xAxisScale, this.$.grid.yAxisScale );
         scene.setPosition(cc.v2( this.$.grid.xDirection * this.$.grid.xAxisOffset,
                                  this.$.grid.yDirection * this.$.grid.yAxisOffset ));
