@@ -21,11 +21,7 @@ function createScene (sceneJson, next) {
     // reset scene view
     window.sceneView.reset();
 
-    // Assets will be loaded by SceneWrapper.prototype.create, here we just deserialize the scene graph
-    var scene = cc.deserialize(sceneJson/*, null, {
-        classFinder: MissingBehavior.safeFindClass,
-    }*/);
-    next(null, scene);
+    cc.AssetLibrary.loadJson(sceneJson, next);
 }
 
 Editor.initScene = function (callback) {

@@ -15,7 +15,7 @@ function init () {
     //sandbox.globalVarsChecker = new GlobalVarsChecker().record();
     builtinClassIds = cc.js._registeredClassIds;
     builtinClassNames = cc.js._registeredClassNames;
-    //builtinComponentMenus = cc._componentMenuItems.slice();
+    builtinComponentMenus = cc._componentMenuItems.slice();
     //builtinCustomAssetMenus = cc._customAssetMenuItems.slice();
 }
 
@@ -23,7 +23,7 @@ function reset () {
     // clear
     cc.Object._deferredDestroy();
     //// reset menus
-    //cc._componentMenuItems = builtinComponentMenus.slice();
+    cc._componentMenuItems = builtinComponentMenus.slice();
     //cc._customAssetMenuItems = builtinCustomAssetMenus.slice();
     //// Editor.MainMenu.reset();
     // remove user classes
@@ -36,6 +36,9 @@ function reset () {
 
     cc._RFreset();
     Editor.clearUrlToUuidCache();
+
+    cc.director.purgeDirector();
+    cc.loader.releaseAll();
 }
 
 var sandbox = {
@@ -90,7 +93,10 @@ var sandbox = {
         var scriptPath = Path.join(Editor.libraryPath, 'bundle.project.js');
         Fs.exists(scriptPath, function (exists) {
             if (exists) {
-                doLoad(scriptPath, next);
+                doLoad(scriptPath, function (err) {
+                    Editor.registerComponentsToCore();
+                    next(err);
+                });
             }
             else {
                 next();
