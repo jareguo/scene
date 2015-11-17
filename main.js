@@ -44,7 +44,7 @@ module.exports = {
                 _updateTitile();
 
                 Editor.sendToAll( 'asset-db:asset-changed', {
-                    type: meta['asset-type'],
+                    type: meta.assetType(),
                     uuid: meta.uuid,
                 });
             });
@@ -77,7 +77,7 @@ module.exports = {
                 }
                 replyUuid( null, meta.uuid );
                 Editor.sendToAll( 'asset-db:asset-changed', {
-                    type: meta['asset-type'],
+                    type: meta.assetType(),
                     uuid: meta.uuid,
                 });
             });
@@ -107,7 +107,7 @@ module.exports = {
             }
             //replyUuid( null, meta.uuid );
             Editor.sendToAll( 'asset-db:asset-changed', {
-                type: meta['asset-type'],
+                type: meta.assetType(),
                 uuid: meta.uuid,
             });
         });
@@ -137,7 +137,7 @@ module.exports = {
 
         reply({
             url: url,
-            type: metaObj['asset-type'],
+            type: metaObj.assetType(),
         });
     }
 };
