@@ -54,11 +54,6 @@ Editor.registerElement({
     },
 
     init: function () {
-        var bcr = this.getBoundingClientRect();
-        if (bcr.width === 0 && bcr.height === 0) {
-            requestAnimationFrame
-        }
-
         this._initEngine();
 
         // init grid

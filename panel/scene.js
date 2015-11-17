@@ -105,10 +105,6 @@ var scenePanel = {
         // }
     },
 
-    openDevTools: function () {
-        // this.$.view.openDevTools();
-    },
-
     selectMove: function ( event ) {
         if ( event ) {
             event.stopPropagation();
