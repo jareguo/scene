@@ -1,4 +1,5 @@
 <link rel="import" href="packages://ui-kit/widget/index.html">
+<link rel="import" href="scene-view/scene-view.html">
 
 <dom-module id="editor-scene">
     <link rel="import" type="css" href="scene.css">
@@ -52,30 +53,11 @@
             <editor-unit-input input-value="{{profiles.local.designHeight}}" hint="H"></editor-unit-input>
 
             <div class="flex-1"></div>
-
-            <editor-button on-click="reload" class="green">
-                <i class="fa fa-rotate-right"></i>
-            </editor-button>
-            <editor-button on-click="openDevTools" class="red">
-                <i class="fa fa-bug"></i>
-            </editor-button>
         </editor-toolbar>
         <div class="wrapper flex-1">
             <div class="border fit">
-                <webview id="view" src="webview/index.html"
-                    nodeintegration
-                    disablewebsecurity
-                    autosize="on"
-                    on-did-start-loading="_onViewDidStartLoading"
-                    on-dom-ready="_onViewDomReady"
-                    on-did-finish-load="_onViewDidFinishLoad"
-                    on-did-fail-load="_onViewDidFailLoad"
-                    on-crashed="_onViewCrashed"
-                    on-gpu-crashed="_onViewGpuCrashed"
-                    on-plugin-crashed="_onViewPluginCrashed"
-                    on-console-message="_onViewConsole"
-                    on-ipc-message="_onViewIpc"
-                ></webview>
+                <scene-view tabindex="-1" id="sceneView"></scene-view>
+
                 <editor-loader id="loader" mask text="Loading"></editor-loader>
                 <div id="dropArea" class="fit" hidden
                     on-dragover="_onDragOver"
