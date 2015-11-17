@@ -179,6 +179,9 @@ module.exports = {
     },
 
     'scene:create-nodes-by-uuids': function ( uuids, parentID ) {
+        var Async = require('async');
+        var self = this;
+
         var parentNode;
         if ( parentID ) {
             parentNode = cc.engine.getInstanceById(parentID);
@@ -206,7 +209,7 @@ module.exports = {
                         }
                         var center_x = cc.game.canvas.width / 2;
                         var center_y = cc.game.canvas.height / 2;
-                        node.scenePosition = this.$.sceneView.pixelToScene( cc.v2(center_x, center_y) );
+                        node.scenePosition = self.$.sceneView.pixelToScene( cc.v2(center_x, center_y) );
                     }
 
                     next ( null, nodeID );
