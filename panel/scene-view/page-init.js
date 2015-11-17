@@ -8,8 +8,6 @@
     require('./playable/time');
     require('./editor-engine');
 
-    //
-    require('./engine-events');
     require('./debug-helper');
 
     // init gizmos
