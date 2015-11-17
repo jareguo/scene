@@ -27,7 +27,7 @@ Editor.registerElement({
         'mousemove': '_onMouseMove',
         'mouseleave': '_onMouseLeave',
         'keydown': '_onKeyDown',
-        'keyup': '_onKeyUp',
+        'keyup': '_onKeyUp'
     },
 
     properties: {
@@ -37,11 +37,9 @@ Editor.registerElement({
         },
     },
 
-    created: function () {
-        window.sceneView = this;
-    },
-
     ready: function () {
+        this._inited = false;
+
         var mappingH = [0, 1, 1];
         var mappingV = [1, 0, 1];
 
@@ -53,35 +51,41 @@ Editor.registerElement({
         this.$.grid.setMappingV( mappingV[0], mappingV[1], mappingV[2] );
 
         this.$.grid.setAnchor( 0.5, 0.5 );
+    },
 
-        // make sure css reflow
-        requestAnimationFrame( function () {
-            this._initEngine();
+    init: function () {
+        var bcr = this.getBoundingClientRect();
+        if (bcr.width === 0 && bcr.height === 0) {
+            requestAnimationFrame
+        }
 
-            // init grid
-            this.$.grid.resize();
-            this.$.grid.repaint();
+        this._initEngine();
 
-            // init gizmos
-            this.$.gizmosView.resize();
-            this.$.gizmosView.sceneToPixel = this.sceneToPixel.bind(this);
-            this.$.gizmosView.worldToPixel = this.worldToPixel.bind(this);
-            this.$.gizmosView.pixelToScene = this.pixelToScene.bind(this);
-            this.$.gizmosView.pixelToWorld = this.pixelToWorld.bind(this);
-        }.bind(this));
+        // init grid
+        this.$.grid.resize();
+        this.$.grid.repaint();
+
+        // init gizmos
+        this.$.gizmosView.resize();
+        this.$.gizmosView.sceneToPixel = this.sceneToPixel.bind(this);
+        this.$.gizmosView.worldToPixel = this.worldToPixel.bind(this);
+        this.$.gizmosView.pixelToScene = this.pixelToScene.bind(this);
+        this.$.gizmosView.pixelToWorld = this.pixelToWorld.bind(this);
+
+        this._inited = true;
     },
 
     reset: function () {
         Editor.Selection.clear('node');
 
         // reset scene gizmos, scene grid
-        window.sceneView.$.gizmosView.reset();
+        this.$.gizmosView.reset();
 
         // reset cc.engine editing state
         cc.engine.animatingInEditMode = false;
     },
 
-    init: function ( x, y, scale ) {
+    initPosition: function ( x, y, scale ) {
         this.scale = scale;
 
         //
@@ -109,8 +113,22 @@ Editor.registerElement({
         cc.engine.repaintInEditMode();
     },
 
+    initSettings: function (settings) {
+        this.$.gizmosView.transformTool = settings.transformTool;
+        this.$.gizmosView.coordinate = settings.coordinate;
+        this.$.gizmosView.pivot = settings.pivot;
+        this.$.gizmosView.designSize = [settings.designWidth, settings.designHeight];
+        cc.engine.setDesignResolutionSize(settings.designWidth, settings.designHeight);
+    },
+
     _resize: function () {
-        if ( cc.engine.isPlaying ) {
+        // need init when panel has size, or canvas and resolution size will be zero
+        if (!this._inited) {
+            this.init();
+            this._inited  = true;
+        }
+
+        if ( cc.engine.isPlaying || !cc.view) {
             return;
         }
 
@@ -159,13 +177,15 @@ Editor.registerElement({
             designHeight: bcr.height
         };
 
+        var self = this;
         cc.engine.init(initOptions, function () {
             Editor.initScene(function (err) {
                 if (err) {
-                    Ipc.sendToHost('scene:init-error', err);
+                    self.fire('scene:init-error', err);
                 }
                 else {
-                    Ipc.sendToHost('scene:ready');
+                    self.fire('scene:ready');
+                    self._resize();
                 }
             });
         });
@@ -176,20 +196,6 @@ Editor.registerElement({
             if ( cc.engine.isPlaying ) {
                 cc.engine.stop();
             }
-        });
-
-        // debounce resize event
-        var self = this;
-        var _resizeDebounceID = null;
-        window.addEventListener('resize', function ( event ) {
-            // debounce write for 10ms
-            if ( _resizeDebounceID ) {
-                return;
-            }
-            _resizeDebounceID = setTimeout(function () {
-                _resizeDebounceID = null;
-                self._resize();
-            }, 10);
         });
     },
 
@@ -203,7 +209,7 @@ Editor.registerElement({
         cc.engine.repaintInEditMode();
 
         Editor.remote.currentSceneUuid = null;
-        Ipc.sendToHost('scene:ready');
+        this.fire('scene:ready');
     },
 
     loadScene: function ( uuid ) {
@@ -214,11 +220,11 @@ Editor.registerElement({
             cc.engine.repaintInEditMode();
 
             if (err) {
-                Ipc.sendToHost('scene:init-error', err);
+                this.fire('scene:init-error', err);
             }
             else {
                 Editor.remote.currentSceneUuid = uuid;
-                Ipc.sendToHost('scene:ready');
+                this.fire('scene:ready');
             }
         }.bind(this));
     },
@@ -231,7 +237,7 @@ Editor.registerElement({
         var designHeight = this.$.gizmosView.designSize[1];
 
         if ( designWidth <= fitWidth && designHeight <= fitHeigth ) {
-            this.init( this.$.grid.xDirection * (bcr.width - designWidth)/2,
+            this.initPosition( this.$.grid.xDirection * (bcr.width - designWidth)/2,
                        this.$.grid.yDirection * (bcr.height - designHeight)/2,
                        1.0
                     );
@@ -241,14 +247,14 @@ Editor.registerElement({
                                               fitWidth, fitHeigth);
             // move x
             if ( result[0] < result[1] ) {
-                this.init( this.$.grid.xDirection * (bcr.width - result[0])/2,
+                this.initPosition( this.$.grid.xDirection * (bcr.width - result[0])/2,
                            this.$.grid.yDirection * (bcr.height - result[1])/2,
                            result[0]/designWidth
                         );
             }
             // move y
             else {
-                this.init( this.$.grid.xDirection * (bcr.width - result[0])/2,
+                this.initPosition( this.$.grid.xDirection * (bcr.width - result[0])/2,
                            this.$.grid.yDirection * (bcr.height - result[1])/2,
                            result[1]/designHeight
                         );
@@ -384,10 +390,10 @@ Editor.registerElement({
     //     //
     //     Editor.playScene(function (err) {
     //         if (err) {
-    //             Ipc.sendToHost('scene:play-error', err);
+    //             this.fire('scene:play-error', err);
     //             return;
     //         }
-    //         Ipc.sendToHost('scene:playing');
+    //         this.fire('scene:playing');
     //     });
     // },
 
@@ -572,6 +578,27 @@ Editor.registerElement({
         if ( Editor.KeyCode(event.which) === 'shift' ) {
             this.style.cursor = '';
         }
+    },
+
+    setTransformTool: function (transformTool) {
+        this.$.gizmosView.transformTool = transformTool;
+        cc.engine.repaintInEditMode();
+    },
+
+    setCoordinate: function (coordinate) {
+        this.$.gizmosView.coordinate = coordinate;
+        cc.engine.repaintInEditMode();
+    },
+
+    setPivot: function (pivot) {
+        this.$.gizmosView.pivot = pivot;
+        cc.engine.repaintInEditMode();
+    },
+
+    setDesignSize: function (w, h) {
+        this.$.gizmosView.designSize = [w, h];
+        // cc.engine.setDesignResolutionSize(w, h);
+        cc.engine.repaintInEditMode();
     },
 });
 
