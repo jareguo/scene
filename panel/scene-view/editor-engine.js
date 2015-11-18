@@ -311,6 +311,7 @@ var EditorEngine = cc.Class({
     setDesignResolutionSize: function (width, height, resolutionPolicy) {
         this._designWidth = width;
         this._designHeight = height;
+        this.emit('design-resolution-changed');
     },
 
     // returns the desigin resolution set before
