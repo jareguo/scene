@@ -149,24 +149,13 @@ Editor.registerElement({
 
     _initEngine: function () {
 
-        // init asset library
-        //var importUrl = Url.format({
-        //    protocol: '',
-        //    pathname: Editor.importPath,
-        //    slashes: true,
-        //});
         if (!cc.engine.isInitialized) {
             var importUrl = Editor.importPath.replace(/\\/g, '/');
             var assetUrl = Path.join(Editor.projectInfo.path, 'assets').replace(/\\/g, '/');
             cc.AssetLibrary.init(importUrl, assetUrl);
         }
         else {
-            cc.game._prepared = false;
-            cc.game._prepareCalled = false;
-            cc.game._rendererInitialized = false;
-            cc.textureCache._clear();
-            cc.loader.releaseAll();
-            cc.shaderCache._programs = {};
+            cc.engine.reset();
         }
 
         // init engine
