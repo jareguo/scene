@@ -148,15 +148,15 @@ Editor.registerElement({
     },
 
     _initEngine: function () {
-        // init asset library
-        //var importUrl = Url.format({
-        //    protocol: '',
-        //    pathname: Editor.importPath,
-        //    slashes: true,
-        //});
-        var importUrl = Editor.importPath.replace(/\\/g, '/');
-        var assetUrl = Path.join(Editor.projectInfo.path, 'assets').replace(/\\/g, '/');
-        cc.AssetLibrary.init(importUrl, assetUrl);
+
+        if (!cc.engine.isInitialized) {
+            var importUrl = Editor.importPath.replace(/\\/g, '/');
+            var assetUrl = Path.join(Editor.projectInfo.path, 'assets').replace(/\\/g, '/');
+            cc.AssetLibrary.init(importUrl, assetUrl);
+        }
+        else {
+            cc.engine.reset();
+        }
 
         // init engine
         var canvasEL = this.$['engine-canvas'];

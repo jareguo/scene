@@ -1,4 +1,4 @@
-cc.engine.on('node-attach-to-scene', function ( event ) {
+function onAttachToScene ( event ) {
     var node = event.detail.target;
     var className = cc.js.getClassName(node);
 
@@ -12,9 +12,9 @@ cc.engine.on('node-attach-to-scene', function ( event ) {
     // components
 
     cc.engine.repaintInEditMode();
-});
+}
 
-cc.engine.on('node-detach-from-scene', function ( event ) {
+function onDetachFromScene ( event ) {
     var node = event.detail.target;
     if ( node.gizmo ) {
         node.gizmo.remove();
@@ -25,7 +25,8 @@ cc.engine.on('node-detach-from-scene', function ( event ) {
     // components
 
     cc.engine.repaintInEditMode();
-});
+}
+
 
 var _updateGizmos = function (node) {
     if ( node.gizmo ) {
@@ -38,9 +39,32 @@ var _updateGizmos = function (node) {
     node._children.forEach(_updateGizmos);
 };
 
-cc.engine.on('post-update', function ( event ) {
+function onPostUpdate( event ) {
     sceneView.$.gizmosView.update();
 
     var wrapper = cc.director.getScene();
     wrapper._children.forEach(_updateGizmos);
-});
+}
+
+
+
+module.exports = {
+    isLoaded: false,
+
+    load: function () {
+        if (this.isLoaded) return;
+        this.isLoaded = true;
+
+        cc.engine.on('post-update', onPostUpdate);
+        cc.engine.on('node-attach-to-scene', onAttachToScene);
+        cc.engine.on('node-detach-from-scene', onDetachFromScene);
+    },
+
+    unload: function () {
+        this.isLoaded = false;
+
+        cc.engine.off('post-update', onPostUpdate);
+        cc.engine.off('node-attach-to-scene', onAttachToScene);
+        cc.engine.off('node-detach-from-scene', onDetachFromScene);
+    }
+};

@@ -439,6 +439,33 @@ var EditorEngine = cc.Class({
             Ticker.cancelAnimationFrame(this._requestId);
             this._requestId = -1;
         }
+    },
+
+    // reset engine state
+    reset: function () {
+        cc.game._prepared = false;
+        cc.game._prepareCalled = false;
+        cc.game._rendererInitialized = false;
+        cc.textureCache._clear();
+        cc.loader.releaseAll();
+        // cc.shaderCache._programs = {};
+        // cc.Director.firstUseDirector = true;
+        // cc.EGLView._instance = null;
+
+        // reset gl state
+        // cc._currentProjectionMatrix = -1;
+        cc._vertexAttribPosition = false;
+        cc._vertexAttribColor = false;
+        cc._vertexAttribTexCoords = false;
+        // if (cc.ENABLE_GL_STATE_CACHE) {
+        //     cc._currentShaderProgram = -1;
+        //     for (var i = 0; i < cc.MAX_ACTIVETEXTURE; i++) {
+        //         cc._currentBoundTexture[i] = -1;
+        //     }
+        //     cc._blendingSource = -1;
+        //     cc._blendingDest = -1;
+        //     cc._GLServerState = 0;
+        // }
     }
 });
 

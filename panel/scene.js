@@ -93,6 +93,14 @@ var scenePanel = {
                 self._resize();
             }, 10);
         });
+
+        var Ipc = require('ipc');
+        Ipc.on('panel:undock', this._onUndock.bind(this));
+    },
+
+    _onUndock: function () {
+        var EngineEvents = Editor.require('packages://scene/panel/scene-view/engine-events');
+        EngineEvents.unload();
     },
 
     _resize: function () {
@@ -302,6 +310,9 @@ var scenePanel = {
         this.initSceneView();
 
         Editor.sendToAll('scene:ready');
+
+        var EngineEvents = Editor.require('packages://scene/panel/scene-view/engine-events');
+        EngineEvents.load();
 
         console.timeEnd('scene:reloading');
     },
