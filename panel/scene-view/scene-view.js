@@ -119,6 +119,10 @@ Editor.registerElement({
     _resize: function () {
         // need init when panel has size, or canvas and resolution size will be zero
         if (!this._inited) {
+            // should not init if bounding rect is zero
+            var bcr = this.getBoundingClientRect();
+            if (bcr.width === 0 && bcr.height === 0) return;
+
             this.init();
             this._inited  = true;
         }
