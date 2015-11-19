@@ -303,6 +303,8 @@ var scenePanel = {
         var h = this.profiles.local.designHeight;
 
         this.$.sceneView.setDesignSize( w, h );
+
+        cc.engine.emit('design-resolution-changed');
     },
 
     '_onSceneReady': function () {
