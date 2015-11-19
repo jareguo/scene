@@ -498,4 +498,64 @@ module.exports = {
 
     'selection:changed': function ( type ) {
     },
+
+    'scene:animation-state-changed': function (info) {
+        var node = cc.engine.getInstanceById(info.nodeId);
+        var comp = node.getComponent(cc.AnimationComponent);
+        var aniState = comp.getAnimationState(info.clip);
+
+        var state = info.state;
+        var clipName = info.clip
+
+        if (state === 'play') {
+            comp.play(clipName);
+            cc.engine.animatingInEditMode = true;
+        }
+        else if (state === 'pause') {
+            comp.pause(clipName);
+            cc.engine.animatingInEditMode = false;
+        }
+        else if (state === 'stop') {
+            comp.stop(clipName);
+            cc.engine.animatingInEditMode = false;
+        }
+    },
+
+    'scene:query-animation-time': function (sessionID, info) {
+        var node = cc.engine.getInstanceById(info.nodeId);
+        var comp = node.getComponent(cc.AnimationComponent);
+        var aniState = comp.getAnimationState(info.clip);
+
+        Editor.sendToWindows( 'scene:reply-animation-time', sessionID, {
+            clip: info.clip,
+            time: aniState.time
+        });
+    },
+
+    'scene:animation-time-changed': function (info) {
+        var node = cc.engine.getInstanceById(info.nodeId);
+        var comp = node.getComponent(cc.AnimationComponent);
+        var aniState = comp.getAnimationState(info.clip);
+
+        var clipName = info.clip;
+
+        if (!aniState.isPlaying) {
+            comp.play(clipName);
+            comp.pause(clipName);
+        }
+
+        comp.setCurrentTime(info.time, clipName);
+        comp.sample();
+    },
+
+    'scene:animation-clip-changed': function (info) {
+        var node = cc.engine.getInstanceById(info.nodeId);
+        var comp = node.getComponent(cc.AnimationComponent);
+
+        var details = new cc.deserialize.Details();
+        var clip = cc.deserialize(info.data, details);
+
+        comp._updateClip(clip);
+    }
+
 };

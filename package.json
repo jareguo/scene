@@ -65,7 +65,12 @@
         "selection:hoverin",
         "selection:hoverout",
         "selection:changed",
-        "selection:context"
+        "selection:context",
+
+        "scene:animation-state-changed",
+        "scene:query-animation-time",
+        "scene:animation-time-changed",
+        "scene:animation-clip-changed"
       ],
       "profiles": {
         "local": {
