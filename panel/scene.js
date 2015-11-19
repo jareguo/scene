@@ -14,7 +14,9 @@ var scenePanel = {
         'drop-area-accept': '_onDropAreaAccept',
 
         'scene:ready': '_onSceneReady',
-        'scene:init-error': '_onSceneInitError'
+        'scene:init-error': '_onSceneInitError',
+
+        'panel-show': '_resize'
     },
 
     properties: {
