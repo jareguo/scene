@@ -67,6 +67,7 @@
         "selection:changed",
         "selection:context",
 
+        "scene:query-animation-node",
         "scene:animation-state-changed",
         "scene:query-animation-time",
         "scene:animation-time-changed",
