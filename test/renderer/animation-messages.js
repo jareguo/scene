@@ -35,7 +35,7 @@ describe('scene messages', function () {
     }
 
 
-    describe(messages[0], function () {
+    describe('scene:animation-state-changed', function () {
         var handler;
         before(function () {
             init();
@@ -82,7 +82,7 @@ describe('scene messages', function () {
         });
     });
 
-    describe(messages[1], function () {
+    describe('scene:query-animation-time', function () {
         var Ipc = require('ipc');
 
         before(init);
@@ -107,7 +107,7 @@ describe('scene messages', function () {
         });
     });
 
-    describe(messages[2], function () {
+    describe('scene:animation-time-changed', function () {
         before(init);
 
         it('should change time when \'scene:animation-time-changed\' emit', function () {
@@ -128,7 +128,7 @@ describe('scene messages', function () {
     });
 
 
-    describe(messages[3], function () {
+    describe('scene:animation-clip-changed', function () {
         before(function () {
             init();
             animation.play(clip.name, 0.4);
