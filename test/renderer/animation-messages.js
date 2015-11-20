@@ -9,8 +9,6 @@ describe('scene messages', function () {
         'scene:animation-clip-changed'
     ];
 
-    Helper.runGame(100,100);
-
     var node,
         animation,
         state,
