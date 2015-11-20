@@ -1,5 +1,4 @@
 Editor.require('app://editor/test-utils/renderer/init');
-var Helper = Editor.require('app://editor/test-utils/renderer/helper');
 var IpcHandler = Editor.require('app://builtin/scene/panel/scene-ipc-handler');
 
 describe('scene messages', function () {
@@ -10,9 +9,7 @@ describe('scene messages', function () {
         'scene:animation-clip-changed'
     ];
 
-    before(function (done) {
-        Helper.initGame(100,100, done);
-    });
+    Helper.runGame(100,100);
 
     var node,
         animation,
