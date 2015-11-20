@@ -13,8 +13,8 @@ var scenePanel = {
         'drop-area-leave': '_onDropAreaLeave',
         'drop-area-accept': '_onDropAreaAccept',
 
-        'scene:ready': '_onSceneReady',
-        'scene:init-error': '_onSceneInitError',
+        'scene-view-ready': '_onSceneViewReady',
+        'scene-view-init-error': '_onSceneViewInitError',
 
         'panel-show': '_resize'
     },
@@ -307,7 +307,7 @@ var scenePanel = {
         cc.engine.emit('design-resolution-changed');
     },
 
-    '_onSceneReady': function () {
+    '_onSceneViewReady': function () {
         this._viewReady = true;
         this.$.loader.hidden = true;
 
@@ -321,7 +321,7 @@ var scenePanel = {
         console.timeEnd('scene:reloading');
     },
 
-    '_onSceneInitError': function (event) {
+    '_onSceneViewInitError': function (event) {
         err = event.args[0];
         Editor.failed('Failed to init scene: %s', err.stack);
 
