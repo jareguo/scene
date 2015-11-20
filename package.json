@@ -6,6 +6,11 @@
   "hosts": {
     "editor-framework": "^0.3.15"
   },
+  "pkgDependencies": {
+    "ui-kit": "^0.1.0",
+    "fire-gizmos": "^0.1.0",
+    "ui-grid": "^0.1.0"
+  },
   "main": "main.js",
   "menus": {
     "Panel/Scene": {
@@ -65,7 +70,13 @@
         "selection:hoverin",
         "selection:hoverout",
         "selection:changed",
-        "selection:context"
+        "selection:context",
+
+        "scene:query-animation-node",
+        "scene:animation-state-changed",
+        "scene:query-animation-time",
+        "scene:animation-time-changed",
+        "scene:animation-clip-changed"
       ],
       "profiles": {
         "local": {

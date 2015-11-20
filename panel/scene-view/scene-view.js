@@ -180,10 +180,10 @@ Editor.registerElement({
         cc.engine.init(initOptions, function () {
             Editor.initScene(function (err) {
                 if (err) {
-                    self.fire('scene:init-error', err);
+                    self.fire('scene-view-init-error', err);
                 }
                 else {
-                    self.fire('scene:ready');
+                    self.fire('scene-view-ready');
                     self._resize();
                 }
             });
@@ -208,7 +208,7 @@ Editor.registerElement({
         cc.engine.repaintInEditMode();
 
         Editor.remote.currentSceneUuid = null;
-        this.fire('scene:ready');
+        this.fire('scene-view-ready');
     },
 
     loadScene: function ( uuid ) {
@@ -219,11 +219,11 @@ Editor.registerElement({
             cc.engine.repaintInEditMode();
 
             if (err) {
-                this.fire('scene:init-error', err);
+                this.fire('scene-view-init-error', err);
             }
             else {
                 Editor.remote.currentSceneUuid = uuid;
-                this.fire('scene:ready');
+                this.fire('scene-view-ready');
             }
         }.bind(this));
     },
