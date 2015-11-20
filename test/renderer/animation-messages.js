@@ -1,6 +1,8 @@
 Editor.require('app://editor/test-utils/renderer/init');
 var IpcHandler = Editor.require('app://builtin/scene/panel/scene-ipc-handler');
 
+Helper.runGame();
+
 describe('scene messages', function () {
     var messages = [
         'scene:animation-state-changed',
