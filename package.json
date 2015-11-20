@@ -6,6 +6,11 @@
   "hosts": {
     "editor-framework": "^0.3.15"
   },
+  "pkgDependencies": {
+    "ui-kit": "^0.1.0",
+    "fire-gizmos": "^0.1.0",
+    "ui-grid": "^0.1.0"
+  },
   "main": "main.js",
   "menus": {
     "Panel/Scene": {

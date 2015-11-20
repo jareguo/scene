@@ -4,19 +4,14 @@ var IpcHandler = Editor.require('app://builtin/scene/panel/scene-ipc-handler');
 Helper.runGame();
 
 describe('scene messages', function () {
-    var messages = [
-        'scene:animation-state-changed',
-        'scene:query-animation-time',
-        'scene:animation-time-changed',
-        'scene:animation-clip-changed'
-    ];
+    Helper.runPanel( 'scene.panel' );
 
     var node,
         animation,
         state,
         clip;
 
-    function init () {
+    beforeEach(function () {
         node = new cc.ENode();
         animation = node.addComponent(cc.AnimationComponent);
 
@@ -34,21 +29,15 @@ describe('scene messages', function () {
         state = animation.getAnimationState(clip.name);
 
         cc.engine.attachedObjsForEditor[node.uuid] = node;
-    }
+    });
 
 
     describe('scene:animation-state-changed', function () {
-        var handler;
-        before(function () {
-            init();
-            handler = IpcHandler[ messages[0] ];
-        });
-
         it('should play animation if origin state is \'stop\' and current state is \'play\'', function () {
             expect(state.isPlaying).to.be.false;
             expect(state.isPaused).to.be.false;
 
-            handler({
+            Helper.recv('scene:animation-state-changed', {
                 nodeId: node.uuid,
                 clip: clip.name,
                 state: 'play'
@@ -58,10 +47,12 @@ describe('scene messages', function () {
         });
 
         it('should pause animation if current state is \'pause\'', function () {
+            animation.play(clip.name);
+
             expect(state.isPlaying).to.be.true;
             expect(state.isPaused).to.be.false;
 
-            handler({
+            Helper.recv('scene:animation-state-changed', {
                 nodeId: node.uuid,
                 clip: clip.name,
                 state: 'pause'
@@ -71,10 +62,13 @@ describe('scene messages', function () {
         });
 
         it('should play animation if origin state is \'pause\' and current state is \'play\'', function () {
+            animation.play(clip.name);
+            animation.pause(clip.name);
+
             expect(state.isPlaying).to.be.true;
             expect(state.isPaused).to.be.true;
 
-            handler({
+            Helper.recv('scene:animation-state-changed', {
                 nodeId: node.uuid,
                 clip: clip.name,
                 state: 'play'
@@ -85,40 +79,32 @@ describe('scene messages', function () {
     });
 
     describe('scene:query-animation-time', function () {
-        var Ipc = require('ipc');
-
-        before(init);
-
         it('should get current time from message \'scene:reply-animation-time\'', function (done) {
             state.setTime(1.5);
 
-            Ipc.on(messages[1], function () {
-                var handler = IpcHandler[messages[1]];
-                handler.apply(this, arguments);
-            });
+            Helper.spyChannels( 'sendToWindows', [
+                'scene:reply-animation-time'
+            ]);
 
-            Editor.sendToWindows(messages[1], 0, {
+            Helper.recv('scene:query-animation-time', 0, {
                 nodeId: node.uuid,
                 clip: clip.name
             });
 
-            Ipc.on('scene:reply-animation-time', function (sessionID, info) {
-                expect(info.time).to.equal(1.5);
+            setTimeout(() => {
+                assert( Helper.sendToWindows.calledWith('scene:reply-animation-time', 0, {clip: clip.name, time: 1.5}) );
                 done();
-            });
+            }, 10);
         });
     });
 
     describe('scene:animation-time-changed', function () {
-        before(init);
-
         it('should change time when \'scene:animation-time-changed\' emit', function () {
-            var handler = IpcHandler[ messages[2] ];
 
             expect(state.time).to.equal(0);
             expect(node.x).to.equal(0);
 
-            handler({
+            Helper.recv('scene:animation-time-changed', {
                 nodeId: node.uuid,
                 clip: clip.name,
                 time: 0.2
@@ -129,15 +115,9 @@ describe('scene messages', function () {
         });
     });
 
-
     describe('scene:animation-clip-changed', function () {
-        before(function () {
-            init();
-            animation.play(clip.name, 0.4);
-        });
-
         it('should change and apply clip when \'scene:animation-clip-changed\' emit', function () {
-            var handler = IpcHandler[ messages[3] ];
+            animation.play(clip.name, 0.4);
 
             var newClip = Helper.newAnimClip('test', 2, {
                 props: {
@@ -151,7 +131,7 @@ describe('scene messages', function () {
 
             expect(node.x).to.equal(0);
 
-            handler({
+            Helper.recv('scene:animation-clip-changed', {
                 nodeId: node.uuid,
                 clip: clip.name,
                 data: newClip.serialize()
