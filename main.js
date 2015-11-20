@@ -1,13 +1,17 @@
+'use strict';
+
 var Fs = require('fire-fs');
-var Path = require('fire-path');
-var Url = require('fire-url');
 
 function _updateTitile () {
     var url = Editor.assetdb.uuidToUrl(Editor.currentSceneUuid);
     if ( !url ) {
         url = 'Untitled';
     }
-    Editor.mainWindow.nativeWin.setTitle( 'Fireball Editor - ' + url );
+    var isDirty = Editor.Undo.dirty();
+    var dirtyMark = isDirty ? '*' : '';
+    Editor.mainWindow.nativeWin.setTitle(
+      `Fireball Editor - ${url}${dirtyMark}`
+    );
 }
 
 module.exports = {
@@ -139,5 +143,10 @@ module.exports = {
             url: url,
             type: metaObj.assetType(),
         });
-    }
+    },
+
+    'undo:changed': function () {
+        _updateTitile();
+    },
+
 };
