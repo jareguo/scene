@@ -190,7 +190,11 @@ module.exports = {
             parentNode = cc.director.getScene();
         }
 
-        Editor.Selection.clear('node');
+        Editor.Selection.unselect(
+          'node',
+          Editor.Selection.curSelection('node'),
+          false
+        );
 
         //
         Async.each( uuids, function ( uuid, done ) {
@@ -222,11 +226,17 @@ module.exports = {
                 }
 
                 if ( nodeID ) {
-                    Editor.Selection.select('node', nodeID, false, true );
+                    Editor.Selection.select('node', nodeID, false, false );
                 }
                 cc.engine.repaintInEditMode();
                 done();
             });
+        }, function ( err ) {
+          if ( err ) {
+            Editor.Selection.cancel();
+            return;
+          }
+          Editor.Selection.confirm();
         });
     },
 
