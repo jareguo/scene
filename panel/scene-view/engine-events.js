@@ -47,6 +47,14 @@ function onPostUpdate( event ) {
 }
 
 
+function onDesignResolutionChanged () {
+    var scenePanel = document.getElementById('scene.panel');
+
+    var size = cc.engine.getDesignResolutionSize();
+    scenePanel.set('profiles.local.designWidth', size.width);
+    scenePanel.set('profiles.local.designHeight', size.height);
+}
+
 
 module.exports = {
     isLoaded: false,
@@ -58,6 +66,7 @@ module.exports = {
         cc.engine.on('post-update', onPostUpdate);
         cc.engine.on('node-attach-to-scene', onAttachToScene);
         cc.engine.on('node-detach-from-scene', onDetachFromScene);
+        cc.engine.on('design-resolution-changed', onDesignResolutionChanged);
     },
 
     unload: function () {
@@ -66,5 +75,6 @@ module.exports = {
         cc.engine.off('post-update', onPostUpdate);
         cc.engine.off('node-attach-to-scene', onAttachToScene);
         cc.engine.off('node-detach-from-scene', onDetachFromScene);
+        cc.engine.off('design-resolution-changed', onDesignResolutionChanged);
     }
 };

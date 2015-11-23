@@ -596,7 +596,7 @@ Editor.registerElement({
 
     setDesignSize: function (w, h) {
         this.$.gizmosView.designSize = [w, h];
-        // cc.engine.setDesignResolutionSize(w, h);
+        cc.engine.setDesignResolutionSize(w, h);
         cc.engine.repaintInEditMode();
     },
 });
