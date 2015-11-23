@@ -88,6 +88,20 @@ Editor.registerElement({
         this.$.grid.setAnchor( 0.5, 0.5 );
     },
 
+    attached: function () {
+        // this.async(() => {
+        //     this.lightDomReady();
+        // });
+
+        requestAnimationFrame(() => {
+            this.lightDomReady();
+        });
+    },
+
+    lightDomReady: function  () {
+        this._resize();
+    },
+
     init: function () {
         this._initEngine();
 

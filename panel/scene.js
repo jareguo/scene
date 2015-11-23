@@ -16,7 +16,8 @@ var scenePanel = {
         'scene-view-ready': '_onSceneViewReady',
         'scene-view-init-error': '_onSceneViewInitError',
 
-        'panel-show': '_resize'
+        'panel-show': '_onPanelResize',
+        'resize': '_onPanelResize'
     },
 
     properties: {
@@ -79,19 +80,7 @@ var scenePanel = {
             // }
         }.bind(this));
 
-        // debounce resize event
-        var self = this;
-        var _resizeDebounceID = null;
-        this.addEventListener('resize', function ( event ) {
-            // debounce write for 10ms
-            if ( _resizeDebounceID ) {
-                return;
-            }
-            _resizeDebounceID = setTimeout(function () {
-                _resizeDebounceID = null;
-                self._resize();
-            }, 10);
-        });
+        this._resizeDebounceID = null;
 
         var Ipc = require('ipc');
         Ipc.on('panel:undock', this._onUndock.bind(this));
@@ -102,8 +91,16 @@ var scenePanel = {
         EngineEvents.unregister();
     },
 
-    _resize: function () {
-        this.$.sceneView._resize();
+    _onPanelResize: function () {
+        // debounce write for 10ms
+        if ( this._resizeDebounceID ) {
+            return;
+        }
+
+        this._resizeDebounceID = setTimeout(() => {
+            this._resizeDebounceID = null;
+            this.$.sceneView._resize();
+        }, 10);
     },
 
     reload: function () {
