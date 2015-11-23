@@ -1,10 +1,12 @@
+var _sceneView;
+
 function onAttachToScene ( event ) {
     var node = event.detail.target;
     var className = cc.js.getClassName(node);
 
     var gizmoDef = Editor.gizmos[className];
     if ( gizmoDef ) {
-        node.gizmo = new gizmoDef( sceneView.$.gizmosView, node );
+        node.gizmo = new gizmoDef( _sceneView.$.gizmosView, node );
         node.gizmo.update();
     }
 
@@ -40,7 +42,7 @@ var _updateGizmos = function (node) {
 };
 
 function onPostUpdate( event ) {
-    sceneView.$.gizmosView.update();
+    _sceneView.$.gizmosView.update();
 
     var wrapper = cc.director.getScene();
     wrapper._children.forEach(_updateGizmos);
@@ -48,20 +50,20 @@ function onPostUpdate( event ) {
 
 
 function onDesignResolutionChanged () {
-    var scenePanel = document.getElementById('scene.panel');
-
     var size = cc.engine.getDesignResolutionSize();
-    scenePanel.set('profiles.local.designWidth', size.width);
-    scenePanel.set('profiles.local.designHeight', size.height);
+
+    _sceneView.designWidth = size.width;
+    _sceneView.designHeight = size.height;
 }
 
 
 module.exports = {
     isLoaded: false,
 
-    load: function () {
+    register: function ( sceneView ) {
         if (this.isLoaded) return;
         this.isLoaded = true;
+        _sceneView = sceneView;
 
         cc.engine.on('post-update', onPostUpdate);
         cc.engine.on('node-attach-to-scene', onAttachToScene);
@@ -69,7 +71,7 @@ module.exports = {
         cc.engine.on('design-resolution-changed', onDesignResolutionChanged);
     },
 
-    unload: function () {
+    unregister: function () {
         this.isLoaded = false;
 
         cc.engine.off('post-update', onPostUpdate);

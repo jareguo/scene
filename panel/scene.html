@@ -56,7 +56,13 @@
         </editor-toolbar>
         <div class="wrapper flex-1">
             <div class="border fit">
-                <scene-view tabindex="-1" id="sceneView"></scene-view>
+                <scene-view tabindex="-1" id="sceneView"
+                    transform-tool="{{transformTool}}"
+                    coordinate="{{coordinate}}"
+                    pivot="{{pivot}}"
+                    design-width="{{profiles.local.designWidth}}"
+                    design-height="{{profiles.local.designHeight}}"
+                ></scene-view>
 
                 <editor-loader id="loader" mask text="Loading"></editor-loader>
                 <div id="dropArea" class="fit" hidden
