@@ -16,26 +16,24 @@ var scenePanel = {
         'scene-view-ready': '_onSceneViewReady',
         'scene-view-init-error': '_onSceneViewInitError',
 
-        'panel-show': '_resize'
+        'panel-show': '_onPanelResize',
+        'resize': '_onPanelResize'
     },
 
     properties: {
         transformTool: {
             type: String,
             value: 'move',
-            observer: '_transformToolChanged',
         },
 
         coordinate: {
             type: String,
             value: 'local',
-            observer: '_coordinateChanged',
         },
 
         pivot: {
             type: String,
             value: 'pivot',
-            observer: '_pivotChanged',
         },
     },
 
@@ -82,19 +80,7 @@ var scenePanel = {
             // }
         }.bind(this));
 
-        // debounce resize event
-        var self = this;
-        var _resizeDebounceID = null;
-        this.addEventListener('resize', function ( event ) {
-            // debounce write for 10ms
-            if ( _resizeDebounceID ) {
-                return;
-            }
-            _resizeDebounceID = setTimeout(function () {
-                _resizeDebounceID = null;
-                self._resize();
-            }, 10);
-        });
+        this._resizeDebounceID = null;
 
         var Ipc = require('ipc');
         Ipc.on('panel:undock', this._onUndock.bind(this));
@@ -102,11 +88,19 @@ var scenePanel = {
 
     _onUndock: function () {
         var EngineEvents = Editor.require('packages://scene/panel/scene-view/engine-events');
-        EngineEvents.unload();
+        EngineEvents.unregister();
     },
 
-    _resize: function () {
-        this.$.sceneView._resize();
+    _onPanelResize: function () {
+        // debounce write for 10ms
+        if ( this._resizeDebounceID ) {
+            return;
+        }
+
+        this._resizeDebounceID = setTimeout(() => {
+            this._resizeDebounceID = null;
+            this.$.sceneView._resize();
+        }, 10);
     },
 
     reload: function () {
@@ -115,6 +109,7 @@ var scenePanel = {
         // }
     },
 
+    // menu messages
     selectMove: function ( event ) {
         if ( event ) {
             event.stopPropagation();
@@ -194,18 +189,6 @@ var scenePanel = {
         return 2;
     },
 
-    // view events
-
-    initSceneView: function () {
-        this.$.sceneView.initSettings({
-            transformTool: this.transformTool,
-            coordinate: this.coordinate,
-            pivot: this.pivot,
-            designWidth: this.profiles.local.designWidth,
-            designHeight: this.profiles.local.designHeight,
-        });
-    },
-
     // drag & drop
 
     _onDropAreaEnter: function ( event ) {
@@ -278,48 +261,26 @@ var scenePanel = {
     },
 
     // value changes
-
-    _transformToolChanged: function () {
-        this.$.sceneView.setTransformTool( this.transformTool );
-        cc.engine.repaintInEditMode();
-    },
-
-    _coordinateChanged: function () {
-        this.$.sceneView.setCoordinate( this.coordinate );
-        cc.engine.repaintInEditMode();
-    },
-
-    _pivotChanged: function () {
-        this.$.sceneView.setPivot( this.pivot );
-        cc.engine.repaintInEditMode();
-    },
-
-    _designSizeChanged: function () {
+    _designSizeChanged: function (event) {
         if ( this.profiles.local.save ) {
             this.profiles.local.save();
         }
-
-        var w = this.profiles.local.designWidth;
-        var h = this.profiles.local.designHeight;
-
-        this.$.sceneView.setDesignSize( w, h );
     },
 
-    '_onSceneViewReady': function () {
+    // view events
+    _onSceneViewReady: function () {
         this._viewReady = true;
         this.$.loader.hidden = true;
-
-        this.initSceneView();
 
         Editor.sendToAll('scene:ready');
 
         var EngineEvents = Editor.require('packages://scene/panel/scene-view/engine-events');
-        EngineEvents.load();
+        EngineEvents.register(this.$.sceneView);
 
         console.timeEnd('scene:reloading');
     },
 
-    '_onSceneViewInitError': function (event) {
+    _onSceneViewInitError: function (event) {
         err = event.args[0];
         Editor.failed('Failed to init scene: %s', err.stack);
 

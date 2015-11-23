@@ -35,6 +35,41 @@ Editor.registerElement({
             type: Number,
             value: 1.0,
         },
+
+        transformTool: {
+            type: String,
+            value: 'move',
+            notify: true,
+            observer: 'setTransformTool',
+        },
+
+        coordinate: {
+            type: String,
+            value: 'local',
+            notify: true,
+            observer: 'setCoordinate',
+        },
+
+        pivot: {
+            type: String,
+            value: 'pivot',
+            notify: true,
+            observer: 'setPivot',
+        },
+
+        designWidth: {
+            type: Number,
+            value: 0,
+            notify: true,
+            observer: '_designSizeChanged',
+        },
+
+        designHeight: {
+            type: Number,
+            value: 0,
+            notify: true,
+            observer: '_designSizeChanged',
+        }
     },
 
     ready: function () {
@@ -51,6 +86,20 @@ Editor.registerElement({
         this.$.grid.setMappingV( mappingV[0], mappingV[1], mappingV[2] );
 
         this.$.grid.setAnchor( 0.5, 0.5 );
+    },
+
+    attached: function () {
+        // this.async(() => {
+        //     this.lightDomReady();
+        // });
+
+        requestAnimationFrame(() => {
+            this.lightDomReady();
+        });
+    },
+
+    lightDomReady: function  () {
+        this._resize();
     },
 
     init: function () {
@@ -108,14 +157,6 @@ Editor.registerElement({
         cc.engine.repaintInEditMode();
     },
 
-    initSettings: function (settings) {
-        this.$.gizmosView.transformTool = settings.transformTool;
-        this.$.gizmosView.coordinate = settings.coordinate;
-        this.$.gizmosView.pivot = settings.pivot;
-        this.$.gizmosView.designSize = [settings.designWidth, settings.designHeight];
-        cc.engine.setDesignResolutionSize(settings.designWidth, settings.designHeight);
-    },
-
     _resize: function () {
         // need init when panel has size, or canvas and resolution size will be zero
         if (!this._inited) {
@@ -124,7 +165,7 @@ Editor.registerElement({
             if (bcr.width === 0 && bcr.height === 0) return;
 
             this.init();
-            this._inited  = true;
+            this._designSizeChanged();
         }
 
         if ( cc.engine.isPlaying || !cc.view) {
@@ -580,25 +621,34 @@ Editor.registerElement({
     },
 
     setTransformTool: function (transformTool) {
-        this.$.gizmosView.transformTool = transformTool;
+        this.$.gizmosView.transformTool = transformTool || this.transformTool;
         cc.engine.repaintInEditMode();
     },
 
     setCoordinate: function (coordinate) {
-        this.$.gizmosView.coordinate = coordinate;
+        this.$.gizmosView.coordinate = coordinate || this.coordinate;
         cc.engine.repaintInEditMode();
     },
 
     setPivot: function (pivot) {
-        this.$.gizmosView.pivot = pivot;
+        this.$.gizmosView.pivot = pivot || this.pivot;
         cc.engine.repaintInEditMode();
     },
 
-    setDesignSize: function (w, h) {
+    _designSizeChanged: function () {
+        if (!this._inited) return;
+
+        var w = this.designWidth;
+        var h = this.designHeight;
+
         this.$.gizmosView.designSize = [w, h];
-        cc.engine.setDesignResolutionSize(w, h);
-        cc.engine.repaintInEditMode();
-    },
+
+        var size = cc.engine.getDesignResolutionSize();
+        if (size.width !== w || size.height !== h) {
+            cc.engine.setDesignResolutionSize(w, h);
+            cc.engine.repaintInEditMode();
+        }
+    }
 });
 
 })();
