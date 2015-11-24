@@ -299,7 +299,7 @@ var EditorEngine = cc.Class({
         deepQueryChildren(scene, function (child) {
             if (testNodeWithSize(child, child.getContentSize())) {
                 list.push(child);
-                return;
+                return true;
             }
 
             var components = child._components;
