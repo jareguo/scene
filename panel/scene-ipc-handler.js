@@ -306,7 +306,9 @@ module.exports = {
                     node.worldPosition = worldPos;
                     node.worldRotation = worldRotation;
                     if (parent) {
-                        node.scale = lossyScale.divSelf(parent.worldScale);
+                        lossyScale.x /= parent.worldScale.x;
+                        lossyScale.y /= parent.worldScale.y;
+                        node.scale = lossyScale;
                     }
                     else {
                         node.scale = lossyScale;

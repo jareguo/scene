@@ -278,26 +278,39 @@ var EditorEngine = cc.Class({
             traversal(root, cb);
         }
 
+        function testNodeWithSize (node, size) {
+            if (size.width === 0 || size.height === 0) return false;
+
+            var bounds = node.getWorldBounds(size);
+
+            // if intersect aabb success, then try intersect obb
+            if (rect.intersects(bounds)) {
+                bounds = node.getWorldOrientedBounds(size);
+                var polygon = new Editor.Polygon(bounds);
+
+                if (Editor.Intersection.rectPolygon(rect, polygon)) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         deepQueryChildren(scene, function (child) {
+            if (testNodeWithSize(child, child.getContentSize())) {
+                list.push(child);
+                return;
+            }
+
             var components = child._components;
 
             for (var i = 0, l = components.length; i < l; i++) {
                 var component = components[i];
                 var size = component.localSize;
 
-                if (size.width === 0 || size.height === 0) continue;
-
-                var bounds = child.getWorldBounds(size);
-
-                // if intersect aabb success, then try intersect obb
-                if (rect.intersects(bounds)) {
-                    bounds = child.getWorldOrientedBounds(size);
-                    var polygon = new Editor.Polygon(bounds);
-
-                    if (Editor.Intersection.rectPolygon(rect, polygon)) {
-                        list.push(child);
-                        break;
-                    }
+                if (testNodeWithSize(child, size)) {
+                    list.push(child);
+                    break;
                 }
             }
 
