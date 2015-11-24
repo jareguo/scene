@@ -32,10 +32,12 @@
         "e": "selectRotate",
         "r": "selectScale",
         "t": "selectRect",
-        "command+backspace": "deleteCurrentSelected",
-        "del": "deleteCurrentSelected",
-        "command+d": "duplicateCurrentSelected",
-        "ctrl+d": "duplicateCurrentSelected"
+        "#sceneView" : {
+          "command+backspace": "deleteCurrentSelected",
+          "del": "deleteCurrentSelected",
+          "command+d": "duplicateCurrentSelected",
+          "ctrl+d": "duplicateCurrentSelected"
+        }
       },
       "messages": [
         "editor:dragstart",
