@@ -38,12 +38,13 @@ module.exports = {
     'scene:save-scene': function (url, json) {
         var fspath = Editor.assetdb._fspath(url);
         if ( Fs.existsSync(fspath) ) {
-            Editor.assetdb.save( url, json, function ( err, meta ) {
+            Editor.assetdb.save( url, json, function ( err, result ) {
                 if ( err ) {
                     Editor.assetdb.error('Failed to save scene %s', url, err.stack);
                     return;
                 }
 
+                var meta = result.meta;
                 Editor.currentSceneUuid = meta.uuid;
                 _updateTitile();
 
