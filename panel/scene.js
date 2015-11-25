@@ -275,7 +275,10 @@ var scenePanel = {
         Editor.sendToAll('scene:ready');
 
         var EngineEvents = Editor.require('packages://scene/panel/scene-view/engine-events');
+        var SceneManager = Editor.require('packages://scene/panel/scene-view/scene-manager');
+
         EngineEvents.register(this.$.sceneView);
+        SceneManager.init(this.$.sceneView);
 
         console.timeEnd('scene:reloading');
     },
