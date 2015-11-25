@@ -558,6 +558,8 @@ module.exports = {
 
         comp.setCurrentTime(info.time, clipName);
         comp.sample();
+
+        cc.engine.repaintInEditMode();
     },
 
     'scene:animation-clip-changed': function (info) {
@@ -568,6 +570,8 @@ module.exports = {
         var clip = cc.deserialize(info.data, details);
 
         comp._updateClip(clip);
+
+        cc.engine.repaintInEditMode();
     }
 
 };

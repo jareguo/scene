@@ -1,13 +1,15 @@
 var Async = require('async');
 var sandbox = require('./sandbox');
 
+var _sceneView;
+
 function enterEditMode ( stashedScene, next ) {
     if ( stashedScene ) {
         // restore selection
         Editor.Selection.select('node', stashedScene.sceneSelection, true, true);
 
         // restore scene view
-        window.sceneView.init(stashedScene.sceneOffsetX,
+        _sceneView.initPosition(stashedScene.sceneOffsetX,
                               stashedScene.sceneOffsetY,
                               stashedScene.sceneScale );
     }
@@ -19,7 +21,7 @@ function createScene (sceneJson, next) {
     //var MissingBehavior = require('./missing-behavior');
 
     // reset scene view
-    window.sceneView.reset();
+    _sceneView.reset();
 
     cc.AssetLibrary.loadJson(sceneJson, next);
 }
@@ -50,14 +52,14 @@ Editor.initScene = function (callback) {
                 var currentSceneUuid = Editor.remote.currentSceneUuid;
                 if ( currentSceneUuid ) {
                     cc.director._loadSceneByUuid(currentSceneUuid, function ( err ) {
-                        window.sceneView.adjustToCenter(10);
+                        _sceneView.adjustToCenter(10);
                         cc.engine.repaintInEditMode();
                         next ( err, null );
                     });
                     return;
                 }
 
-                window.sceneView.adjustToCenter(10);
+                _sceneView.adjustToCenter(10);
                 next( null, null );
             },
             enterEditMode,
@@ -73,12 +75,12 @@ Editor.stashScene = function (callback) {
     // store the scene, scene-view postion, scene-view scale
     Editor.remote.stashedScene = {
         sceneJson: jsonText,
-        sceneScale: window.sceneView.scale,
-        sceneOffsetX: window.sceneView.$.grid.xAxisOffset,
-        sceneOffsetY: window.sceneView.$.grid.yAxisOffset,
+        sceneScale: _sceneView.scale,
+        sceneOffsetX: _sceneView.$.grid.xAxisOffset,
+        sceneOffsetY: _sceneView.$.grid.yAxisOffset,
         sceneSelection: Editor.Selection.curSelection('node'),
-        designWidth: window.sceneView.$.gizmosView.designSize[0],
-        designHeight: window.sceneView.$.gizmosView.designSize[1],
+        designWidth: _sceneView.$.gizmosView.designSize[0],
+        designHeight: _sceneView.$.gizmosView.designSize[1],
     };
 
     if ( callback ) {
@@ -122,8 +124,8 @@ Editor.playScene = function (callback) {
                 Editor.Selection.select('node', selection, true, true);
 
                 //
-                window.sceneView.$.grid.hidden = true;
-                window.sceneView.$.gizmosView.hidden = true;
+                _sceneView.$.grid.hidden = true;
+                _sceneView.$.gizmosView.hidden = true;
 
                 //if (this.$.pause.active) {
                 //    cc.engine.step();
@@ -140,4 +142,10 @@ Editor.playScene = function (callback) {
 Editor.softReload = function (compiled) {
     // hot update new compiled scripts
     sandbox.reload(compiled);
+};
+
+module.exports = {
+    init: function (sceneView) {
+        _sceneView = sceneView;
+    }
 };
