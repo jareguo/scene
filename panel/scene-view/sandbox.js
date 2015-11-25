@@ -42,6 +42,8 @@ function reset () {
 }
 
 var sandbox = {
+    reset: reset,
+
     reload: function (compiled) {
         this.compiled = compiled;
         Editor.stashScene(function (err, json) {
