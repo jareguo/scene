@@ -397,10 +397,11 @@ module.exports = {
         Editor.softReload(compiled);
     },
 
-    'scene:create-prefab': function ( id, url ) {
+    'scene:create-prefab': function ( id, baseUrl ) {
         var node = cc.engine.getInstanceById(id);
         var prefab = Editor.PrefabUtils.createPrefabFrom(node);
         var json = Editor.serialize(prefab);
+        var Url = require('fire-url');
         var url = Url.join(baseUrl, node.name + '.prefab');
 
         Editor.sendRequestToCore('scene:create-prefab', url, json, function (err, uuid) {
