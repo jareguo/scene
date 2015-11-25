@@ -200,7 +200,9 @@ Editor.registerElement({
             cc.AssetLibrary.init(importUrl, assetUrl);
         }
         else {
+            // 从外部窗口 attach 回到主窗口时需要重置所有 engine 相关状态
             cc.engine.reset();
+            Editor.Sandbox.reset();
         }
 
         // init engine
