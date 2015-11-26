@@ -230,13 +230,13 @@
             var Async = require('async');
 
             Editor.Selection.clear('node');
-            Async.each( uuids, function ( uuid, done ) {
+            Async.each( uuids, ( uuid, done ) => {
                 Async.waterfall([
-                    function ( next ) {
+                    next => {
                         Editor.createNode(uuid, next);
                     },
 
-                    function ( node, next ) {
+                    ( node, next ) => {
                         var nodeID;
                         if ( node ) {
                             nodeID = node.uuid;
@@ -245,10 +245,13 @@
                             node.parent = cc.director.getScene();
                         }
 
+                        this.undo.recordCreatedNode(nodeID);
+                        this.undo.commit();
+
                         next ( null, nodeID );
                     },
 
-                ], function ( err, nodeID ) {
+                ], ( err, nodeID ) => {
                     if ( err ) {
                         Editor.failed( 'Failed to drop asset %s, message: %s', uuid, err.stack || err.errorMessage );
                         return;
@@ -499,13 +502,13 @@
             );
 
             //
-            Async.each( uuids, function ( uuid, done ) {
+            Async.each( uuids, ( uuid, done ) => {
                 Async.waterfall([
-                    function ( next ) {
+                    next => {
                         Editor.createNode(uuid, next);
                     },
 
-                    function ( node, next ) {
+                    ( node, next ) => {
                         var nodeID;
                         if ( node ) {
                             nodeID = node.uuid;
@@ -516,12 +519,14 @@
                             var centerX = cc.game.canvas.width / 2;
                             var centerY = cc.game.canvas.height / 2;
                             node.scenePosition = self.$.sceneView.pixelToScene( cc.v2(centerX, centerY) );
+
+                            this.undo.recordCreatedNode(nodeID);
                         }
 
                         next ( null, nodeID );
                     }
 
-                ], function ( err, nodeID ) {
+                ], ( err, nodeID ) => {
                     if ( err ) {
                         Editor.failed( 'Failed to drop asset %s, message: %s', uuid, err.stack || err.errorMessage );
                         return;
@@ -533,7 +538,9 @@
                     cc.engine.repaintInEditMode();
                     done();
                 });
-            }, function ( err ) {
+            }, err => {
+                this.undo.commit();
+
                 if ( err ) {
                     Editor.Selection.cancel();
                     return;

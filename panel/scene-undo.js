@@ -2,6 +2,12 @@
 
 const Record = Editor.require('app://editor/share/engine-extends/record-object');
 
+/**
+ * info = {
+ *   before: [{id, data}],
+ *   after: [{id, data}],
+ * }
+ */
 class RecordObjectsCommand extends Editor.Undo.Command {
     undo () {
         let nodeIDs = [];
@@ -52,20 +58,63 @@ class RecordObjectsCommand extends Editor.Undo.Command {
     }
 }
 
-let _needFlushRecords = false;
+/**
+ * info = {
+ *   list: [{node, parent}]
+ * }
+ */
+class CreateObjectsCommand extends Editor.Undo.Command {
+    undo () {
+        let nodeIDs = [];
+        this.info.list.forEach(info => {
+            info.node.parent = null;
+            nodeIDs.push(info.node.uuid);
+        });
+        Editor.Selection.unselect('node', nodeIDs);
+    }
+
+    redo () {
+        let nodeIDs = [];
+        this.info.list.forEach(info => {
+            info.node.parent = info.parent;
+            nodeIDs.push(info.node.uuid);
+        });
+        Editor.Selection.select('node', nodeIDs);
+    }
+}
+
+let _currentCreatedRecords = [];
 let _currentRecords = [];
 let _undo = Editor.Undo.local();
 
 let SceneUndo = {
     init () {
         _undo.register( 'record-objects', RecordObjectsCommand );
+        _undo.register( 'create-objects', CreateObjectsCommand );
+
+        _currentCreatedRecords = [];
         _currentRecords = [];
-        _needFlushRecords = false;
+    },
+
+    recordCreatedNode ( id, desc ) {
+        if ( desc ) {
+            _undo.setCurrentDescription(desc);
+        }
+
+        // only record object if it has not recorded yet
+        let exists = _currentCreatedRecords.some( info => {
+            return info.node.id === id;
+        });
+        if ( !exists ) {
+            let node = cc.engine.getInstanceById(id);
+            _currentCreatedRecords.push({
+                node: node,
+                parent: node.parent,
+            });
+        }
     },
 
     recordObject ( id, desc ) {
-        _needFlushRecords = true;
-
         if ( desc ) {
             _undo.setCurrentDescription(desc);
         }
@@ -86,8 +135,17 @@ let SceneUndo = {
     },
 
     commit () {
+        // flush created records
+        if ( _currentCreatedRecords.length ) {
+            _undo.add('create-objects', {
+                list: _currentCreatedRecords
+            });
+
+            _currentCreatedRecords = [];
+        }
+
         // flush records
-        if ( _needFlushRecords ) {
+        if ( _currentRecords.length ) {
             let beforeList = _currentRecords;
             let afterList = _currentRecords.map( info => {
                 let obj = cc.engine.getInstanceById(info.id);
@@ -103,7 +161,6 @@ let SceneUndo = {
             });
 
             _currentRecords = [];
-            _needFlushRecords = false;
         }
 
         //
