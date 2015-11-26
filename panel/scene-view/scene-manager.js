@@ -115,8 +115,8 @@ Editor.playScene = function (callback) {
             });
 
             // reset scene camera
-            scene.position = cc.Vec2.zero;
-            scene.scale = cc.Vec2.one;
+            scene.position = cc.Vec2.ZERO;
+            scene.scale = cc.Vec2.ONE;
 
             // play new scene
             cc.director.runScene(scene, function () {

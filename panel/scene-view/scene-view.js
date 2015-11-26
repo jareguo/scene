@@ -243,6 +243,9 @@ Editor.registerElement({
 
     newScene: function () {
         var scene = new cc.EScene();
+        var canvas = new cc.ENode();
+        canvas.parent = scene;
+        canvas.addComponent(cc.Canvas);
 
         this.reset();
         cc.director.runScene(scene);
