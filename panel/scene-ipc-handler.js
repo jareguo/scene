@@ -524,7 +524,7 @@ module.exports = {
             comp.play(clipName);
             cc.engine.animatingInEditMode = true;
         }
-        else if (state === 'pause') {
+        else if (state === 'pause' && comp.isPlaying) {
             comp.pause(clipName);
             cc.engine.animatingInEditMode = false;
         }
