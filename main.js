@@ -7,6 +7,8 @@ function _updateTitile () {
     if ( !url ) {
         url = 'Untitled';
     }
+
+    // TODO
     var isDirty = Editor.Undo.dirty();
     var dirtyMark = isDirty ? '*' : '';
     Editor.mainWindow.nativeWin.setTitle(

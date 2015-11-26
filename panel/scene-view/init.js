@@ -1,4 +1,6 @@
 (function () {
+    'use strict';
+
     // init scene manager
     require('./scene-manager');
 
