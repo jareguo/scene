@@ -75,13 +75,15 @@ module.exports = {
     'scene:create-prefab': function (replyUuid, url, json) {
         var fsPath = Editor.assetdb._fspath(url);
         if ( Fs.existsSync(fsPath) ) {
-            Editor.assetdb.save( url, json, function ( err, meta ) {
+            Editor.assetdb.save( url, json, function ( err, result ) {
                 if ( err ) {
                     Editor.assetdb.error('Failed to save prefab %s, messages: %s',
                         url, err.stack);
                     replyUuid( err );
                     return;
                 }
+
+                var meta = result.meta;
                 replyUuid( null, meta.uuid );
                 Editor.sendToAll( 'asset-db:asset-changed', {
                     type: meta.assetType(),
@@ -105,14 +107,15 @@ module.exports = {
 
     'scene:apply-prefab': function (uuid, json) {
         var url = Editor.assetdb.uuidToUrl(uuid);
-        Editor.assetdb.save( url, json, function ( err, meta ) {
+        Editor.assetdb.save( url, json, function ( err, result ) {
             if ( err ) {
                 Editor.assetdb.error('Failed to apply prefab %s, messages: %s',
                     url, err.stack);
                 //replyUuid( err );
                 return;
             }
-            //replyUuid( null, meta.uuid );
+
+            var meta = result.meta;
             Editor.sendToAll( 'asset-db:asset-changed', {
                 type: meta.assetType(),
                 uuid: meta.uuid,
