@@ -567,12 +567,15 @@ module.exports = {
         var node = cc.engine.getInstanceById(info.nodeId);
         var comp = node.getComponent(cc.AnimationComponent);
 
-        var details = new cc.deserialize.Details();
-        var clip = cc.deserialize(info.data, details);
+        cc.AssetLibrary.loadJson(info.data, function (err, clip) {
+            if (err) {
+                Editor.error(err);
+                return;
+            }
 
-        comp._updateClip(clip);
-
-        cc.engine.repaintInEditMode();
+            comp._updateClip(clip);
+            cc.engine.repaintInEditMode();
+        });
     }
 
 };
