@@ -65,6 +65,11 @@
         "scene:apply-prefab",
         "scene:revert-prefab",
 
+        "scene:undo",
+        "scene:redo",
+        "scene:undo-record",
+        "scene:undo-commit",
+
         "selection:selected",
         "selection:unselected",
         "selection:activated",
