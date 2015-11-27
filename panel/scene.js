@@ -246,7 +246,7 @@
                             node.parent = cc.director.getScene();
                         }
 
-                        this.undo.recordCreatedNode(nodeID);
+                        this.undo.recordCreateNode(nodeID);
                         this.undo.commit();
 
                         next ( null, nodeID );
@@ -521,7 +521,7 @@
                             var centerY = cc.game.canvas.height / 2;
                             node.scenePosition = self.$.sceneView.pixelToScene( cc.v2(centerX, centerY) );
 
-                            this.undo.recordCreatedNode(nodeID);
+                            this.undo.recordCreateNode(nodeID);
                         }
 
                         next ( null, nodeID );
@@ -604,6 +604,8 @@
                 var id = ids[i];
                 var node = cc.engine.getInstanceById(id);
                 if (node && (!parent || !parent.isChildOf(node))) {
+                    this.undo.recordMoveNode(id);
+
                     if (node.parent !== parent) {
                         // keep world transform not changed
                         var worldPos = node.worldPosition;
@@ -651,6 +653,8 @@
                     }
                 }
             }
+
+            this.undo.commit();
         },
 
         'scene:delete-nodes': function ( ids ) {

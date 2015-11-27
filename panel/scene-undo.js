@@ -11,9 +11,10 @@ const Record = Editor.require('app://editor/share/engine-extends/record-object')
 class RecordObjectsCommand extends Editor.Undo.Command {
     undo () {
         let nodeIDs = [];
-
-        this.info.before.forEach(objInfo => {
+        for ( let i = this.info.before.length-1; i >= 0; --i ) {
+            let objInfo = this.info.before[i];
             let obj = cc.engine.getInstanceById(objInfo.id);
+
             Record.RestoreObject( obj, objInfo.data );
 
             //
@@ -30,14 +31,15 @@ class RecordObjectsCommand extends Editor.Undo.Command {
             }
 
             Editor.Selection.select( 'node', nodeIDs );
-        });
+        }
     }
 
     redo () {
         let nodeIDs = [];
-
-        this.info.after.forEach(objInfo => {
+        for ( let i = 0; i < this.info.after.length; ++i ) {
+            let objInfo = this.info.after[i];
             let obj = cc.engine.getInstanceById(objInfo.id);
+
             Record.RestoreObject( obj, objInfo.data );
 
             //
@@ -54,57 +56,120 @@ class RecordObjectsCommand extends Editor.Undo.Command {
             }
 
             Editor.Selection.select( 'node', nodeIDs );
-        });
+        }
     }
 }
 
 /**
  * info = {
- *   list: [{node, parent}]
+ *   list: [{node, parent, siblingIndex}]
  * }
  */
-class CreateObjectsCommand extends Editor.Undo.Command {
+class CreateNodesCommand extends Editor.Undo.Command {
     undo () {
         let nodeIDs = [];
-        this.info.list.forEach(info => {
+        for ( let i = this.info.list.length-1; i >= 0; --i ) {
+            let info = this.info.list[i];
+
             info.node.parent = null;
             nodeIDs.push(info.node.uuid);
-        });
+        }
         Editor.Selection.unselect('node', nodeIDs);
     }
 
     redo () {
         let nodeIDs = [];
-        this.info.list.forEach(info => {
+        for ( let i = 0; i < this.info.list.length; ++i ) {
+            let info = this.info.list[i];
+
             info.node.parent = info.parent;
+            info.node.setSiblingIndex(info.siblingIndex);
             nodeIDs.push(info.node.uuid);
-        });
+        }
         Editor.Selection.select('node', nodeIDs);
     }
 }
 
 /**
  * info = {
- *   list: [{node, parent}]
+ *   list: [{node, parent, siblingIndex}]
  * }
  */
-class DeleteObjectsCommand extends Editor.Undo.Command {
+class DeleteNodesCommand extends Editor.Undo.Command {
     undo () {
         let nodeIDs = [];
-        this.info.list.forEach(info => {
+        for ( let i = this.info.list.length-1; i >= 0; --i ) {
+            let info = this.info.list[i];
+
             info.node.parent = info.parent;
+            info.node.setSiblingIndex(info.siblingIndex);
             nodeIDs.push(info.node.uuid);
-        });
+        }
         Editor.Selection.select('node', nodeIDs);
     }
 
     redo () {
         let nodeIDs = [];
-        this.info.list.forEach(info => {
+        for ( let i = 0; i < this.info.list.length; ++i ) {
+            let info = this.info.list[i];
+
             info.node.parent = null;
             nodeIDs.push(info.node.uuid);
-        });
+        }
         Editor.Selection.unselect('node', nodeIDs);
+    }
+}
+
+/**
+ * info = {
+ *   list: [{node, parent, siblingIndex}]
+ * }
+ */
+class MoveNodesCommand extends Editor.Undo.Command {
+    static moveNode ( node, parent, siblingIndex ) {
+        if (node.parent !== parent) {
+            // keep world transform not changed
+            var worldPos = node.worldPosition;
+            var worldRotation = node.worldRotation;
+            var lossyScale = node.worldScale;
+
+            node.parent = parent;
+
+            // restore world transform
+            node.worldPosition = worldPos;
+            node.worldRotation = worldRotation;
+            if (parent) {
+                lossyScale.x /= parent.worldScale.x;
+                lossyScale.y /= parent.worldScale.y;
+                node.scale = lossyScale;
+            } else {
+                node.scale = lossyScale;
+            }
+        }
+
+        node.setSiblingIndex(siblingIndex);
+    }
+
+    undo () {
+        let nodeIDs = [];
+        for ( let i = this.info.before.length-1; i >= 0; --i ) {
+            let info = this.info.before[i];
+
+            MoveNodesCommand.moveNode(info.node, info.parent, info.siblingIndex);
+            nodeIDs.push(info.node.uuid);
+        }
+        Editor.Selection.select('node', nodeIDs);
+    }
+
+    redo () {
+        let nodeIDs = [];
+        for ( let i = 0; i < this.info.after.length; ++i ) {
+            let info = this.info.after[i];
+
+            MoveNodesCommand.moveNode(info.node, info.parent, info.siblingIndex);
+            nodeIDs.push(info.node.uuid);
+        }
+        Editor.Selection.select('node', nodeIDs);
     }
 }
 
@@ -114,17 +179,21 @@ class DeleteObjectsCommand extends Editor.Undo.Command {
 
 let _currentCreatedRecords = [];
 let _currentDeletedRecords = [];
-let _currentRecords = [];
+let _currentMovedRecords = [];
+let _currentObjectRecords = [];
 let _undo = Editor.Undo.local();
 
 let SceneUndo = {
     init () {
         _undo.register( 'record-objects', RecordObjectsCommand );
-        _undo.register( 'create-objects', CreateObjectsCommand );
-        _undo.register( 'delete-objects', DeleteObjectsCommand );
+        _undo.register( 'create-nodes', CreateNodesCommand );
+        _undo.register( 'delete-nodes', DeleteNodesCommand );
+        _undo.register( 'move-nodes', MoveNodesCommand );
 
         _currentCreatedRecords = [];
-        _currentRecords = [];
+        _currentDeletedRecords = [];
+        _currentMovedRecords = [];
+        _currentObjectRecords = [];
     },
 
     recordObject ( id, desc ) {
@@ -133,52 +202,73 @@ let SceneUndo = {
         }
 
         // only record object if it has not recorded yet
-        let exists = _currentRecords.some( info => {
-            return info.id === id;
+        let exists = _currentObjectRecords.some( record => {
+            return record.id === id;
         });
         if ( !exists ) {
             let obj = cc.engine.getInstanceById(id);
             let data = Record.RecordObject(obj);
 
-            _currentRecords.push({
+            _currentObjectRecords.push({
                 id: id,
                 data: data,
             });
         }
     },
 
-    recordCreatedNode ( id, desc ) {
+    recordCreateNode ( id, desc ) {
         if ( desc ) {
             _undo.setCurrentDescription(desc);
         }
 
         // only record object if it has not recorded yet
-        let exists = _currentCreatedRecords.some(info => {
-            return info.node.id === id;
+        let exists = _currentCreatedRecords.some(record => {
+            return record.node.id === id;
         });
         if ( !exists ) {
             let node = cc.engine.getInstanceById(id);
             _currentCreatedRecords.push({
                 node: node,
                 parent: node.parent,
+                siblingIndex: node.getSiblingIndex(),
             });
         }
     },
 
-    recordDeletedNode ( id, desc ) {
+    recordDeleteNode ( id, desc ) {
         if ( desc ) {
             _undo.setCurrentDescription(desc);
         }
 
         // only record object if it has not recorded yet
-        let exists = _currentDeletedRecords.some(info => {
-            return info.node.id === id;
+        let exists = _currentDeletedRecords.some(record => {
+            return record.node.id === id;
         });
         if ( !exists ) {
             let node = cc.engine.getInstanceById(id);
             _currentDeletedRecords.push({
                 node: node,
                 parent: node.parent,
+                siblingIndex: node.getSiblingIndex(),
+            });
+        }
+    },
+
+    recordMoveNode ( id, desc ) {
+        if ( desc ) {
+            _undo.setCurrentDescription(desc);
+        }
+
+        // only record object if it has not recorded yet
+        let exists = _currentMovedRecords.some(record => {
+            return record.node.id === id;
+        });
+        if ( !exists ) {
+            let node = cc.engine.getInstanceById(id);
+            _currentMovedRecords.push({
+                node: node,
+                parent: node.parent,
+                siblingIndex: node.getSiblingIndex(),
             });
         }
     },
@@ -186,7 +276,7 @@ let SceneUndo = {
     commit () {
         // flush created records
         if ( _currentCreatedRecords.length ) {
-            _undo.add('create-objects', {
+            _undo.add('create-nodes', {
                 list: _currentCreatedRecords
             });
 
@@ -194,12 +284,12 @@ let SceneUndo = {
         }
 
         // flush records
-        if ( _currentRecords.length ) {
-            let beforeList = _currentRecords;
-            let afterList = _currentRecords.map( info => {
-                let obj = cc.engine.getInstanceById(info.id);
+        if ( _currentObjectRecords.length ) {
+            let beforeList = _currentObjectRecords;
+            let afterList = _currentObjectRecords.map( record => {
+                let obj = cc.engine.getInstanceById(record.id);
                 return {
-                    id: info.id,
+                    id: record.id,
                     data: Record.RecordObject(obj),
                 };
             });
@@ -209,7 +299,26 @@ let SceneUndo = {
                 after: afterList,
             });
 
-            _currentRecords = [];
+            _currentObjectRecords = [];
+        }
+
+        // flush move records
+        if ( _currentMovedRecords.length ) {
+            let beforeList = _currentMovedRecords;
+            let afterList = _currentMovedRecords.map( record => {
+                return {
+                    node: record.node,
+                    parent: record.node.parent,
+                    siblingIndex: record.node.getSiblingIndex(),
+                };
+            });
+
+            _undo.add('move-nodes', {
+                before: beforeList,
+                after: afterList,
+            });
+
+            _currentMovedRecords = [];
         }
 
         // flush deleted records

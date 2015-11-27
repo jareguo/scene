@@ -389,7 +389,7 @@ Editor.registerElement({
         for (var i = 0; i < ids.length; i++) {
             var id = ids[i];
             var node = cc.engine.getInstanceById(id);
-            this.undo.recordDeletedNode(id);
+            this.undo.recordDeleteNode(id);
 
             if (node) {
                 node.destroy();
