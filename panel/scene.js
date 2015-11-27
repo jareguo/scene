@@ -448,7 +448,7 @@
             }
         },
 
-        'scene:component-add': function ( id, compId ) {
+        'scene:add-component': function ( id, compId ) {
             if (compId) {
                 var isScript = Editor.isUuid(compId);
                 if (isScript) {
@@ -477,7 +477,7 @@
             }
         },
 
-        'scene:component-remove': function ( id, uuid ) {
+        'scene:remove-component': function ( id, uuid ) {
             var comp = cc.engine.getInstanceById(uuid);
             if (comp) {
                 comp.destroy();
