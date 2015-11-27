@@ -100,6 +100,7 @@
             SceneUndo.init();
 
             this.undo = SceneUndo;
+            this.$.sceneView.undo = SceneUndo;
             this.$.sceneView.$.gizmosView.undo = SceneUndo;
         },
 
