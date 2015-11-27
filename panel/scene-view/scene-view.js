@@ -1,5 +1,6 @@
 (function () {
-var Ipc = require('ipc');
+'use strict';
+
 var Path = require('fire-path');
 //var Url = require('fire-url');
 
@@ -93,7 +94,7 @@ Editor.registerElement({
         //     this.lightDomReady();
         // });
 
-        requestAnimationFrame(() => {
+        window.requestAnimationFrame(() => {
             this.lightDomReady();
         });
     },
@@ -158,10 +159,12 @@ Editor.registerElement({
     },
 
     _resize: function () {
+        var bcr;
+
         // need init when panel has size, or canvas and resolution size will be zero
         if (!this._inited) {
             // should not init if bounding rect is zero
-            var bcr = this.getBoundingClientRect();
+            bcr = this.getBoundingClientRect();
             if (bcr.width === 0 && bcr.height === 0) return;
 
             this.init();
@@ -180,7 +183,7 @@ Editor.registerElement({
         this.$.gizmosView.resize();
 
         // resize engine
-        var bcr = this.getBoundingClientRect();
+        bcr = this.getBoundingClientRect();
         cc.view.setCanvasSize(bcr.width, bcr.height);
         cc.view.setDesignResolutionSize(bcr.width, bcr.height);
 
@@ -386,10 +389,13 @@ Editor.registerElement({
         for (var i = 0; i < ids.length; i++) {
             var id = ids[i];
             var node = cc.engine.getInstanceById(id);
+            this.undo.recordDeletedNode(id);
+
             if (node) {
                 node.destroy();
             }
         }
+        this.undo.commit();
         Editor.Selection.unselect('node', ids, true);
     },
 
