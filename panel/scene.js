@@ -454,22 +454,24 @@
                 if (isScript) {
                     compId = Editor.compressUuid(compId);
                 }
-                var Comp = cc.js._getClassById(compId);
-                if (!Comp) {
+                var compCtor = cc.js._getClassById(compId);
+                if (!compCtor) {
                     if (isScript) {
-                        return Editor.error('Can not find cc.Component in the script "%s".', compId);
+                        return Editor.error(`Can not find cc.Component in the script ${compId}.`);
                     }
                     else {
-                        return Editor.error('Failed to get component "%s".', compId);
+                        return Editor.error(`Failed to get component ${compId}`);
                     }
                 }
                 //
+                var comp;
                 var node = cc.engine.getInstanceById(id);
                 if (node) {
-                    node.addComponent(Comp);
-                }
-                else {
-                    Editor.error('Can not find node ' + id);
+                    comp = node.addComponent(compCtor);
+                    this.undo.recordAddComponent( id, comp, node._components.indexOf(comp) );
+                    this.undo.commit();
+                } else {
+                    Editor.error( `Can not find node ${id}` );
                 }
             }
             else {
@@ -480,6 +482,10 @@
         'scene:remove-component': function ( id, uuid ) {
             var comp = cc.engine.getInstanceById(uuid);
             if (comp) {
+                var node = cc.engine.getInstanceById(id);
+                this.undo.recordRemoveComponent( id, comp, node._components.indexOf(comp) );
+                this.undo.commit();
+
                 comp.destroy();
             }
         },
@@ -763,6 +769,10 @@
 
         'scene:undo-commit': function () {
             this.undo.commit();
+        },
+
+        'scene:undo-cancel': function () {
+            this.undo.cancel();
         },
 
         'selection:selected': function ( type, ids ) {

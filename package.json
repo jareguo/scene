@@ -69,6 +69,7 @@
         "scene:redo",
         "scene:undo-record",
         "scene:undo-commit",
+        "scene:undo-cancel",
 
         "selection:selected",
         "selection:unselected",

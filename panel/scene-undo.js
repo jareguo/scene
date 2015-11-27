@@ -174,6 +174,38 @@ class MoveNodesCommand extends Editor.Undo.Command {
 }
 
 /**
+ * info = {
+ *   list: [{id, comp, index}]
+ * }
+ */
+class AddComponentCommand extends Editor.Undo.Command {
+    undo () {
+        // this.info.comp.destroy();
+    }
+
+    redo () {
+        // var node = cc.engine.getInstanceById(this.info.id);
+        // node._addComponent(this.info.comp);
+    }
+}
+
+/**
+ * info = {
+ *   list: [{id, comp, index}]
+ * }
+ */
+class RemoveComponentCommand extends Editor.Undo.Command {
+    undo () {
+        // var node = cc.engine.getInstanceById(this.info.id);
+        // node._addComponent(this.info.comp);
+    }
+
+    redo () {
+        // this.info.comp.destroy();
+    }
+}
+
+/**
  * SceneUndo
  */
 
@@ -189,6 +221,8 @@ let SceneUndo = {
         _undo.register( 'create-nodes', CreateNodesCommand );
         _undo.register( 'delete-nodes', DeleteNodesCommand );
         _undo.register( 'move-nodes', MoveNodesCommand );
+        _undo.register( 'add-component', AddComponentCommand );
+        _undo.register( 'remove-component', RemoveComponentCommand );
 
         _currentCreatedRecords = [];
         _currentDeletedRecords = [];
@@ -273,6 +307,30 @@ let SceneUndo = {
         }
     },
 
+    recordAddComponent ( id, comp, index, desc ) {
+        if ( desc ) {
+            _undo.setCurrentDescription(desc);
+        }
+
+        _undo.add('add-component', {
+            id: id,
+            comp: comp,
+            index: index,
+        });
+    },
+
+    recordRemoveComponent ( id, comp, index, desc ) {
+        if ( desc ) {
+            _undo.setCurrentDescription(desc);
+        }
+
+        _undo.add('remove-component', {
+            id: id,
+            comp: comp,
+            index: index,
+        });
+    },
+
     commit () {
         // flush created records
         if ( _currentCreatedRecords.length ) {
@@ -323,7 +381,7 @@ let SceneUndo = {
 
         // flush deleted records
         if ( _currentDeletedRecords.length ) {
-            _undo.add('delete-objects', {
+            _undo.add('delete-nodes', {
                 list: _currentDeletedRecords
             });
 
@@ -332,6 +390,16 @@ let SceneUndo = {
 
         //
         _undo.commit();
+    },
+
+    cancel () {
+        _currentCreatedRecords = [];
+        _currentDeletedRecords = [];
+        _currentMovedRecords = [];
+        _currentObjectRecords = [];
+
+        //
+        _undo.cancel();
     },
 
     undo () {
