@@ -69,6 +69,11 @@ module.exports = {
         let url = Editor.assetdb.uuidToUrl(Editor.currentSceneUuid);
         if ( !url ) {
             url = _showSaveDialog();
+
+            // we've cancel the save
+            if ( !url ) {
+                return;
+            }
         }
 
         let fspath = Editor.assetdb._fspath(url);
