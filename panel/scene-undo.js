@@ -230,6 +230,15 @@ let SceneUndo = {
         _currentObjectRecords = [];
     },
 
+    clear () {
+        _currentCreatedRecords = [];
+        _currentDeletedRecords = [];
+        _currentMovedRecords = [];
+        _currentObjectRecords = [];
+
+        _undo.clear();
+    },
+
     recordObject ( id, desc ) {
         if ( desc ) {
             _undo.setCurrentDescription(desc);
@@ -410,6 +419,18 @@ let SceneUndo = {
     redo () {
         _undo.redo();
         cc.engine.repaintInEditMode();
+    },
+
+    save () {
+        _undo.save();
+    },
+
+    dirty () {
+        return _undo.dirty();
+    },
+
+    on () {
+        _undo.on.apply( _undo, arguments );
     },
 };
 
