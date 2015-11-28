@@ -616,6 +616,9 @@
                     Editor.error('Unknown node to create:', classID);
                 }
             }
+
+            this.undo.recordCreateNode(node.uuid);
+            this.undo.commit();
         },
 
         'scene:move-nodes': function ( ids, parentID, nextSiblingId ) {
