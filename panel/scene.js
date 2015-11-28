@@ -55,58 +55,63 @@
         },
 
         ready: function () {
-            this._initDroppable(this.$.dropArea);
-
             // beforeunload event
             window.addEventListener('beforeunload', event => {
-                Editor.Selection.clear('node');
+                let res = this.confirmCloseScene();
+                switch ( res ) {
+                // save
+                case 0:
+                    this._saveScene();
+                    Editor.Selection.clear('node');
+                    event.returnValue = true;
+                    return;
 
-                // TODO
-                // var res = this.confirmCloseScene();
-                // switch ( res ) {
-                // // save
-                // case 0:
-                //     this.saveCurrentScene();
-                //     event.returnValue = true;
-                //     return;
+                // cancel
+                case 1:
+                    event.returnValue = false;
+                    return;
 
-                // // cancel
-                // case 1:
-                //     event.returnValue = false;
-                //     return;
-
-                // // don't save
-                // case 2:
-                //     event.returnValue = true;
-                //     return;
-                // }
+                // don't save
+                case 2:
+                    Editor.Selection.clear('node');
+                    event.returnValue = true;
+                    return;
+                }
             });
 
-            this.initModules();
+            // init droppable
+            this._initDroppable(this.$.dropArea);
 
-            this._resizeDebounceID = null;
-
-            var Ipc = require('ipc');
-            Ipc.on('panel:undock', this._onUndock.bind(this));
-        },
-
-        initModules: function () {
+            // init scene manager
             const SceneManager = Editor.require('packages://scene/panel/scene-view/scene-manager');
-            const EngineEvents = Editor.require('packages://scene/panel/scene-view/engine-events');
-            const SceneUndo = Editor.require('packages://scene/panel/scene-undo');
-
             SceneManager.init(this.$.sceneView);
-            EngineEvents.register(this.$.sceneView);
-            SceneUndo.init();
 
+            // register engine events
+            const EngineEvents = Editor.require('packages://scene/panel/scene-view/engine-events');
+            EngineEvents.register(this.$.sceneView);
+
+            // init undo
+            const SceneUndo = Editor.require('packages://scene/panel/scene-undo');
+            SceneUndo.init();
+            SceneUndo.on('changed', () => {
+                Editor.sendToCore('scene:update-title', this.undo.dirty());
+            });
             this.undo = SceneUndo;
             this.$.sceneView.undo = SceneUndo;
             this.$.sceneView.$.gizmosView.undo = SceneUndo;
-        },
 
-        _onUndock: function () {
-            var EngineEvents = Editor.require('packages://scene/panel/scene-view/engine-events');
-            EngineEvents.unregister();
+            this._resizeDebounceID = null;
+
+            // A VERY HACK SOLUTION
+            // TODO: add panel-close event
+            var Ipc = require('ipc');
+            Ipc.on('panel:undock', (panelID) => {
+                if ( panelID !== 'scene.panel' ) {
+                    return;
+                }
+
+                EngineEvents.unregister();
+            });
         },
 
         _onPanelResize: function () {
@@ -179,10 +184,8 @@
         },
 
         confirmCloseScene: function () {
-            var dirty = true;
+            var dirty = this.undo.dirty();
             if ( dirty ) {
-                var Url = require('fire-url');
-
                 var name = 'New Scene';
                 var url = 'assets://New Scene.fire';
                 var currentSceneUuid = Editor.remote.currentSceneUuid;
@@ -282,7 +285,7 @@
         },
 
         // value changes
-        _designSizeChanged: function (event) {
+        _designSizeChanged: function () {
             if ( this.profiles.local.save ) {
                 this.profiles.local.save();
             }
@@ -292,6 +295,7 @@
         _onSceneViewReady: function () {
             this._viewReady = true;
             this.$.loader.hidden = true;
+            this.undo.clear();
 
             Editor.sendToAll('scene:ready');
 
@@ -305,14 +309,51 @@
             this.$.loader.hidden = true;
         },
 
-        'panel:run': function ( argv ) {
-            if ( !argv || !argv.uuid )
-                return;
+        _saveScene: function ( cb ) {
+            var sceneAsset = new cc.SceneAsset();
+            sceneAsset.scene = cc.director.getScene();
 
+            // NOTE: we stash scene because we want to save and reload the connected browser
+            Editor.stashScene(function () {
+                // reload connected browser
+                Editor.sendToCore('app:reload-on-device');
+                Editor.sendToCore('scene:save-scene', Editor.serialize(sceneAsset));
+
+                if ( cb ) {
+                    cb ();
+                }
+            });
+        },
+
+        _loadScene ( uuid ) {
             this.$.loader.hidden = false;
             Editor.sendToAll('scene:reloading');
+            this.$.sceneView.loadScene(uuid);
+        },
 
-            this.$.sceneView.loadScene(argv.uuid);
+        'panel:run': function ( argv ) {
+            if ( !argv || !argv.uuid ) {
+                return;
+            }
+
+            let res = this.confirmCloseScene();
+            switch ( res ) {
+                // save
+                case 0:
+                this._saveScene(() => {
+                    this._loadScene(argv.uuid);
+                });
+                return;
+
+                // cancel
+                case 1:
+                return;
+
+                // don't save
+                case 2:
+                this._loadScene(argv.uuid);
+                return;
+            }
         },
 
         'editor:dragstart': function () {
@@ -333,20 +374,6 @@
             this.$.loader.hidden = false;
             Editor.sendToAll('scene:reloading');
             this.$.sceneView.newScene();
-        },
-
-        'scene:save-scene-from-page': function ( url ) {
-            var sceneAsset = new cc.SceneAsset();
-            sceneAsset.scene = cc.director.getScene();
-
-            // NOTE: we stash scene because we want to save and reload the connected browser
-            Editor.stashScene(function () {
-                // reload connected browser
-                Editor.sendToCore('app:reload-on-device');
-
-                //
-                Editor.sendToCore( 'scene:save-scene', url, Editor.serialize(sceneAsset) );
-            });
         },
 
         'scene:play-on-device': function () {
@@ -755,6 +782,14 @@
             Editor.PrefabUtils.revertPrefab(node);
         },
 
+        'scene:stash-and-save': function () {
+            this._saveScene();
+        },
+
+        'scene:saved': function () {
+            this.undo.save();
+        },
+
         'scene:undo': function () {
             this.undo.undo();
         },
@@ -773,6 +808,74 @@
 
         'scene:undo-cancel': function () {
             this.undo.cancel();
+        },
+
+        'scene:animation-state-changed': function (info) {
+            var node = cc.engine.getInstanceById(info.nodeId);
+            var comp = node.getComponent(cc.AnimationComponent);
+            // var aniState = comp.getAnimationState(info.clip);
+
+            var state = info.state;
+            var clipName = info.clip;
+
+            if (state === 'play') {
+                comp.play(clipName);
+                cc.engine.animatingInEditMode = true;
+            }
+            else if (state === 'pause') {
+                if (comp.isPlaying) {
+                    comp.pause(clipName);
+                }
+                cc.engine.animatingInEditMode = false;
+            }
+            else if (state === 'stop') {
+                comp.stop(clipName);
+                cc.engine.animatingInEditMode = false;
+            }
+        },
+
+        'scene:query-animation-time': function (sessionID, info) {
+            var node = cc.engine.getInstanceById(info.nodeId);
+            var comp = node.getComponent(cc.AnimationComponent);
+            var aniState = comp.getAnimationState(info.clip);
+
+            Editor.sendToWindows( 'scene:reply-animation-time', sessionID, {
+                clip: info.clip,
+                time: aniState.time
+            });
+        },
+
+        'scene:animation-time-changed': function (info) {
+            var node = cc.engine.getInstanceById(info.nodeId);
+            var comp = node.getComponent(cc.AnimationComponent);
+            var aniState = comp.getAnimationState(info.clip);
+
+            var clipName = info.clip;
+
+            if (!aniState.isPlaying) {
+                comp.play(clipName);
+                comp.pause(clipName);
+            }
+
+            comp.setCurrentTime(info.time, clipName);
+            comp.sample();
+
+            cc.engine.repaintInEditMode();
+        },
+
+        'scene:animation-clip-changed': function (info) {
+            var node = cc.engine.getInstanceById(info.nodeId);
+            var comp = node.getComponent(cc.AnimationComponent);
+
+            cc.AssetLibrary.loadJson(info.data, function (err, clip) {
+                if (err) {
+                    Editor.error(err);
+                    return;
+                }
+
+                comp._updateClip(clip);
+                cc.engine.repaintInEditMode();
+            });
         },
 
         'selection:selected': function ( type, ids ) {
@@ -844,79 +947,5 @@
             }
             this.$.sceneView.hoverout(id);
         },
-
-        'selection:context': function ( type, id ) {
-        },
-
-        'selection:changed': function ( type ) {
-        },
-
-        'scene:animation-state-changed': function (info) {
-            var node = cc.engine.getInstanceById(info.nodeId);
-            var comp = node.getComponent(cc.AnimationComponent);
-            // var aniState = comp.getAnimationState(info.clip);
-
-            var state = info.state;
-            var clipName = info.clip;
-
-            if (state === 'play') {
-                comp.play(clipName);
-                cc.engine.animatingInEditMode = true;
-            }
-            else if (state === 'pause') {
-                if (comp.isPlaying) {
-                    comp.pause(clipName);
-                }
-                cc.engine.animatingInEditMode = false;
-            }
-            else if (state === 'stop') {
-                comp.stop(clipName);
-                cc.engine.animatingInEditMode = false;
-            }
-        },
-
-        'scene:query-animation-time': function (sessionID, info) {
-            var node = cc.engine.getInstanceById(info.nodeId);
-            var comp = node.getComponent(cc.AnimationComponent);
-            var aniState = comp.getAnimationState(info.clip);
-
-            Editor.sendToWindows( 'scene:reply-animation-time', sessionID, {
-                clip: info.clip,
-                time: aniState.time
-            });
-        },
-
-        'scene:animation-time-changed': function (info) {
-            var node = cc.engine.getInstanceById(info.nodeId);
-            var comp = node.getComponent(cc.AnimationComponent);
-            var aniState = comp.getAnimationState(info.clip);
-
-            var clipName = info.clip;
-
-            if (!aniState.isPlaying) {
-                comp.play(clipName);
-                comp.pause(clipName);
-            }
-
-            comp.setCurrentTime(info.time, clipName);
-            comp.sample();
-
-            cc.engine.repaintInEditMode();
-        },
-
-        'scene:animation-clip-changed': function (info) {
-            var node = cc.engine.getInstanceById(info.nodeId);
-            var comp = node.getComponent(cc.AnimationComponent);
-
-            cc.AssetLibrary.loadJson(info.data, function (err, clip) {
-                if (err) {
-                    Editor.error(err);
-                    return;
-                }
-
-                comp._updateClip(clip);
-                cc.engine.repaintInEditMode();
-            });
-        }
     });
 })();

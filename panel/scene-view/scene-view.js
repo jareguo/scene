@@ -234,14 +234,6 @@ Editor.registerElement({
                 }
             });
         });
-
-        // beforeunload event
-        window.addEventListener('beforeunload', function ( event ) {
-            Editor.Selection.clear('node');
-            if ( cc.engine.isPlaying ) {
-                cc.engine.stop();
-            }
-        });
     },
 
     newScene: function () {
