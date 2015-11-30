@@ -839,9 +839,12 @@
             var comp = node.getComponent(cc.AnimationComponent);
             var aniState = comp.getAnimationState(info.clip);
 
+            var wrappedInfo = aniState.getWrappedInfo(aniState.time);
+
             Editor.sendToWindows( 'scene:reply-animation-time', sessionID, {
                 clip: info.clip,
-                time: aniState.time
+                time: wrappedInfo.time,
+                isPlaying: aniState.isPlaying
             });
         },
 
