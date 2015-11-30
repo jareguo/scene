@@ -101,6 +101,8 @@ class DeleteNodesCommand extends Editor.Undo.Command {
         for ( let i = this.info.list.length-1; i >= 0; --i ) {
             let info = this.info.list[i];
 
+            Record.RestoreObject( info.node, info.data );
+
             info.node.parent = info.parent;
             info.node.setSiblingIndex(info.siblingIndex);
             nodeIDs.push(info.node.uuid);
@@ -113,7 +115,7 @@ class DeleteNodesCommand extends Editor.Undo.Command {
         for ( let i = 0; i < this.info.list.length; ++i ) {
             let info = this.info.list[i];
 
-            info.node.parent = null;
+            info.node.destroy();
             nodeIDs.push(info.node.uuid);
         }
         Editor.Selection.unselect('node', nodeIDs);
@@ -292,6 +294,7 @@ let SceneUndo = {
             _currentDeletedRecords.push({
                 node: node,
                 parent: node.parent,
+                data: Record.RecordObject(node),
                 siblingIndex: node.getSiblingIndex(),
             });
         }
