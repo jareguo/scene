@@ -102,6 +102,9 @@ class DeleteNodesCommand extends Editor.Undo.Command {
             let info = this.info.list[i];
 
             Record.RestoreObject( info.node, info.data );
+            info.comps.forEach(compInfo => {
+                Record.RestoreObject( compInfo.comp, compInfo.data );
+            });
 
             info.node.parent = info.parent;
             info.node.setSiblingIndex(info.siblingIndex);
@@ -296,6 +299,12 @@ let SceneUndo = {
                 parent: node.parent,
                 data: Record.RecordObject(node),
                 siblingIndex: node.getSiblingIndex(),
+                comps: node._components.map(comp => {
+                    return {
+                        comp: comp,
+                        data: Record.RecordObject(comp),
+                    };
+                }),
             });
         }
     },
