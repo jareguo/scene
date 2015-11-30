@@ -813,7 +813,7 @@
         'scene:animation-state-changed': function (info) {
             var node = cc.engine.getInstanceById(info.nodeId);
             var comp = node.getComponent(cc.AnimationComponent);
-            // var aniState = comp.getAnimationState(info.clip);
+            var aniState = comp.getAnimationState(info.clip);
 
             var state = info.state;
             var clipName = info.clip;
@@ -823,7 +823,7 @@
                 cc.engine.animatingInEditMode = true;
             }
             else if (state === 'pause') {
-                if (comp.isPlaying) {
+                if (aniState.isPlaying) {
                     comp.pause(clipName);
                 }
                 cc.engine.animatingInEditMode = false;
