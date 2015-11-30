@@ -300,6 +300,8 @@ let SceneUndo = {
                 data: Record.RecordObject(node),
                 siblingIndex: node.getSiblingIndex(),
                 comps: node._components.map(comp => {
+                    // HACK:
+                    comp._objFlags &= cc.Object.Flags.PersistentMask;
                     return {
                         comp: comp,
                         data: Record.RecordObject(comp),
