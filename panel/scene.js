@@ -410,7 +410,7 @@
             Editor.sendToWindows( 'scene:query-node-info:reply', sessionID, {
                 name: node ? node.name : '',
                 type: cc.js.getClassName(node),
-                missed: node ? false : true,
+                missed: node == null,
             });
         },
 
@@ -478,9 +478,6 @@
         'scene:add-component': function ( id, compId ) {
             if (compId) {
                 var isScript = Editor.isUuid(compId);
-                if (isScript) {
-                    compId = Editor.compressUuid(compId);
-                }
                 var compCtor = cc.js._getClassById(compId);
                 if (!compCtor) {
                     if (isScript) {
