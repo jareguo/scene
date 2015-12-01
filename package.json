@@ -49,6 +49,7 @@
         "scene:query-hierarchy",
         "scene:query-node",
         "scene:query-node-info",
+        "scene:query-node-functions",
         "scene:new-property",
         "scene:set-property",
         "scene:add-component",
