@@ -217,7 +217,8 @@ var EditorEngine = cc.Class({
             this.emit('before-update');
             cc.director.gameUpdate(deltaTime);
             cc.director.engineUpdate(deltaTime);
-            this.emit('post-update');
+            this.emit('post-update', deltaTime);
+            this.emit('late-update');
         }
         cc.director.visit(deltaTime);
         cc.director.render(deltaTime);
@@ -238,7 +239,8 @@ var EditorEngine = cc.Class({
             if (updateAnimate) {
                 cc.director.engineUpdate(deltaTime);
             }
-            this.emit('post-update');
+            this.emit('post-update', deltaTime);
+            this.emit('late-update');
             cc.director.visit();
             cc.director.render();
         }
