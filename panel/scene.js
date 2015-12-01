@@ -414,6 +414,13 @@
             });
         },
 
+        'scene:query-node-functions': function ( sessionID, nodeID ) {
+            var node = cc.engine.getInstanceById(nodeID);
+            var dump = Editor.getNodeFunctions(node);
+
+            Editor.sendToWindows( 'scene:query-node-functions:reply', sessionID, dump);
+        },
+
         'scene:query-animation-node': function (queryID, nodeID, childName) {
             var node = cc.engine.getInstanceById(nodeID);
             var dump = Editor.getAnimationNodeDump(node, childName);
