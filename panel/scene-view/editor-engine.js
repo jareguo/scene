@@ -214,6 +214,7 @@ var EditorEngine = cc.Class({
      */
     tick: function (deltaTime, updateLogic) {
         if (updateLogic) {
+            this.emit('before-update');
             cc.director.gameUpdate(deltaTime);
             cc.director.engineUpdate(deltaTime);
             this.emit('post-update');
@@ -233,6 +234,7 @@ var EditorEngine = cc.Class({
             // invoke updateInEditMode
             //cc.director.getScene()._callUpdateInEM(deltaTime);
 
+            this.emit('before-update');
             if (updateAnimate) {
                 cc.director.engineUpdate(deltaTime);
             }
