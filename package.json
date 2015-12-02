@@ -50,6 +50,7 @@
         "scene:query-node",
         "scene:query-node-info",
         "scene:query-node-functions",
+        "scene:is-child-class-of",
         "scene:new-property",
         "scene:set-property",
         "scene:add-component",
