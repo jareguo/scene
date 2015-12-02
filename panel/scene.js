@@ -410,7 +410,7 @@
             Editor.sendToWindows( 'scene:query-node-info:reply', sessionID, {
                 name: node ? node.name : '',
                 type: cc.js.getClassName(node),
-                missed: node == null,
+                missed: node === null,
             });
         },
 
@@ -418,13 +418,20 @@
             var node = cc.engine.getInstanceById(nodeID);
             var dump = Editor.getNodeFunctions(node);
 
-            Editor.sendToWindows( 'scene:query-node-functions:reply', sessionID, dump);
+            Editor.sendToWindows('scene:query-node-functions:reply', sessionID, dump);
         },
 
         'scene:query-animation-node': function (queryID, nodeID, childName) {
             var node = cc.engine.getInstanceById(nodeID);
             var dump = Editor.getAnimationNodeDump(node, childName);
-            Editor.sendToWindows( 'scene:reply-animation-node', queryID, dump );
+            Editor.sendToWindows('scene:reply-animation-node', queryID, dump );
+        },
+
+        'scene:is-child-class-of': function ( sessionID, className, baseClassName ) {
+            let sub = cc.js._getClassById(className);
+            let base = cc.js._getClassById(baseClassName);
+            let result = cc.isChildClassOf(sub, base);
+            Editor.sendToWindows('scene:is-child-class-of:reply', sessionID, result);
         },
 
         'scene:new-property': function ( info ) {
