@@ -238,7 +238,7 @@ Editor.registerElement({
 
     newScene: function () {
         var scene = new cc.EScene();
-        var canvas = new cc.ENode();
+        var canvas = new cc.ENode('Canvas');
         canvas.parent = scene;
         canvas.addComponent(cc.Canvas);
 
