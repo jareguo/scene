@@ -1,7 +1,5 @@
 'use strict';
 
-const utils = Editor.require('app://editor/share/engine-extends/undo-utils');
-
 /**
  * info = {
  *   before: [{id, data}],
@@ -15,7 +13,7 @@ class RecordObjectsCommand extends Editor.Undo.Command {
             let objInfo = this.info.before[i];
             let obj = cc.engine.getInstanceById(objInfo.id);
 
-            utils.restoreObject( obj, objInfo.data );
+            Editor._restoreObject( obj, objInfo.data );
 
             //
             let node = null;
@@ -40,7 +38,7 @@ class RecordObjectsCommand extends Editor.Undo.Command {
             let objInfo = this.info.after[i];
             let obj = cc.engine.getInstanceById(objInfo.id);
 
-            utils.restoreObject( obj, objInfo.data );
+            Editor._restoreObject( obj, objInfo.data );
 
             //
             let node = null;
@@ -101,9 +99,10 @@ class DeleteNodesCommand extends Editor.Undo.Command {
         for ( let i = this.info.list.length-1; i >= 0; --i ) {
             let info = this.info.list[i];
 
-            utils.restoreObject( info.node, info.data );
+            Editor._restoreObject( info.node, info.data );
             info.comps.forEach(compInfo => {
-                utils.restoreObject( compInfo.comp, compInfo.data );
+                Editor._restoreObject( compInfo.comp, compInfo.data );
+                Editor._renewObject( compInfo.comp );
             });
 
             info.node.parent = info.parent;
@@ -255,7 +254,7 @@ let SceneUndo = {
         });
         if ( !exists ) {
             let obj = cc.engine.getInstanceById(id);
-            let data = utils.recordObject(obj);
+            let data = Editor._recordObject(obj);
 
             _currentObjectRecords.push({
                 id: id,
@@ -297,13 +296,12 @@ let SceneUndo = {
             _currentDeletedRecords.push({
                 node: node,
                 parent: node.parent,
-                data: utils.recordObject(node),
+                data: Editor._recordObject(node),
                 siblingIndex: node.getSiblingIndex(),
                 comps: node._components.map(comp => {
-                    utils.renewObject(comp);
                     return {
                         comp: comp,
-                        data: utils.recordObject(comp),
+                        data: Editor._recordObject(comp),
                     };
                 }),
             });
@@ -370,7 +368,7 @@ let SceneUndo = {
                 let obj = cc.engine.getInstanceById(record.id);
                 return {
                     id: record.id,
-                    data: utils.recordObject(obj),
+                    data: Editor._recordObject(obj),
                 };
             });
 
