@@ -161,11 +161,6 @@ var EditorEngine = cc.Class({
             };
 
         cc.game.run(config, function () {
-            var scene = new cc.EScene();
-
-            // scene anchor point need be 0,0
-            scene.setAnchorPoint(0.0, 0.0);
-
             if (CC_EDITOR) {
                 cc.view.enableRetina(false);
                 cc.game.canvas.style.imageRendering = 'pixelated';
@@ -175,6 +170,7 @@ var EditorEngine = cc.Class({
             cc.view.setDesignResolutionSize(options.designWidth, options.designHeight, cc.ResolutionPolicy.SHOW_ALL);
             cc.view.setCanvasSize(config.width, config.height);
 
+            var scene = new cc.EScene();
             cc.director.runScene(scene);
             cc.game.pause();
 
