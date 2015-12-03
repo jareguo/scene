@@ -237,13 +237,8 @@ Editor.registerElement({
     },
 
     newScene: function () {
-        var scene = new cc.EScene();
-        var canvas = new cc.ENode('Canvas');
-        canvas.parent = scene;
-        canvas.addComponent(cc.Canvas);
-
         this.reset();
-        cc.director.runScene(scene);
+        Editor.runDefaultScene();
 
         this.adjustToCenter(20);
         cc.engine.repaintInEditMode();

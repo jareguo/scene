@@ -26,6 +26,15 @@ function createScene (sceneJson, next) {
     cc.AssetLibrary.loadJson(sceneJson, next);
 }
 
+Editor.runDefaultScene = function () {
+    var scene = new cc.EScene();
+    var canvas = new cc.ENode('Canvas');
+    canvas.parent = scene;
+    canvas.addComponent(cc.Canvas);
+
+    cc.director.runScene(scene);
+};
+
 Editor.initScene = function (callback) {
     var stashedScene = Editor.remote.stashedScene; // a remote sync method
     var sceneJson = stashedScene ? stashedScene.sceneJson : null;
@@ -57,6 +66,9 @@ Editor.initScene = function (callback) {
                         next ( err, null );
                     });
                     return;
+                }
+                else {
+                    Editor.runDefaultScene();
                 }
 
                 _sceneView.adjustToCenter(10);
