@@ -17,7 +17,7 @@ function _updateTitile (dirty) {
 }
 
 function _showSaveDialog () {
-    let rootPath = Editor.assetdb._fspath('assets://');
+    let rootPath = Editor.assetdb._fspath('db://assets/');
     let savePath = Dialog.showSaveDialog( Editor.mainWindow.nativeWin, {
         title: 'Save Scene',
         defaultPath: rootPath,
@@ -28,7 +28,7 @@ function _showSaveDialog () {
 
     if ( savePath ) {
         if ( Path.contains( rootPath, savePath ) ) {
-            return 'assets://' + Path.relative( rootPath, savePath );
+            return 'db://assets/' + Path.relative( rootPath, savePath );
         }
 
         Dialog.showMessageBox ( Editor.mainWindow.nativeWin, {

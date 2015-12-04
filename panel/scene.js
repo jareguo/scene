@@ -187,7 +187,7 @@
             var dirty = this.undo.dirty();
             if ( dirty ) {
                 var name = 'New Scene';
-                var url = 'assets://New Scene.fire';
+                var url = 'db://assets/New Scene.fire';
                 var currentSceneUuid = Editor.remote.currentSceneUuid;
 
                 if ( currentSceneUuid ) {
