@@ -13,6 +13,10 @@
     background: #333;
 }
 
+#sceneView {
+    overflow: hidden;
+}
+
 editor-buttons-item img {
     height: 10px;
 }

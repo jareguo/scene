@@ -1,7 +1,25 @@
 (function () {
-var Ipc = require('ipc');
+'use strict';
+
 var Path = require('fire-path');
 //var Url = require('fire-url');
+
+function callOnFocusInTryCatch (c) {
+    try {
+        c.onFocusInEditor();
+    }
+    catch (e) {
+        cc._throw(e);
+    }
+}
+function callOnLostFocusInTryCatch (c) {
+    try {
+        c.onLostFocusInEditor();
+    }
+    catch (e) {
+        cc._throw(e);
+    }
+}
 
 Editor.registerElement({
     listeners: {
@@ -10,7 +28,7 @@ Editor.registerElement({
         'mousemove': '_onMouseMove',
         'mouseleave': '_onMouseLeave',
         'keydown': '_onKeyDown',
-        'keyup': '_onKeyUp',
+        'keyup': '_onKeyUp'
     },
 
     properties: {
@@ -18,15 +36,48 @@ Editor.registerElement({
             type: Number,
             value: 1.0,
         },
-    },
 
-    created: function () {
-        window.sceneView = this;
+        transformTool: {
+            type: String,
+            value: 'move',
+            notify: true,
+            observer: 'setTransformTool',
+        },
+
+        coordinate: {
+            type: String,
+            value: 'local',
+            notify: true,
+            observer: 'setCoordinate',
+        },
+
+        pivot: {
+            type: String,
+            value: 'pivot',
+            notify: true,
+            observer: 'setPivot',
+        },
+
+        designWidth: {
+            type: Number,
+            value: 0,
+            notify: true,
+            observer: '_designSizeChanged',
+        },
+
+        designHeight: {
+            type: Number,
+            value: 0,
+            notify: true,
+            observer: '_designSizeChanged',
+        }
     },
 
     ready: function () {
-        var mappingH = cc.Runtime.Settings['mapping-h'];
-        var mappingV = cc.Runtime.Settings['mapping-v'];
+        this._inited = false;
+
+        var mappingH = [0, 1, 1];
+        var mappingV = [1, 0, 1];
 
         // grid
         this.$.grid.setScaleH( [5,2], 0.01, 1000 );
@@ -36,35 +87,50 @@ Editor.registerElement({
         this.$.grid.setMappingV( mappingV[0], mappingV[1], mappingV[2] );
 
         this.$.grid.setAnchor( 0.5, 0.5 );
+    },
 
-        // make sure css reflow
-        requestAnimationFrame( function () {
-            this._initEngine();
+    attached: function () {
+        // this.async(() => {
+        //     this.lightDomReady();
+        // });
 
-            // init grid
-            this.$.grid.resize();
-            this.$.grid.repaint();
+        window.requestAnimationFrame(() => {
+            this.lightDomReady();
+        });
+    },
 
-            // init gizmos
-            this.$.gizmosView.resize();
-            this.$.gizmosView.sceneToPixel = this.sceneToPixel.bind(this);
-            this.$.gizmosView.worldToPixel = this.worldToPixel.bind(this);
-            this.$.gizmosView.pixelToScene = this.pixelToScene.bind(this);
-            this.$.gizmosView.pixelToWorld = this.pixelToWorld.bind(this);
-        }.bind(this));
+    lightDomReady: function  () {
+        this._resize();
+    },
+
+    init: function () {
+        this._initEngine();
+
+        // init grid
+        this.$.grid.resize();
+        this.$.grid.repaint();
+
+        // init gizmos
+        this.$.gizmosView.resize();
+        this.$.gizmosView.sceneToPixel = this.sceneToPixel.bind(this);
+        this.$.gizmosView.worldToPixel = this.worldToPixel.bind(this);
+        this.$.gizmosView.pixelToScene = this.pixelToScene.bind(this);
+        this.$.gizmosView.pixelToWorld = this.pixelToWorld.bind(this);
+
+        this._inited = true;
     },
 
     reset: function () {
         Editor.Selection.clear('node');
 
         // reset scene gizmos, scene grid
-        window.sceneView.$.gizmosView.reset();
+        this.$.gizmosView.reset();
 
         // reset cc.engine editing state
         cc.engine.animatingInEditMode = false;
     },
 
-    init: function ( x, y, scale ) {
+    initPosition: function ( x, y, scale ) {
         this.scale = scale;
 
         //
@@ -75,16 +141,37 @@ Editor.registerElement({
         //
         this.$.gizmosView.scale = scale;
 
-        //
-        var scene = cc(cc.director.getRunningScene());
+        // override some attributes to make the transform of Scene not serializable
+        var SceneTransformProps = ['_position', '_rotationX', '_rotationY', '_scaleX', '_scaleY', '_skewX', '_skewY'];
+        SceneTransformProps.forEach(function (prop) {
+            var attr = cc.Class.attr(cc.EScene, prop);
+            attr = cc.js.addon({
+                serializable: false
+            }, attr);
+            cc.Class.attr(cc.EScene.prototype, prop, attr);
+        });
+
+        var scene = cc.director.getScene();
         scene.scale = cc.v2( this.$.grid.xAxisScale, this.$.grid.yAxisScale );
-        scene.position = cc.v2(this.$.grid.xDirection*this.$.grid.xAxisOffset,
-                                 this.$.grid.yDirection*this.$.grid.yAxisOffset);
+        scene.setPosition(cc.v2( this.$.grid.xDirection * this.$.grid.xAxisOffset,
+                                 this.$.grid.yDirection * this.$.grid.yAxisOffset ));
         cc.engine.repaintInEditMode();
     },
 
     _resize: function () {
-        if ( cc.engine.isPlaying ) {
+        var bcr;
+
+        // need init when panel has size, or canvas and resolution size will be zero
+        if (!this._inited) {
+            // should not init if bounding rect is zero
+            bcr = this.getBoundingClientRect();
+            if (bcr.width === 0 && bcr.height === 0) return;
+
+            this.init();
+            this._designSizeChanged();
+        }
+
+        if ( cc.engine.isPlaying || !cc.view) {
             return;
         }
 
@@ -96,28 +183,30 @@ Editor.registerElement({
         this.$.gizmosView.resize();
 
         // resize engine
-        var bcr = this.getBoundingClientRect();
-        cc.view.setFrameSize(bcr.width, bcr.height);
+        bcr = this.getBoundingClientRect();
+        cc.view.setCanvasSize(bcr.width, bcr.height);
         cc.view.setDesignResolutionSize(bcr.width, bcr.height);
 
         // sync axis offset and scale from grid
-        var scene = cc(cc.director.getRunningScene());
+        var scene = cc.director.getScene();
         scene.scale = cc.v2(this.$.grid.xAxisScale, this.$.grid.yAxisScale);
-        scene.position = cc.v2(this.$.grid.xDirection*this.$.grid.xAxisOffset,
-                                 this.$.grid.yDirection*this.$.grid.yAxisOffset);
+        scene.setPosition(cc.v2(this.$.grid.xDirection * this.$.grid.xAxisOffset,
+                                this.$.grid.yDirection * this.$.grid.yAxisOffset));
         cc.engine.repaintInEditMode();
     },
 
     _initEngine: function () {
-        // init asset library
-        //var importUrl = Url.format({
-        //    protocol: '',
-        //    pathname: Editor.importPath,
-        //    slashes: true,
-        //});
-        var importUrl = Editor.importPath.replace(/\\/g, '/');
-        var assetUrl = Path.join(Editor.projectInfo.path, 'assets').replace(/\\/g, '/');
-        cc.AssetLibrary.init(importUrl, assetUrl);
+
+        if (!cc.engine.isInitialized) {
+            var importUrl = Editor.importPath.replace(/\\/g, '/');
+            var assetUrl = Path.join(Editor.projectInfo.path, 'assets').replace(/\\/g, '/');
+            cc.AssetLibrary.init(importUrl, assetUrl);
+        }
+        else {
+            // 从外部窗口 attach 回到主窗口时需要重置所有 engine 相关状态
+            cc.engine.reset();
+            Editor.Sandbox.reset();
+        }
 
         // init engine
         var canvasEL = this.$['engine-canvas'];
@@ -133,67 +222,44 @@ Editor.registerElement({
             designHeight: bcr.height
         };
 
+        var self = this;
         cc.engine.init(initOptions, function () {
             Editor.initScene(function (err) {
                 if (err) {
-                    Ipc.sendToHost('scene:init-error', err);
+                    self.fire('scene-view-init-error', err);
                 }
                 else {
-                    Ipc.sendToHost('scene:ready');
+                    self.fire('scene-view-ready');
+                    self._resize();
                 }
             });
-        });
-
-        // beforeunload event
-        window.addEventListener('beforeunload', function ( event ) {
-            Editor.Selection.clear('node');
-            if ( cc.engine.isPlaying ) {
-                cc.engine.stop();
-            }
-        });
-
-        // debounce resize event
-        var self = this;
-        var _resizeDebounceID = null;
-        window.addEventListener('resize', function ( event ) {
-            // debounce write for 10ms
-            if ( _resizeDebounceID ) {
-                return;
-            }
-            _resizeDebounceID = setTimeout(function () {
-                _resizeDebounceID = null;
-                self._resize();
-            }, 10);
         });
     },
 
     newScene: function () {
-        var sceneWrapper = new cc.Runtime.SceneWrapper();
-        sceneWrapper.createAndAttachNode();
-
         this.reset();
-        cc.game._launchScene(sceneWrapper);
+        Editor.runDefaultScene();
 
         this.adjustToCenter(20);
         cc.engine.repaintInEditMode();
 
         Editor.remote.currentSceneUuid = null;
-        Ipc.sendToHost('scene:ready');
+        this.fire('scene-view-ready');
     },
 
     loadScene: function ( uuid ) {
         this.reset();
 
-        cc.game._loadSceneByUuid(uuid, function (err) {
+        cc.director._loadSceneByUuid(uuid, function (err) {
             this.adjustToCenter(20);
             cc.engine.repaintInEditMode();
 
             if (err) {
-                Ipc.sendToHost('scene:init-error', err);
+                this.fire('scene-view-init-error', err);
             }
             else {
                 Editor.remote.currentSceneUuid = uuid;
-                Ipc.sendToHost('scene:ready');
+                this.fire('scene-view-ready');
             }
         }.bind(this));
     },
@@ -206,7 +272,7 @@ Editor.registerElement({
         var designHeight = this.$.gizmosView.designSize[1];
 
         if ( designWidth <= fitWidth && designHeight <= fitHeigth ) {
-            this.init( this.$.grid.xDirection * (bcr.width - designWidth)/2,
+            this.initPosition( this.$.grid.xDirection * (bcr.width - designWidth)/2,
                        this.$.grid.yDirection * (bcr.height - designHeight)/2,
                        1.0
                     );
@@ -216,14 +282,14 @@ Editor.registerElement({
                                               fitWidth, fitHeigth);
             // move x
             if ( result[0] < result[1] ) {
-                this.init( this.$.grid.xDirection * (bcr.width - result[0])/2,
+                this.initPosition( this.$.grid.xDirection * (bcr.width - result[0])/2,
                            this.$.grid.yDirection * (bcr.height - result[1])/2,
                            result[0]/designWidth
                         );
             }
             // move y
             else {
-                this.init( this.$.grid.xDirection * (bcr.width - result[0])/2,
+                this.initPosition( this.$.grid.xDirection * (bcr.width - result[0])/2,
                            this.$.grid.yDirection * (bcr.height - result[1])/2,
                            result[1]/designHeight
                         );
@@ -239,8 +305,8 @@ Editor.registerElement({
     },
 
     worldToPixel: function (pos) {
-        var scene = cc(cc.director.getRunningScene());
-        var scenePos = scene.transformPointToLocal(pos);
+        var scene = cc.director.getScene();
+        var scenePos = scene.convertToNodeSpaceAR(pos);
         return this.sceneToPixel( scenePos );
     },
 
@@ -252,27 +318,41 @@ Editor.registerElement({
     },
 
     pixelToWorld: function (pos) {
-        var scene = cc(cc.director.getRunningScene());
-        return scene.transformPointToWorld( this.pixelToScene(pos) );
+        var scene = cc.director.getScene();
+        return cc.v2(scene.convertToWorldSpaceAR(this.pixelToScene(pos)));
     },
 
     activate: function ( id ) {
-        var wrapper = cc.engine.getInstanceById(id);
-        if ( wrapper && wrapper.constructor.animatableInEditor ) {
-            if ( wrapper.onFocusInEditor )
-                wrapper.onFocusInEditor();
-
-            cc.engine.animatingInEditMode = true;
+        var node = cc.engine.getInstanceById(id);
+        if (node) {
+            for (var i = 0; i < node._components.length; ++i) {
+                var comp = node._components[0];
+                if (comp.constructor._executeInEditMode && comp.isValid) {
+                    if (comp.onFocusInEditor) {
+                        callOnFocusInTryCatch(comp);
+                    }
+                    if (comp.constructor._playOnFocus) {
+                        cc.engine.animatingInEditMode = true;
+                    }
+                }
+            }
         }
     },
 
     deactivate: function ( id ) {
-        var wrapper = cc.engine.getInstanceById(id);
-        if ( wrapper && wrapper.constructor.animatableInEditor ) {
-            if ( wrapper.onLostFocusInEditor )
-                wrapper.onLostFocusInEditor();
-
-            cc.engine.animatingInEditMode = false;
+        var node = cc.engine.getInstanceById(id);
+        if (node && node.isValid) {
+            for (var i = 0; i < node._components.length; ++i) {
+                var comp = node._components[0];
+                if (comp.constructor._executeInEditMode && comp.isValid) {
+                    if (comp.onLostFocusInEditor) {
+                        callOnLostFocusInTryCatch(comp);
+                    }
+                    if (comp.constructor._playOnFocus) {
+                        cc.engine.animatingInEditMode = false;
+                    }
+                }
+            }
         }
     },
 
@@ -295,11 +375,13 @@ Editor.registerElement({
     delete: function ( ids ) {
         for (var i = 0; i < ids.length; i++) {
             var id = ids[i];
-            var nodeWrapper = cc.engine.getInstanceById(id);
-            if (nodeWrapper) {
-                nodeWrapper.parent = null;
+            var node = cc.engine.getInstanceById(id);
+            if (node) {
+                this.undo.recordDeleteNode(id);
+                node.destroy();
             }
         }
+        this.undo.commit();
         Editor.Selection.unselect('node', ids, true);
     },
 
@@ -313,13 +395,12 @@ Editor.registerElement({
 
         var nodes = cc.engine.getIntersectionList( new cc.Rect(worldHitPoint.x, worldHitPoint.y, 1, 1) );
         nodes.forEach( function ( node ) {
-            var fireNode = cc(node);
-            var aabb = fireNode.getWorldBounds();
+            var aabb = node.getWorldBounds();
             // TODO: calculate the OBB center instead
             var dist = worldHitPoint.sub(aabb.center).magSqr();
             if ( dist < minDist ) {
                 minDist = dist;
-                resultNode = fireNode;
+                resultNode = node;
             }
         });
 
@@ -334,8 +415,7 @@ Editor.registerElement({
         var results = [];
         var nodes = cc.engine.getIntersectionList(worldRect);
         nodes.forEach( function ( node ) {
-            var fireNode = cc(node);
-            results.push(fireNode);
+            results.push(node);
         });
 
         return results;
@@ -347,10 +427,10 @@ Editor.registerElement({
     //     //
     //     Editor.playScene(function (err) {
     //         if (err) {
-    //             Ipc.sendToHost('scene:play-error', err);
+    //             this.fire('scene:play-error', err);
     //             return;
     //         }
-    //         Ipc.sendToHost('scene:playing');
+    //         this.fire('scene:playing');
     //     });
     // },
 
@@ -372,9 +452,9 @@ Editor.registerElement({
                     this.$.grid.pan( dx, dy );
                     this.$.grid.repaint();
 
-                    var scene = cc(cc.director.getRunningScene());
-                    scene.position = cc.v2(this.$.grid.xDirection*this.$.grid.xAxisOffset,
-                                             this.$.grid.yDirection*this.$.grid.yAxisOffset);
+                    var scene = cc.director.getScene();
+                    scene.setPosition(cc.v2(this.$.grid.xDirection * this.$.grid.xAxisOffset,
+                                            this.$.grid.yDirection * this.$.grid.yAxisOffset));
                     cc.engine.repaintInEditMode();
                 }.bind(this),
 
@@ -479,8 +559,6 @@ Editor.registerElement({
                     }
                 }.bind(this)
             );
-
-            return;
         }
     },
 
@@ -504,10 +582,10 @@ Editor.registerElement({
         this.$.gizmosView.scale = newScale;
 
         //
-        var scene = cc(cc.director.getRunningScene());
+        var scene = cc.director.getScene();
         scene.scale = cc.v2( this.$.grid.xAxisScale, this.$.grid.yAxisScale );
-        scene.position = cc.v2(this.$.grid.xDirection*this.$.grid.xAxisOffset,
-                                 this.$.grid.yDirection*this.$.grid.yAxisOffset);
+        scene.setPosition(cc.v2(this.$.grid.xDirection * this.$.grid.xAxisOffset,
+                                this.$.grid.yDirection * this.$.grid.yAxisOffset));
         cc.engine.repaintInEditMode();
     },
 
@@ -528,7 +606,6 @@ Editor.registerElement({
 
         if ( Editor.KeyCode(event.which) === 'shift' ) {
             this.style.cursor = '-webkit-grab';
-            return;
         }
     },
 
@@ -539,6 +616,36 @@ Editor.registerElement({
             this.style.cursor = '';
         }
     },
+
+    setTransformTool: function (transformTool) {
+        this.$.gizmosView.transformTool = transformTool || this.transformTool;
+        cc.engine.repaintInEditMode();
+    },
+
+    setCoordinate: function (coordinate) {
+        this.$.gizmosView.coordinate = coordinate || this.coordinate;
+        cc.engine.repaintInEditMode();
+    },
+
+    setPivot: function (pivot) {
+        this.$.gizmosView.pivot = pivot || this.pivot;
+        cc.engine.repaintInEditMode();
+    },
+
+    _designSizeChanged: function () {
+        if (!this._inited) return;
+
+        var w = this.designWidth;
+        var h = this.designHeight;
+
+        this.$.gizmosView.designSize = [w, h];
+
+        var size = cc.engine.getDesignResolutionSize();
+        if (size.width !== w || size.height !== h) {
+            cc.engine.setDesignResolutionSize(w, h);
+            cc.engine.repaintInEditMode();
+        }
+    }
 });
 
 })();

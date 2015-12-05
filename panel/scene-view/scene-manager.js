@@ -1,13 +1,15 @@
 var Async = require('async');
 var sandbox = require('./sandbox');
 
+var _sceneView;
+
 function enterEditMode ( stashedScene, next ) {
     if ( stashedScene ) {
         // restore selection
         Editor.Selection.select('node', stashedScene.sceneSelection, true, true);
 
         // restore scene view
-        window.sceneView.init(stashedScene.sceneOffsetX,
+        _sceneView.initPosition(stashedScene.sceneOffsetX,
                               stashedScene.sceneOffsetY,
                               stashedScene.sceneScale );
     }
@@ -19,16 +21,19 @@ function createScene (sceneJson, next) {
     //var MissingBehavior = require('./missing-behavior');
 
     // reset scene view
-    window.sceneView.reset();
+    _sceneView.reset();
 
-    // Assets will be loaded by SceneWrapper.prototype.create, here we just deserialize the scene graph
-    var scene = cc.deserialize(sceneJson/*, null, {
-        classFinder: MissingBehavior.safeFindClass,
-    }*/);
-    cc.game._initScene(scene, function () {
-        next(null, scene);
-    });
+    cc.AssetLibrary.loadJson(sceneJson, next);
 }
+
+Editor.runDefaultScene = function () {
+    var scene = new cc.EScene();
+    var canvas = new cc.ENode('Canvas');
+    canvas.parent = scene;
+    canvas.addComponent(cc.Canvas);
+
+    cc.director.runScene(scene);
+};
 
 Editor.initScene = function (callback) {
     var stashedScene = Editor.remote.stashedScene; // a remote sync method
@@ -40,7 +45,7 @@ Editor.initScene = function (callback) {
                 sandbox.loadCompiledScript,
                 createScene.bind(this, sceneJson),
                 function (scene, next) {
-                    cc.game._launchScene(scene);
+                    cc.director.runScene(scene);
                     cc.engine.repaintInEditMode();
                     next( null, stashedScene );
                 },
@@ -55,15 +60,18 @@ Editor.initScene = function (callback) {
             function ( next ) {
                 var currentSceneUuid = Editor.remote.currentSceneUuid;
                 if ( currentSceneUuid ) {
-                    cc.game._loadSceneByUuid(currentSceneUuid, function ( err ) {
-                        window.sceneView.adjustToCenter(10);
+                    cc.director._loadSceneByUuid(currentSceneUuid, function ( err ) {
+                        _sceneView.adjustToCenter(10);
                         cc.engine.repaintInEditMode();
                         next ( err, null );
                     });
                     return;
                 }
+                else {
+                    Editor.runDefaultScene();
+                }
 
-                window.sceneView.adjustToCenter(10);
+                _sceneView.adjustToCenter(10);
                 next( null, null );
             },
             enterEditMode,
@@ -73,18 +81,18 @@ Editor.initScene = function (callback) {
 
 Editor.stashScene = function (callback) {
     // get scene json
-    var scene = cc(cc.director.getRunningScene());
+    var scene = cc.director.getScene();
     var jsonText = Editor.serialize(scene, {stringify: true});
 
     // store the scene, scene-view postion, scene-view scale
     Editor.remote.stashedScene = {
         sceneJson: jsonText,
-        sceneScale: window.sceneView.scale,
-        sceneOffsetX: window.sceneView.$.grid.xAxisOffset,
-        sceneOffsetY: window.sceneView.$.grid.yAxisOffset,
+        sceneScale: _sceneView.scale,
+        sceneOffsetX: _sceneView.$.grid.xAxisOffset,
+        sceneOffsetY: _sceneView.$.grid.yAxisOffset,
         sceneSelection: Editor.Selection.curSelection('node'),
-        designWidth: window.sceneView.$.gizmosView.designSize[0],
-        designHeight: window.sceneView.$.gizmosView.designSize[1],
+        designWidth: _sceneView.$.gizmosView.designSize[0],
+        designHeight: _sceneView.$.gizmosView.designSize[1],
     };
 
     if ( callback ) {
@@ -97,7 +105,7 @@ Editor.reloadScene = function (callback) {
         Editor.stashScene,
         createScene,
         function (scene, next) {
-            cc.game._launchScene(scene);
+            cc.director.runScene(scene);
             cc.engine.repaintInEditMode();
             next( null, Editor.remote.stashedScene );
         },
@@ -119,17 +127,17 @@ Editor.playScene = function (callback) {
             });
 
             // reset scene camera
-            scene.position = cc.Vec2.zero;
-            scene.scale = cc.Vec2.one;
+            scene.position = cc.Vec2.ZERO;
+            scene.scale = cc.Vec2.ONE;
 
             // play new scene
-            cc.game._launchScene(scene, function () {
+            cc.director.runScene(scene, function () {
                 // restore selection
                 Editor.Selection.select('node', selection, true, true);
 
                 //
-                window.sceneView.$.grid.hidden = true;
-                window.sceneView.$.gizmosView.hidden = true;
+                _sceneView.$.grid.hidden = true;
+                _sceneView.$.gizmosView.hidden = true;
 
                 //if (this.$.pause.active) {
                 //    cc.engine.step();
@@ -146,4 +154,10 @@ Editor.playScene = function (callback) {
 Editor.softReload = function (compiled) {
     // hot update new compiled scripts
     sandbox.reload(compiled);
+};
+
+module.exports = {
+    init: function (sceneView) {
+        _sceneView = sceneView;
+    }
 };

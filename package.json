@@ -6,6 +6,11 @@
   "hosts": {
     "editor-framework": "^0.3.15"
   },
+  "pkgDependencies": {
+    "ui-kit": "^0.1.0",
+    "fire-gizmos": "^0.1.0",
+    "ui-grid": "^0.1.0"
+  },
   "main": "main.js",
   "menus": {
     "Panel/Scene": {
@@ -26,26 +31,30 @@
         "w": "selectMove",
         "e": "selectRotate",
         "r": "selectScale",
-        "command+backspace": "deleteCurrentSelected",
-        "del": "deleteCurrentSelected",
-        "command+d": "duplicateCurrentSelected",
-        "ctrl+d": "duplicateCurrentSelected"
+        "t": "selectRect",
+        "#sceneView" : {
+          "command+backspace": "deleteCurrentSelected",
+          "del": "deleteCurrentSelected",
+          "command+d": "duplicateCurrentSelected",
+          "ctrl+d": "duplicateCurrentSelected"
+        }
       },
       "messages": [
         "editor:dragstart",
         "editor:dragend",
         "scene:is-ready",
         "scene:new-scene",
-        "scene:save-scene-from-page",
         "scene:play-on-device",
         "scene:reload-on-device",
         "scene:query-hierarchy",
         "scene:query-node",
         "scene:query-node-info",
-        "scene:node-new-property",
-        "scene:node-set-property",
-        "scene:node-mixin",
-        "scene:node-unmixin",
+        "scene:query-node-functions",
+        "scene:is-child-class-of",
+        "scene:new-property",
+        "scene:set-property",
+        "scene:add-component",
+        "scene:remove-component",
         "scene:create-node-by-classid",
         "scene:create-nodes-by-uuids",
         "scene:move-nodes",
@@ -57,14 +66,27 @@
         "scene:apply-prefab",
         "scene:revert-prefab",
 
+        "scene:stash-and-save",
+        "scene:saved",
+
+        "scene:undo",
+        "scene:redo",
+        "scene:undo-record",
+        "scene:undo-commit",
+        "scene:undo-cancel",
+
+        "scene:query-animation-node",
+        "scene:animation-state-changed",
+        "scene:query-animation-time",
+        "scene:animation-time-changed",
+        "scene:animation-clip-changed",
+
         "selection:selected",
         "selection:unselected",
         "selection:activated",
         "selection:deactivated",
         "selection:hoverin",
-        "selection:hoverout",
-        "selection:changed",
-        "selection:context"
+        "selection:hoverout"
       ],
       "profiles": {
         "local": {
