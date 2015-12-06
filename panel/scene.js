@@ -18,6 +18,11 @@
         });
     }
 
+    var detailsForClipboard = {
+        data: null,
+        hash: '',   // used to verify whether the detail data is match with current clipboard
+    };
+
     Editor.registerPanel('scene.panel', {
         behaviors: [ EditorUI.droppable ],
 
@@ -275,35 +280,30 @@
 
                 var copyed = JSON.parse(data).nodeIDs;
                 var hash = copyed.join(', ');
-                Editor.sendRequestToCore('scene:require-copy-data', hash, function (err, data) {
-                    if (data) {
-                        var copyData = JSON.parse(data);
-                        //var sceneId = copyData.sceneId;
-                        // TODO
-                        // 如果场景不同，则重新加载
-                        // 如果场景相同，则直接 duplicate....
-                        cc.AssetLibrary.loadJson(copyData, function (err, copyData) {
-                            var parent;
-                            if (parentId) {
-                                parent = cc.engine.getInstanceById(parentId);
-                            }
-                            if (!parent) {
-                                parent = cc.director.getScene();
-                            }
-
-                            var nodes = copyData.nodes;
-                            var node;
-                            for (var id in nodes) {
-                                node = cc.instantiate(nodes[id]);
-                                node.parent = parent;
-                            }
-
-                            // select the last one
-                            Editor.Selection.select('node', node.uuid);
-                        });
+                if (detailsForClipboard.hash === hash) {
+                    var parent;
+                    if (parentId) {
+                        parent = cc.engine.getInstanceById(parentId);
                     }
-                });
+                    if (!parent) {
+                        parent = cc.director.getScene();
+                    }
+
+                    var nodes = detailsForClipboard.data.nodes;
+                    var node;
+                    for (var id in nodes) {
+                        node = cc.instantiate(nodes[id]);
+                        node.parent = parent;
+                    }
+
+                    // select the last one
+                    Editor.Selection.select('node', node.uuid);
+                    return;
+                }
             }
+            // clear mismatched data
+            detailsForClipboard.hash = '';
+            detailsForClipboard.data = null;
         },
 
         // drag & drop
@@ -815,12 +815,15 @@
             };
 
             nodes.forEach(x => {
-                copyData.nodes[x.uuid] = Editor.PrefabUtils.getDumpableNode(x, true);
+                // save current values
+                copyData.nodes[x.uuid] = cc.instantiate(x);
             });
 
-            var json = Editor.serialize(copyData);
-            var hash = this._copyingIds.join(', ');
-            Editor.sendToCore('scene:cache-copy-data', json, hash);
+            // save real data to cache
+            detailsForClipboard.hash = this._copyingIds.join(', ');
+            detailsForClipboard.data = copyData;
+
+            // save this._copyingIds to clipboard
             Editor.sendToCore('scene:send-copy-event', Editor.requireIpcEvent);
         },
 
