@@ -44,6 +44,11 @@ function _showSaveDialog () {
     }
 }
 
+var cacheForClipboard = {
+    nodeData: '',
+    hash: '',
+};
+
 module.exports = {
     load () {
     },
@@ -192,4 +197,30 @@ module.exports = {
     'scene:update-title' ( dirty ) {
         _updateTitile(dirty);
     },
+
+    'scene:send-copy-event': function (event) {
+        // Emit copy event on the sender's web contents,
+        // so that the web can access to the clipboard without pressing [Command + C]
+        event.sender.copy();
+    },
+    'scene:send-paste-event': function (event) {
+        // Emit paste event on the sender's web contents
+        // so that the web can access to the clipboard without pressing [Command + P]
+        event.sender.paste();
+    },
+
+    'scene:cache-copy-data' (data, hash) {
+        cacheForClipboard.nodeData = data;
+        cacheForClipboard.hash = hash;
+    },
+    'scene:require-copy-data' (reply, hash) {
+        if (cacheForClipboard.hash === hash) {
+            reply(null, cacheForClipboard.nodeData);
+        }
+        else {
+            // 如果哈希不符，说明剪贴板被修改了，可以清空之前的缓存
+            reply(null, '');
+            cacheForClipboard.nodeData = '';
+        }
+    }
 };
