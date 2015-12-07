@@ -101,6 +101,7 @@ var sandbox = {
                 });
             }
             else {
+                Editor.updateComponentMenu();
                 next();
             }
         });
