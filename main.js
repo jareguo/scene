@@ -191,16 +191,5 @@ module.exports = {
 
     'scene:update-title' ( dirty ) {
         _updateTitile(dirty);
-    },
-
-    'scene:send-copy-event': function (event) {
-        // Emit copy event on the sender's web contents,
-        // so that the web can access to the clipboard without pressing [Command + C]
-        event.sender.copy();
-    },
-    'scene:send-paste-event': function (event) {
-        // Emit paste event on the sender's web contents
-        // so that the web can access to the clipboard without pressing [Command + P]
-        event.sender.paste();
     }
 };

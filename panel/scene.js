@@ -823,8 +823,9 @@
             detailsForClipboard.hash = this._copyingIds.join(', ');
             detailsForClipboard.data = copyData;
 
-            // save this._copyingIds to clipboard
-            Editor.sendToCore('scene:send-copy-event', Editor.requireIpcEvent);
+            // Emit copy event on this web contents,
+            // so that we can access to the clipboard without pressing [Command + C]
+            require('remote').getCurrentWebContents().copy();
         },
 
         'scene:paste-nodes': function (parentId) {
@@ -832,7 +833,10 @@
                 parentId = cc.director.getScene().uuid;
             }
             this._pastingId = parentId;
-            Editor.sendToCore('scene:send-paste-event', Editor.requireIpcEvent);
+
+            // Emit paste event on this web contents
+            // so that we can access to the clipboard without pressing [Command + P]
+            require('remote').getCurrentWebContents().paste();
         },
 
         'scene:duplicate-nodes': function ( ids ) {
