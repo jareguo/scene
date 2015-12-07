@@ -110,10 +110,6 @@
             const SceneManager = Editor.require('packages://scene/panel/scene-view/scene-manager');
             SceneManager.init(this.$.sceneView);
 
-            // register engine events
-            const EngineEvents = Editor.require('packages://scene/panel/scene-view/engine-events');
-            EngineEvents.register(this.$.sceneView);
-
             // init undo
             const SceneUndo = Editor.require('packages://scene/panel/scene-undo');
             SceneUndo.init();
@@ -388,6 +384,10 @@
             this._viewReady = true;
             this.$.loader.hidden = true;
             this.undo.clear();
+
+            // register engine events
+            const EngineEvents = Editor.require('packages://scene/panel/scene-view/engine-events');
+            EngineEvents.register(this.$.sceneView);
 
             Editor.sendToAll('scene:ready');
 
