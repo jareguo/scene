@@ -65,7 +65,7 @@ module.exports = {
         this.isLoaded = true;
         _sceneView = sceneView;
 
-        cc.engine.on('post-update', onPostUpdate);
+        cc.director.on(cc.Director.EVENT_AFTER_VISIT, onPostUpdate);
         cc.engine.on('node-attach-to-scene', onAttachToScene);
         cc.engine.on('node-detach-from-scene', onDetachFromScene);
         cc.engine.on('design-resolution-changed', onDesignResolutionChanged);
@@ -74,7 +74,7 @@ module.exports = {
     unregister: function () {
         this.isLoaded = false;
 
-        cc.engine.off('post-update', onPostUpdate);
+        cc.director.off(cc.Director.EVENT_AFTER_VISIT, onPostUpdate);
         cc.engine.off('node-attach-to-scene', onAttachToScene);
         cc.engine.off('node-detach-from-scene', onDetachFromScene);
         cc.engine.off('design-resolution-changed', onDesignResolutionChanged);
