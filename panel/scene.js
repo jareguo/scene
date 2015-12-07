@@ -985,7 +985,10 @@
                 comp.pause(clipName);
             }
 
-            comp.setCurrentTime(info.time, clipName);
+            var time = info.time;
+            if (time > aniState.duration) time = aniState.duration;
+
+            comp.setCurrentTime(time, clipName);
             comp.sample();
 
             cc.engine.repaintInEditMode();
