@@ -581,39 +581,51 @@
             }
         },
 
-        'scene:add-component': function ( id, compId ) {
-            if (compId) {
-                var isScript = Editor.isUuid(compId);
-                var compCtor = cc.js._getClassById(compId);
+        'scene:add-component': function ( nodeID, compID ) {
+            if ( arguments.length === 1 ) {
+                compID = nodeID;
+                nodeID = Editor.Selection.curActivate('node');
+            }
+
+            if ( !nodeID ) {
+                Editor.warn('Please select a node first');
+                return;
+            }
+
+            if ( !compID ) {
+                Editor.error('Component ID is undefined');
+                return;
+            }
+
+            if (compID) {
+                var isScript = Editor.isUuid(compID);
+                var compCtor = cc.js._getClassById(compID);
                 if (!compCtor) {
                     if (isScript) {
-                        return Editor.error(`Can not find cc.Component in the script ${compId}.`);
+                        return Editor.error(`Can not find cc.Component in the script ${compID}.`);
                     }
                     else {
-                        return Editor.error(`Failed to get component ${compId}`);
+                        return Editor.error(`Failed to get component ${compID}`);
                     }
                 }
                 //
                 var comp;
-                var node = cc.engine.getInstanceById(id);
+                var node = cc.engine.getInstanceById(nodeID);
                 if (node) {
                     comp = node.addComponent(compCtor);
-                    this.undo.recordAddComponent( id, comp, node._components.indexOf(comp) );
+                    this.undo.recordAddComponent( nodeID, comp, node._components.indexOf(comp) );
                     this.undo.commit();
                 } else {
-                    Editor.error( `Can not find node ${id}` );
+                    Editor.error( `Can not find node ${nodeID}` );
                 }
-            }
-            else {
-                Editor.error('invalid compId to add component');
             }
         },
 
-        'scene:remove-component': function ( id, uuid ) {
-            var comp = cc.engine.getInstanceById(uuid);
+        'scene:remove-component': function ( nodeID, compID ) {
+            var comp = cc.engine.getInstanceById(compID);
             if (comp) {
-                var node = cc.engine.getInstanceById(id);
-                this.undo.recordRemoveComponent( id, comp, node._components.indexOf(comp) );
+                var node = cc.engine.getInstanceById(nodeID);
+                this.undo.recordRemoveComponent( nodeID, comp, node._components.indexOf(comp) );
                 this.undo.commit();
 
                 comp.destroy();
