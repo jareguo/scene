@@ -209,7 +209,7 @@ var EditorEngine = cc.Class({
      * @param {boolean} updateAnimate
      */
     tick: function (deltaTime, updateAnimate) {
-        cc.director.drawScene(deltaTime, updateAnimate);
+        cc.director.mainLoop(deltaTime, updateAnimate);
     },
 
     /**
@@ -220,7 +220,7 @@ var EditorEngine = cc.Class({
      */
     tickInEditMode: function (deltaTime, updateAnimate) {
         if (CC_EDITOR) {
-            cc.director.drawScene(deltaTime, updateAnimate);
+            cc.director.mainLoop(deltaTime, updateAnimate);
         }
     },
 
