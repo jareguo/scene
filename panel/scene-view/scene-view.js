@@ -196,13 +196,7 @@ Editor.registerElement({
     },
 
     _initEngine: function () {
-
-        if (!cc.engine.isInitialized) {
-            var importUrl = Editor.importPath.replace(/\\/g, '/');
-            var assetUrl = Path.join(Editor.projectInfo.path, 'assets').replace(/\\/g, '/');
-            cc.AssetLibrary.init(importUrl, assetUrl);
-        }
-        else {
+        if ( cc.engine.isInitialized ) {
             // 从外部窗口 attach 回到主窗口时需要重置所有 engine 相关状态
             cc.engine.reset();
             Editor.Sandbox.reset();
