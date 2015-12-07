@@ -59,6 +59,8 @@
         "scene:create-nodes-by-uuids",
         "scene:move-nodes",
         "scene:delete-nodes",
+        "scene:copy-nodes",
+        "scene:paste-nodes",
         "scene:duplicate-nodes",
         "scene:stash-and-reload",
         "scene:soft-reload",

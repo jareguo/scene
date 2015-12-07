@@ -3,6 +3,26 @@
 
     const Url = require('fire-url');
 
+    function getTopLevelNodes (nodes) {
+        return Editor.Utils.arrayCmpFilter(nodes, function (a, b) {
+            if (a === b) {
+                return 0;
+            }
+            if (b.isChildOf(a)) {
+                return 1;
+            }
+            if (a.isChildOf(b)) {
+                return -1;
+            }
+            return 0;
+        });
+    }
+
+    var detailsForClipboard = {
+        data: null,
+        hash: '',   // used to verify whether the detail data is match with current clipboard
+    };
+
     Editor.registerPanel('scene.panel', {
         behaviors: [ EditorUI.droppable ],
 
@@ -47,6 +67,10 @@
         created: function () {
             this._viewReady = false;
             this._ipcList = [];
+            this._thisOnCopy = null;
+            this._thisOnPaste = null;
+            this._copyingIds = null;
+            this._pastingId = '';
 
             console.time('scene:reloading');
 
@@ -112,6 +136,17 @@
 
                 EngineEvents.unregister();
             });
+        },
+
+        attached: function () {
+            this._thisOnCopy = this._onCopy.bind(this);
+            document.addEventListener('copy', this._thisOnCopy);
+            this._thisOnPaste = this._onPaste.bind(this);
+            document.addEventListener('paste', this._thisOnPaste);
+        },
+        detached: function () {
+            document.removeEventListener('copy', this._thisOnCopy);
+            document.removeEventListener('paste', this._thisOnPaste);
         },
 
         _onPanelResize: function () {
@@ -208,6 +243,63 @@
 
             //
             return 2;
+        },
+
+        // copy & paste
+
+        _onCopy: function ( clipboardEvent ) {
+            //var copyingNode = this.$.sceneView.contains(document.activeElement);
+            if (this._copyingIds) {
+                clipboardEvent.clipboardData.clearData();
+                if (this._copyingIds && this._copyingIds.length > 0) {
+                    var copyInfo = {
+                        nodeIDs: this._copyingIds
+                    };
+                    clipboardEvent.clipboardData.setData('text/fireball', JSON.stringify(copyInfo));
+                }
+                clipboardEvent.stopPropagation();
+                clipboardEvent.preventDefault();
+                this._copyingIds = null;
+            }
+        },
+
+        _onPaste: function ( clipboardEvent ) {
+            //var copyingNode = this.$.sceneView.contains(document.activeElement);
+            if (this._pastingId) {
+                var data = clipboardEvent.clipboardData.getData('text/fireball');
+                if (data) {
+                    clipboardEvent.stopPropagation();
+                    clipboardEvent.preventDefault();
+
+                    var copyed = JSON.parse(data).nodeIDs;
+                    var hash = copyed.join(', ');
+                    if (detailsForClipboard.hash === hash) {
+                        var parent;
+                        if (this._pastingId) {
+                            parent = cc.engine.getInstanceById(this._pastingId);
+                        }
+                        if (!parent) {
+                            parent = cc.director.getScene();
+                        }
+
+                        var nodes = detailsForClipboard.data.nodes;
+                        var node;
+                        for (var id in nodes) {
+                            node = cc.instantiate(nodes[id]);
+                            node.parent = parent;
+                        }
+
+                        // select the last one
+                        Editor.Selection.select('node', node.uuid);
+                        return;
+                    }
+                }
+                // clear mismatched data
+                detailsForClipboard.hash = '';
+                detailsForClipboard.data = null;
+
+                this._pastingId = '';
+            }
         },
 
         // drag & drop
@@ -708,6 +800,41 @@
             this.$.sceneView.delete(ids);
         },
 
+        'scene:copy-nodes': function (ids) {
+            var nodes = ids.map(x => cc.engine.getInstanceById(x)).filter(x => !!x);
+            nodes = getTopLevelNodes(nodes).filter(x => !!x);
+            this._copyingIds = nodes.map(x => x.uuid);
+
+            var copyData = {
+                sceneId: cc.director.getScene().uuid,
+                nodes: {}
+            };
+
+            nodes.forEach(x => {
+                // save current values
+                copyData.nodes[x.uuid] = cc.instantiate(x);
+            });
+
+            // save real data to cache
+            detailsForClipboard.hash = this._copyingIds.join(', ');
+            detailsForClipboard.data = copyData;
+
+            // Emit copy event on this web contents,
+            // so that we can access to the clipboard without pressing [Command + C]
+            require('remote').getCurrentWebContents().copy();
+        },
+
+        'scene:paste-nodes': function (parentId) {
+            if (!parentId) {
+                parentId = cc.director.getScene().uuid;
+            }
+            this._pastingId = parentId;
+
+            // Emit paste event on this web contents
+            // so that we can access to the clipboard without pressing [Command + P]
+            require('remote').getCurrentWebContents().paste();
+        },
+
         'scene:duplicate-nodes': function ( ids ) {
             var nodes = [];
             for ( var i = 0; i < ids.length; ++i ) {
@@ -717,23 +844,7 @@
                 }
             }
 
-            // get top-level wrappers
-            var results = Editor.Utils.arrayCmpFilter ( nodes, function ( a, b ) {
-                if (a === b) {
-                    return 0;
-                }
-
-                if (b.isChildOf(a)) {
-                    return 1;
-                }
-
-                if (a.isChildOf(b)) {
-                    return -1;
-                }
-
-                return 0;
-            });
-
+            var results = getTopLevelNodes(nodes);
 
             // duplicate results
             var clones = [];

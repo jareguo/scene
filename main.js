@@ -191,5 +191,5 @@ module.exports = {
 
     'scene:update-title' ( dirty ) {
         _updateTitile(dirty);
-    },
+    }
 };
