@@ -206,18 +206,10 @@ var EditorEngine = cc.Class({
      * This method will be invoke only if useDefaultMainLoop is true.
      * @method tick
      * @param {number} deltaTime
-     * @param {boolean} updateLogic
+     * @param {boolean} updateAnimate
      */
-    tick: function (deltaTime, updateLogic) {
-        if (updateLogic) {
-            this.emit('before-update');
-            cc.director.gameUpdate(deltaTime);
-            cc.director.engineUpdate(deltaTime);
-            this.emit('post-update', deltaTime);
-            this.emit('late-update');
-        }
-        cc.director.visit(deltaTime);
-        cc.director.render(deltaTime);
+    tick: function (deltaTime, updateAnimate) {
+        cc.director.drawScene(deltaTime, updateAnimate);
     },
 
     /**
@@ -228,17 +220,7 @@ var EditorEngine = cc.Class({
      */
     tickInEditMode: function (deltaTime, updateAnimate) {
         if (CC_EDITOR) {
-            // invoke updateInEditMode
-            //cc.director.getScene()._callUpdateInEM(deltaTime);
-
-            this.emit('before-update');
-            if (updateAnimate) {
-                cc.director.engineUpdate(deltaTime);
-            }
-            this.emit('post-update', deltaTime);
-            this.emit('late-update');
-            cc.director.visit();
-            cc.director.render();
+            cc.director.drawScene(deltaTime, updateAnimate);
         }
     },
 
