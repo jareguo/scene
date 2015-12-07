@@ -128,7 +128,7 @@ var EditorEngine = cc.Class({
         this.createGame(options, function (err) {
             if (!err) {
                 if (CC_EDITOR && Editor.isPageLevel) {
-                    Editor.registerComponentsToCore();
+                    Editor.updateComponentMenu();
                 }
             }
 
