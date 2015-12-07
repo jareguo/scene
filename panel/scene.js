@@ -139,27 +139,14 @@
         },
 
         attached: function () {
-            this._thisOnCopy = function (event) {
-                //var copyingNode = this.$.sceneView.contains(document.activeElement);
-                if (this._copyingIds) {
-                    this._doCopy(event, this._copyingIds);
-                    this._copyingIds = null;
-                }
-            }.bind(this);
-            document.addEventListener('copy', this._thisOnCopy, false);
-
-            this._thisOnPaste = function (event) {
-                //var copyingNode = this.$.sceneView.contains(document.activeElement);
-                if (this._pastingId) {
-                    this._doPaste(event, this._pastingId);
-                    this._pastingId = '';
-                }
-            }.bind(this);
-            document.addEventListener('paste', this._thisOnPaste, false);
+            this._thisOnCopy = this._onCopy.bind(this);
+            document.addEventListener('copy', this._thisOnCopy);
+            this._thisOnPaste = this._onPaste.bind(this);
+            document.addEventListener('paste', this._thisOnPaste);
         },
         detached: function () {
-            document.removeEventListener('copy', this._thisOnCopy, false);
-            document.removeEventListener('paste', this._thisOnPaste, false);
+            document.removeEventListener('copy', this._thisOnCopy);
+            document.removeEventListener('paste', this._thisOnPaste);
         },
 
         _onPanelResize: function () {
@@ -260,50 +247,59 @@
 
         // copy & paste
 
-        _doCopy: function ( clipboardEvent, ids ) {
-            clipboardEvent.clipboardData.clearData();
-            if (ids && ids.length > 0) {
-                var copyInfo = {
-                    nodeIDs: ids
-                };
-                clipboardEvent.clipboardData.setData('text/fireball', JSON.stringify(copyInfo));
-            }
-            clipboardEvent.stopPropagation();
-            clipboardEvent.preventDefault();
-        },
-
-        _doPaste: function ( clipboardEvent, parentId ) {
-            var data = clipboardEvent.clipboardData.getData('text/fireball');
-            if (data) {
+        _onCopy: function ( clipboardEvent ) {
+            //var copyingNode = this.$.sceneView.contains(document.activeElement);
+            if (this._copyingIds) {
+                clipboardEvent.clipboardData.clearData();
+                if (this._copyingIds && this._copyingIds.length > 0) {
+                    var copyInfo = {
+                        nodeIDs: this._copyingIds
+                    };
+                    clipboardEvent.clipboardData.setData('text/fireball', JSON.stringify(copyInfo));
+                }
                 clipboardEvent.stopPropagation();
                 clipboardEvent.preventDefault();
-
-                var copyed = JSON.parse(data).nodeIDs;
-                var hash = copyed.join(', ');
-                if (detailsForClipboard.hash === hash) {
-                    var parent;
-                    if (parentId) {
-                        parent = cc.engine.getInstanceById(parentId);
-                    }
-                    if (!parent) {
-                        parent = cc.director.getScene();
-                    }
-
-                    var nodes = detailsForClipboard.data.nodes;
-                    var node;
-                    for (var id in nodes) {
-                        node = cc.instantiate(nodes[id]);
-                        node.parent = parent;
-                    }
-
-                    // select the last one
-                    Editor.Selection.select('node', node.uuid);
-                    return;
-                }
+                this._copyingIds = null;
             }
-            // clear mismatched data
-            detailsForClipboard.hash = '';
-            detailsForClipboard.data = null;
+        },
+
+        _onPaste: function ( clipboardEvent ) {
+            //var copyingNode = this.$.sceneView.contains(document.activeElement);
+            if (this._pastingId) {
+                var data = clipboardEvent.clipboardData.getData('text/fireball');
+                if (data) {
+                    clipboardEvent.stopPropagation();
+                    clipboardEvent.preventDefault();
+
+                    var copyed = JSON.parse(data).nodeIDs;
+                    var hash = copyed.join(', ');
+                    if (detailsForClipboard.hash === hash) {
+                        var parent;
+                        if (this._pastingId) {
+                            parent = cc.engine.getInstanceById(this._pastingId);
+                        }
+                        if (!parent) {
+                            parent = cc.director.getScene();
+                        }
+
+                        var nodes = detailsForClipboard.data.nodes;
+                        var node;
+                        for (var id in nodes) {
+                            node = cc.instantiate(nodes[id]);
+                            node.parent = parent;
+                        }
+
+                        // select the last one
+                        Editor.Selection.select('node', node.uuid);
+                        return;
+                    }
+                }
+                // clear mismatched data
+                detailsForClipboard.hash = '';
+                detailsForClipboard.data = null;
+
+                this._pastingId = '';
+            }
         },
 
         // drag & drop
