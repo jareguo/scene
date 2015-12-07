@@ -56,6 +56,7 @@
         "scene:add-component",
         "scene:remove-component",
         "scene:create-node-by-classid",
+        "scene:create-node-by-prefab",
         "scene:create-nodes-by-uuids",
         "scene:move-nodes",
         "scene:delete-nodes",

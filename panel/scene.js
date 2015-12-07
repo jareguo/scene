@@ -724,6 +724,41 @@
             this.undo.commit();
         },
 
+        'scene:create-node-by-prefab': function ( name, prefabID, referenceID, position ) {
+            var parent;
+
+            Editor.createNode(prefabID, (err, node) => {
+                if ( err ) {
+                    Editor.error(err);
+                    return;
+                }
+
+                node.name = name;
+
+                if ( referenceID ) {
+                    parent = cc.engine.getInstanceById(referenceID);
+                    if ( position === 'sibling' ) {
+                        parent = parent.parent;
+                    }
+                }
+                if ( !parent ) {
+                    parent = cc.director.getScene();
+                }
+
+                node.parent = parent;
+
+                var centerX = cc.game.canvas.width / 2;
+                var centerY = cc.game.canvas.height / 2;
+                node.scenePosition = this.$.sceneView.pixelToScene( cc.v2(centerX, centerY) );
+
+                cc.engine.repaintInEditMode();
+                Editor.Selection.select('node', node.uuid, true, true );
+
+                this.undo.recordCreateNode(node.uuid);
+                this.undo.commit();
+            });
+        },
+
         'scene:move-nodes': function ( ids, parentID, nextSiblingId ) {
             function getSiblingIndex (node) {
                 return node._parent._children.indexOf(node);
