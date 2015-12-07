@@ -130,6 +130,7 @@
                     return;
                 }
 
+                const EngineEvents = Editor.require('packages://scene/panel/scene-view/engine-events');
                 EngineEvents.unregister();
             });
         },
