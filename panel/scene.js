@@ -746,6 +746,8 @@
                     return;
                 }
 
+                Editor.PrefabUtils.unlinkPrefab(node);
+
                 node.name = name;
 
                 if ( referenceID ) {
